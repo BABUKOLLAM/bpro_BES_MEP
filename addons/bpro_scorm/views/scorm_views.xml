@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_scorm_package_list" model="ir.ui.view">
+        <field name="name">bpro.scorm.package.list</field>
+        <field name="model">bpro.scorm.package</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="channel_id"/>
+                <field name="launch_path"/>
+                <field name="attempt_count" string="Attempts"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_scorm_package_form" model="ir.ui.view">
+        <field name="name">bpro.scorm.package.form</field>
+        <field name="model">bpro.scorm.package</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_open_player" string="Open Player" type="object"
+                            class="btn-primary" invisible="not launch_path"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" placeholder="e.g. Fire Safety (legacy)"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="zip_file" filename="zip_filename"/>
+                            <field name="zip_filename" invisible="1"/>
+                            <field name="launch_path"/>
+                            <field name="player_url" widget="url" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="channel_id"/>
+                            <field name="slide_id"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Attempts">
+                            <field name="attempt_ids" readonly="1">
+                                <list>
+                                    <field name="user_id"/>
+                                    <field name="lesson_status"/>
+                                    <field name="score_raw"/>
+                                    <field name="completed_on"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_scorm_package" model="ir.actions.act_window">
+        <field name="name">SCORM Packages</field>
+        <field name="res_model">bpro.scorm.package</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <menuitem id="menu_scorm_packages" name="SCORM Packages"
+              parent="bpro_pms.menu_pms_config" action="action_scorm_package"
+              sequence="30"/>
+</odoo>

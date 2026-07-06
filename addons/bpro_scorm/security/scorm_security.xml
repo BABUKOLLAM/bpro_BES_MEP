@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Packages follow the content ownership model (global vs client) -->
+    <record id="rule_scorm_package_company" model="ir.rule">
+        <field name="name">SCORM Package: Own Company or Global</field>
+        <field name="model_id" ref="model_bpro_scorm_package"/>
+        <field name="groups" eval="[(4, ref('bpro_base.group_employee'))]"/>
+        <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'parent_of', [user.company_id.id])]</field>
+    </record>
+
+    <record id="rule_scorm_package_super" model="ir.rule">
+        <field name="name">SCORM Package: Super Admin All</field>
+        <field name="model_id" ref="model_bpro_scorm_package"/>
+        <field name="groups" eval="[(4, ref('bpro_base.group_super_admin'))]"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+    </record>
+
+    <!-- Attempts: own attempts; HR sees company; super admin all -->
+    <record id="rule_scorm_attempt_self" model="ir.rule">
+        <field name="name">SCORM Attempt: Self Only</field>
+        <field name="model_id" ref="model_bpro_scorm_attempt"/>
+        <field name="groups" eval="[(4, ref('bpro_base.group_employee'))]"/>
+        <field name="domain_force">[('user_id', '=', user.id)]</field>
+    </record>
+
+    <record id="rule_scorm_attempt_hr" model="ir.rule">
+        <field name="name">SCORM Attempt: Own Company</field>
+        <field name="model_id" ref="model_bpro_scorm_attempt"/>
+        <field name="groups" eval="[(4, ref('bpro_base.group_client_hr'))]"/>
+        <field name="domain_force">[('user_id.company_id', 'in', company_ids)]</field>
+    </record>
+
+    <record id="rule_scorm_attempt_super" model="ir.rule">
+        <field name="name">SCORM Attempt: Super Admin All</field>
+        <field name="model_id" ref="model_bpro_scorm_attempt"/>
+        <field name="groups" eval="[(4, ref('bpro_base.group_super_admin'))]"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+    </record>
+</odoo>

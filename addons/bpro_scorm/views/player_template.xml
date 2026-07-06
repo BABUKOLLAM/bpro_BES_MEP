@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="player" name="bpro SCORM Player">
+        <html>
+            <head>
+                <title t-out="package.name"/>
+                <meta name="viewport" content="width=device-width, initial-scale=1"/>
+                <style>
+                    html, body { margin: 0; height: 100%; }
+                    #scorm-frame { width: 100%; height: 100%; border: 0; }
+                </style>
+                <script type="text/javascript">
+                    // SCORM 1.2 API adapter (window.API), persisted via /scorm/commit
+                    (function () {
+                        var packageId = <t t-out="package.id"/>;
+                        var cmi = {
+                            "cmi.core.lesson_status": <t t-out="lesson_status_json"/>,
+                            "cmi.suspend_data": <t t-out="suspend_data_json"/>,
+                            "cmi.core.score.raw": ""
+                        };
+                        var dirty = false;
+                        function commit() {
+                            if (!dirty) return "true";
+                            dirty = false;
+                            fetch("/scorm/commit/" + packageId, {
+                                method: "POST",
+                                headers: {"Content-Type": "application/json"},
+                                body: JSON.stringify({
+                                    jsonrpc: "2.0", method: "call",
+                                    params: {
+                                        lesson_status: cmi["cmi.core.lesson_status"],
+                                        score_raw: cmi["cmi.core.score.raw"],
+                                        suspend_data: cmi["cmi.suspend_data"]
+                                    }
+                                })
+                            });
+                            return "true";
+                        }
+                        window.API = {
+                            LMSInitialize: function () { return "true"; },
+                            LMSFinish: function () { return commit(); },
+                            LMSGetValue: function (k) { return cmi[k] || ""; },
+                            LMSSetValue: function (k, v) { cmi[k] = String(v); dirty = true; return "true"; },
+                            LMSCommit: function () { return commit(); },
+                            LMSGetLastError: function () { return "0"; },
+                            LMSGetErrorString: function () { return "No error"; },
+                            LMSGetDiagnostic: function () { return ""; }
+                        };
+                        window.addEventListener("beforeunload", commit);
+                    })();
+                </script>
+            </head>
+            <body>
+                <iframe id="scorm-frame" t-att-src="content_url"/>
+            </body>
+        </html>
+    </template>
+</odoo>

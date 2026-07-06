@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_scorm_package_employee,bpro.scorm.package employee,model_bpro_scorm_package,bpro_base.group_employee,1,0,0,0
+access_scorm_package_hr,bpro.scorm.package hr,model_bpro_scorm_package,bpro_base.group_client_hr,1,1,1,1
+access_scorm_attempt_employee,bpro.scorm.attempt employee,model_bpro_scorm_attempt,bpro_base.group_employee,1,1,1,0
+access_scorm_attempt_hr,bpro.scorm.attempt hr,model_bpro_scorm_attempt,bpro_base.group_client_hr,1,1,1,1
