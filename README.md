@@ -37,11 +37,14 @@ Test logins (local dev): `hr.a@test`, `hod.a@test`, `emp.a@test`, `hr.b@test` �
 - [x] P3: induction/re-induction/policy automation (certificates pending)
 - [x] P5: role dashboards — bpro PMS → Reporting (Training Compliance + Goals Analysis),
       auto-scoped: HR = company, HOD = department, employee = self, super admin = all clients
-- [x] P6 (seed): courses linked to goals + training progress on goals
+- [x] P6: competencies (global or client-owned) linked to courses; **Training Needs**
+      flagged on appraisals auto-enroll the employee in matching courses when the
+      appraisal completes; **bpro 360** tab on the employee form (goals + appraisals +
+      training needs + avg goal progress + avg training completion + last rating);
+      training progress % on each goal
 - [x] P7 (core): **Onboard New Client** wizard (bpro PMS menu, super admin only) —
       company + HR admin + first department + induction enrollment in one flow
 - [ ] P4: SCORM player / legacy content
-- [ ] P6 (full): competency models, appraisal→training-need auto-enrollment, Employee 360
 - [ ] P7 (rest): per-client websites/branding, subscriptions billing
 - [ ] P8: pilot with 1-2 real clients
 

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Competency -> Courses link -->
+    <record id="view_pms_competency_form_courses" model="ir.ui.view">
+        <field name="name">bpro.pms.competency.form.courses</field>
+        <field name="model">bpro.pms.competency</field>
+        <field name="inherit_id" ref="bpro_pms.view_pms_competency_form"/>
+        <field name="arch" type="xml">
+            <field name="description" position="after">
+                <field name="course_ids" widget="many2many_tags"/>
+            </field>
+        </field>
+    </record>
+
+    <!-- Training completion on the 360 tab -->
+    <record id="view_employee_form_360_lms" model="ir.ui.view">
+        <field name="name">hr.employee.form.bpro360.lms</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="bpro_pms.view_employee_form_360"/>
+        <field name="arch" type="xml">
+            <field name="pms_last_rating" position="after">
+                <field name="lms_completion" widget="progressbar"/>
+            </field>
+        </field>
+    </record>
+</odoo>

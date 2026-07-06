@@ -22,7 +22,9 @@
     <record id="group_client_hr" model="res.groups">
         <field name="name">Client HR Admin</field>
         <field name="category_id" ref="module_category_bpro"/>
-        <field name="implied_ids" eval="[(4, ref('group_hod'))]"/>
+        <!-- hr.group_hr_user gives real hr.employee access; the bpro
+             record rules still scope it to their own company -->
+        <field name="implied_ids" eval="[(4, ref('group_hod')), (4, ref('hr.group_hr_user'))]"/>
         <field name="comment">Full access within their own company only.</field>
     </record>
 

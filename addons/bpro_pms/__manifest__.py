@@ -22,6 +22,7 @@ bpro Performance Management System
         "views/pms_cycle_views.xml",
         "views/pms_appraisal_views.xml",
         "views/pms_menus.xml",
+        "views/pms_competency_views.xml",
     ],
     "application": True,
     "installable": True,

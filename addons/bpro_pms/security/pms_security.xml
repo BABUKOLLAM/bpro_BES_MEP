@@ -74,4 +74,48 @@
         <field name="groups" eval="[(4, ref('bpro_base.group_super_admin'))]"/>
         <field name="domain_force">[(1, '=', 1)]</field>
     </record>
+
+    <!-- Competencies: own company + global (parent), like courses -->
+    <record id="rule_pms_competency_company" model="ir.rule">
+        <field name="name">PMS Competency: Own Company or Global</field>
+        <field name="model_id" ref="model_bpro_pms_competency"/>
+        <field name="groups" eval="[(4, ref('bpro_base.group_employee'))]"/>
+        <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'parent_of', [user.company_id.id])]</field>
+    </record>
+
+    <record id="rule_pms_competency_super" model="ir.rule">
+        <field name="name">PMS Competency: Super Admin All</field>
+        <field name="model_id" ref="model_bpro_pms_competency"/>
+        <field name="groups" eval="[(4, ref('bpro_base.group_super_admin'))]"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+    </record>
+
+    <!-- Training needs: same three-tier pattern as goals -->
+    <record id="rule_pms_need_self" model="ir.rule">
+        <field name="name">PMS Training Need: Self Only</field>
+        <field name="model_id" ref="model_bpro_pms_training_need"/>
+        <field name="groups" eval="[(4, ref('bpro_base.group_employee'))]"/>
+        <field name="domain_force">[('employee_id.user_id', '=', user.id)]</field>
+    </record>
+
+    <record id="rule_pms_need_hod" model="ir.rule">
+        <field name="name">PMS Training Need: Own Department</field>
+        <field name="model_id" ref="model_bpro_pms_training_need"/>
+        <field name="groups" eval="[(4, ref('bpro_base.group_hod'))]"/>
+        <field name="domain_force">[('employee_id.department_id.manager_id.user_id', '=', user.id)]</field>
+    </record>
+
+    <record id="rule_pms_need_hr" model="ir.rule">
+        <field name="name">PMS Training Need: Own Company</field>
+        <field name="model_id" ref="model_bpro_pms_training_need"/>
+        <field name="groups" eval="[(4, ref('bpro_base.group_client_hr'))]"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+
+    <record id="rule_pms_need_super" model="ir.rule">
+        <field name="name">PMS Training Need: Super Admin All</field>
+        <field name="model_id" ref="model_bpro_pms_training_need"/>
+        <field name="groups" eval="[(4, ref('bpro_base.group_super_admin'))]"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+    </record>
 </odoo>

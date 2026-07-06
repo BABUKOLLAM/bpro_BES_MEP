@@ -45,6 +45,9 @@ class PmsAppraisal(models.Model):
         default="draft",
         tracking=True,
     )
+    training_need_ids = fields.One2many(
+        "bpro.pms.training.need", "appraisal_id", string="Training Needs"
+    )
     company_id = fields.Many2one(
         "res.company", default=lambda self: self.env.company, required=True
     )
@@ -74,4 +77,6 @@ class PmsAppraisal(models.Model):
         return self.write({"state": "review"})
 
     def action_done(self):
-        return self.write({"state": "done"})
+        res = self.write({"state": "done"})
+        self.training_need_ids._auto_enroll()
+        return res

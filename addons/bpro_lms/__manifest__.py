@@ -22,6 +22,7 @@ Builds on Odoo eLearning (website_slides):
         "data/lms_cron.xml",
         "views/lms_menus.xml",
         "views/training_report_views.xml",
+        "views/lms_360_views.xml",
     ],
     "application": True,
     "installable": True,
