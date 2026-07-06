@@ -12,7 +12,7 @@ Client onboarding wizard for bpro Super Admins:
     "author": "Team bpro",
     "website": "https://bpropms.com",
     "license": "LGPL-3",
-    "depends": ["bpro_base", "bpro_lms"],
+    "depends": ["bpro_base", "bpro_lms", "website"],
     "data": [
         "security/ir.model.access.csv",
         "wizard/client_onboarding_views.xml",

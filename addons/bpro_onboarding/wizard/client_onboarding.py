@@ -16,6 +16,11 @@ class ClientOnboarding(models.TransientModel):
         default="General",
         help="Created inside the new company (optional).",
     )
+    portal_domain = fields.Char(
+        string="Portal Domain",
+        help="White-label portal domain, e.g. clientname.bprolms.com. "
+        "Leave empty to configure later.",
+    )
 
     def action_onboard(self):
         self.ensure_one()
@@ -61,6 +66,16 @@ class ClientOnboarding(models.TransientModel):
                 ],
             }
         )
+        # white-label portal: one website per client company (roadmap sec. 4)
+        self.env["website"].sudo().create(
+            {
+                "name": f"{self.client_name} Portal",
+                "company_id": company.id,
+                "domain": self.portal_domain or False,
+                "logo": self.logo or master.logo,
+            }
+        )
+
         # employee record triggers global Induction auto-enrollment
         self.env["hr.employee"].sudo().create(
             {

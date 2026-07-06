@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_billing_plan_super,bpro.billing.plan super,model_bpro_billing_plan,bpro_base.group_super_admin,1,1,1,1
+access_billing_subscription_super,bpro.billing.subscription super,model_bpro_billing_subscription,bpro_base.group_super_admin,1,1,1,1

@@ -10,6 +10,7 @@
                         <field name="client_name" placeholder="e.g. myG Digital Pvt Ltd"/>
                         <field name="logo" widget="image" class="oe_avatar"/>
                         <field name="first_department"/>
+                        <field name="portal_domain"/>
                     </group>
                     <group string="Client HR Admin">
                         <field name="hr_name" placeholder="e.g. Priya Nair"/>
