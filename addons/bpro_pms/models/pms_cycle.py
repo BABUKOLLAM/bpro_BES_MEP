@@ -34,7 +34,7 @@ class PmsCycle(models.Model):
             cycle.appraisal_count = len(cycle.appraisal_ids)
 
     def action_open(self):
-        self.write({"state": "open"})
+        return self.write({"state": "open"})
 
     def action_close(self):
-        self.write({"state": "closed"})
+        return self.write({"state": "closed"})

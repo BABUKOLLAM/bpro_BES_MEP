@@ -53,13 +53,13 @@ class PmsGoal(models.Model):
     ]
 
     def action_activate(self):
-        self.write({"state": "active"})
+        return self.write({"state": "active"})
 
     def action_done(self):
-        self.write({"state": "done", "progress": 100})
+        return self.write({"state": "done", "progress": 100})
 
     def action_cancel(self):
-        self.write({"state": "cancelled"})
+        return self.write({"state": "cancelled"})
 
     def action_reset_draft(self):
-        self.write({"state": "draft"})
+        return self.write({"state": "draft"})

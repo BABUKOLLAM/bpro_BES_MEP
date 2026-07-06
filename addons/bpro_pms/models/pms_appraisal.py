@@ -68,10 +68,10 @@ class PmsAppraisal(models.Model):
             )
 
     def action_start_self(self):
-        self.write({"state": "self"})
+        return self.write({"state": "self"})
 
     def action_submit_review(self):
-        self.write({"state": "review"})
+        return self.write({"state": "review"})
 
     def action_done(self):
-        self.write({"state": "done"})
+        return self.write({"state": "done"})
