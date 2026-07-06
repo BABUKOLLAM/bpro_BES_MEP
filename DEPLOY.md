@@ -34,7 +34,7 @@ Caddy obtains and renews HTTPS certificates automatically.
 # create + initialize the production database
 docker compose -f docker-compose.prod.yml exec odoo \
   odoo -c /etc/odoo/odoo.conf -d bpro \
-  -i base,bpro_base,bpro_pms,bpro_lms,bpro_branding,bpro_onboarding,bpro_billing,bpro_scorm,l10n_in \
+  -i base,bpro_base,bpro_pms,bpro_lms,bpro_branding,bpro_onboarding,bpro_billing,bpro_scorm,l10n_in,website_payment \
   --without-demo=all --stop-after-init
 docker compose -f docker-compose.prod.yml restart odoo
 ```
