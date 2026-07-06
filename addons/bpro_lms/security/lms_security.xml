@@ -17,4 +17,33 @@
         <field name="groups" eval="[(4, ref('bpro_base.group_super_admin'))]"/>
         <field name="domain_force">[(1, '=', 1)]</field>
     </record>
+
+    <!-- Training compliance report: same three-tier scoping -->
+    <record id="rule_training_report_self" model="ir.rule">
+        <field name="name">Training Report: Self Only</field>
+        <field name="model_id" ref="model_bpro_training_report"/>
+        <field name="groups" eval="[(4, ref('bpro_base.group_employee'))]"/>
+        <field name="domain_force">[('employee_id.user_id', '=', user.id)]</field>
+    </record>
+
+    <record id="rule_training_report_hod" model="ir.rule">
+        <field name="name">Training Report: Own Department</field>
+        <field name="model_id" ref="model_bpro_training_report"/>
+        <field name="groups" eval="[(4, ref('bpro_base.group_hod'))]"/>
+        <field name="domain_force">[('department_id.manager_id.user_id', '=', user.id)]</field>
+    </record>
+
+    <record id="rule_training_report_hr" model="ir.rule">
+        <field name="name">Training Report: Own Company</field>
+        <field name="model_id" ref="model_bpro_training_report"/>
+        <field name="groups" eval="[(4, ref('bpro_base.group_client_hr'))]"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+
+    <record id="rule_training_report_super" model="ir.rule">
+        <field name="name">Training Report: Super Admin All</field>
+        <field name="model_id" ref="model_bpro_training_report"/>
+        <field name="groups" eval="[(4, ref('bpro_base.group_super_admin'))]"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+    </record>
 </odoo>

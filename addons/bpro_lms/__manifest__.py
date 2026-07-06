@@ -16,10 +16,12 @@ Builds on Odoo eLearning (website_slides):
     "license": "LGPL-3",
     "depends": ["website_slides", "hr", "bpro_base", "bpro_pms"],
     "data": [
+        "security/ir.model.access.csv",
         "security/lms_security.xml",
         "data/course_taxonomy.xml",
         "data/lms_cron.xml",
         "views/lms_menus.xml",
+        "views/training_report_views.xml",
     ],
     "application": True,
     "installable": True,

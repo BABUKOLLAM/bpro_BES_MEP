@@ -84,6 +84,36 @@
         </field>
     </record>
 
+    <record id="view_pms_goal_pivot" model="ir.ui.view">
+        <field name="name">bpro.pms.goal.pivot</field>
+        <field name="model">bpro.pms.goal</field>
+        <field name="arch" type="xml">
+            <pivot string="Goals Analysis">
+                <field name="company_id" type="row"/>
+                <field name="department_id" type="row"/>
+                <field name="state" type="col"/>
+                <field name="progress" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="view_pms_goal_graph" model="ir.ui.view">
+        <field name="name">bpro.pms.goal.graph</field>
+        <field name="model">bpro.pms.goal</field>
+        <field name="arch" type="xml">
+            <graph string="Goals Analysis" type="bar">
+                <field name="department_id"/>
+                <field name="progress" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="action_pms_goal_report" model="ir.actions.act_window">
+        <field name="name">Goals Analysis</field>
+        <field name="res_model">bpro.pms.goal</field>
+        <field name="view_mode">pivot,graph</field>
+    </record>
+
     <record id="action_pms_goal" model="ir.actions.act_window">
         <field name="name">Goals</field>
         <field name="res_model">bpro.pms.goal</field>

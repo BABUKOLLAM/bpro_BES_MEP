@@ -19,6 +19,13 @@ class PmsGoal(models.Model):
         store=True,
         readonly=True,
     )
+    department_id = fields.Many2one(
+        "hr.department",
+        string="Department",
+        related="employee_id.department_id",
+        store=True,
+        readonly=True,
+    )
     cycle_id = fields.Many2one(
         "bpro.pms.cycle", string="Review Cycle", tracking=True
     )

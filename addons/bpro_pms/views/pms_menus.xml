@@ -6,6 +6,10 @@
               action="action_pms_goal" sequence="10"/>
     <menuitem id="menu_pms_appraisals" name="Appraisals" parent="menu_pms_root"
               action="action_pms_appraisal" sequence="20"/>
+    <menuitem id="menu_pms_reporting" name="Reporting" parent="menu_pms_root"
+              sequence="80"/>
+    <menuitem id="menu_pms_goal_report" name="Goals Analysis" parent="menu_pms_reporting"
+              action="action_pms_goal_report" sequence="10"/>
     <menuitem id="menu_pms_config" name="Configuration" parent="menu_pms_root"
               sequence="90" groups="bpro_base.group_client_hr"/>
     <menuitem id="menu_pms_cycles" name="Review Cycles" parent="menu_pms_config"

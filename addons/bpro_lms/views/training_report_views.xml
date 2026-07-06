@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_training_report_pivot" model="ir.ui.view">
+        <field name="name">bpro.training.report.pivot</field>
+        <field name="model">bpro.training.report</field>
+        <field name="arch" type="xml">
+            <pivot string="Training Compliance">
+                <field name="company_id" type="row"/>
+                <field name="department_id" type="row"/>
+                <field name="channel_id" type="col"/>
+                <field name="completion" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="view_training_report_graph" model="ir.ui.view">
+        <field name="name">bpro.training.report.graph</field>
+        <field name="model">bpro.training.report</field>
+        <field name="arch" type="xml">
+            <graph string="Training Compliance" type="bar">
+                <field name="department_id"/>
+                <field name="completion" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="view_training_report_list" model="ir.ui.view">
+        <field name="name">bpro.training.report.list</field>
+        <field name="model">bpro.training.report</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="company_id" groups="base.group_multi_company"/>
+                <field name="department_id"/>
+                <field name="employee_id"/>
+                <field name="channel_id"/>
+                <field name="member_status"/>
+                <field name="completion" widget="progressbar"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_training_report_search" model="ir.ui.view">
+        <field name="name">bpro.training.report.search</field>
+        <field name="model">bpro.training.report</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="employee_id"/>
+                <field name="channel_id"/>
+                <filter name="not_completed" string="Pending" domain="[('is_completed', '=', False)]"/>
+                <filter name="completed" string="Completed" domain="[('is_completed', '=', True)]"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_company" string="Company" context="{'group_by': 'company_id'}"/>
+                    <filter name="group_department" string="Department" context="{'group_by': 'department_id'}"/>
+                    <filter name="group_course" string="Course" context="{'group_by': 'channel_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_training_report" model="ir.actions.act_window">
+        <field name="name">Training Compliance</field>
+        <field name="res_model">bpro.training.report</field>
+        <field name="view_mode">pivot,graph,list</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No enrollments yet</p>
+            <p>HR sees the whole company, HODs their department, bpro admins every client.</p>
+        </field>
+    </record>
+
+    <menuitem id="menu_pms_training_report" name="Training Compliance"
+              parent="bpro_pms.menu_pms_reporting" action="action_training_report" sequence="20"/>
+</odoo>
