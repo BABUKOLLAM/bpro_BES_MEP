@@ -14,8 +14,10 @@ Builds on Odoo eLearning (website_slides):
     "author": "Team bpro",
     "website": "https://bpropms.com",
     "license": "LGPL-3",
-    "depends": ["website_slides", "hr", "bpro_pms"],
+    "depends": ["website_slides", "hr", "bpro_base", "bpro_pms"],
     "data": [
+        "security/lms_security.xml",
+        "data/course_taxonomy.xml",
         "views/lms_menus.xml",
     ],
     "application": True,

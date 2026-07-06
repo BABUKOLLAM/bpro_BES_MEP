@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <!-- Course taxonomy per roadmap P1 -->
+    <record id="tag_group_course_type" model="slide.channel.tag.group">
+        <field name="name">Course Type</field>
+        <field name="sequence">1</field>
+    </record>
+
+    <record id="tag_induction" model="slide.channel.tag">
+        <field name="name">Induction</field>
+        <field name="group_id" ref="tag_group_course_type"/>
+    </record>
+    <record id="tag_re_induction" model="slide.channel.tag">
+        <field name="name">Re-Induction</field>
+        <field name="group_id" ref="tag_group_course_type"/>
+    </record>
+    <record id="tag_policy_updation" model="slide.channel.tag">
+        <field name="name">Policy Updation</field>
+        <field name="group_id" ref="tag_group_course_type"/>
+    </record>
+    <record id="tag_compliance" model="slide.channel.tag">
+        <field name="name">Compliance</field>
+        <field name="group_id" ref="tag_group_course_type"/>
+    </record>
+    <record id="tag_role_based" model="slide.channel.tag">
+        <field name="name">Role-based</field>
+        <field name="group_id" ref="tag_group_course_type"/>
+    </record>
+</odoo>

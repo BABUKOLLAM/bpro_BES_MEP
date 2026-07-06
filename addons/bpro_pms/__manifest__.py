@@ -14,7 +14,7 @@ bpro Performance Management System
     "author": "Team bpro",
     "website": "https://bpropms.com",
     "license": "LGPL-3",
-    "depends": ["hr", "mail"],
+    "depends": ["bpro_base", "hr", "mail"],
     "data": [
         "security/pms_security.xml",
         "security/ir.model.access.csv",
