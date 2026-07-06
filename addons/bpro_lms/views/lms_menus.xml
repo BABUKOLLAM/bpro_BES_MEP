@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Add Required Courses to the goal form -->
+    <record id="view_pms_goal_form_lms" model="ir.ui.view">
+        <field name="name">bpro.pms.goal.form.lms</field>
+        <field name="model">bpro.pms.goal</field>
+        <field name="inherit_id" ref="bpro_pms.view_pms_goal_form"/>
+        <field name="arch" type="xml">
+            <notebook position="inside">
+                <page string="Training">
+                    <field name="course_ids" widget="many2many_tags"/>
+                </page>
+            </notebook>
+        </field>
+    </record>
+</odoo>

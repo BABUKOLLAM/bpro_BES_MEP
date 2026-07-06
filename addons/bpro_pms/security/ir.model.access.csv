@@ -1,0 +1,7 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_pms_goal_user,bpro.pms.goal user,model_bpro_pms_goal,group_pms_user,1,1,1,0
+access_pms_goal_manager,bpro.pms.goal manager,model_bpro_pms_goal,group_pms_manager,1,1,1,1
+access_pms_cycle_user,bpro.pms.cycle user,model_bpro_pms_cycle,group_pms_user,1,0,0,0
+access_pms_cycle_manager,bpro.pms.cycle manager,model_bpro_pms_cycle,group_pms_manager,1,1,1,1
+access_pms_appraisal_user,bpro.pms.appraisal user,model_bpro_pms_appraisal,group_pms_user,1,1,0,0
+access_pms_appraisal_manager,bpro.pms.appraisal manager,model_bpro_pms_appraisal,group_pms_manager,1,1,1,1

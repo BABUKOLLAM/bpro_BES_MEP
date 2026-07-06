@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Browser tab title suffix -->
+    <record id="config_web_base_title" model="ir.config_parameter">
+        <field name="key">web.base.title</field>
+        <field name="value">bpro LMS + PMS</field>
+    </record>
+</odoo>

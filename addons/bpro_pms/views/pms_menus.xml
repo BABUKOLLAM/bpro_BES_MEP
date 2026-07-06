@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_pms_root" name="bpro PMS" sequence="60"/>
+    <menuitem id="menu_pms_goals" name="Goals" parent="menu_pms_root"
+              action="action_pms_goal" sequence="10"/>
+    <menuitem id="menu_pms_appraisals" name="Appraisals" parent="menu_pms_root"
+              action="action_pms_appraisal" sequence="20"/>
+    <menuitem id="menu_pms_config" name="Configuration" parent="menu_pms_root"
+              sequence="90" groups="bpro_pms.group_pms_manager"/>
+    <menuitem id="menu_pms_cycles" name="Review Cycles" parent="menu_pms_config"
+              action="action_pms_cycle" sequence="10"/>
+</odoo>

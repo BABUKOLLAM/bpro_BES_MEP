@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_pms_goal_list" model="ir.ui.view">
+        <field name="name">bpro.pms.goal.list</field>
+        <field name="model">bpro.pms.goal</field>
+        <field name="arch" type="xml">
+            <list decoration-success="state == 'done'" decoration-muted="state == 'cancelled'">
+                <field name="name"/>
+                <field name="employee_id"/>
+                <field name="cycle_id"/>
+                <field name="weight"/>
+                <field name="progress" widget="progressbar"/>
+                <field name="deadline"/>
+                <field name="state" widget="badge"
+                       decoration-info="state == 'active'"
+                       decoration-success="state == 'done'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_pms_goal_form" model="ir.ui.view">
+        <field name="name">bpro.pms.goal.form</field>
+        <field name="model">bpro.pms.goal</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_activate" string="Start" type="object"
+                            class="btn-primary" invisible="state != 'draft'"/>
+                    <button name="action_done" string="Mark Achieved" type="object"
+                            class="btn-success" invisible="state != 'active'"/>
+                    <button name="action_cancel" string="Cancel" type="object"
+                            invisible="state in ('done', 'cancelled')"/>
+                    <button name="action_reset_draft" string="Reset to Draft" type="object"
+                            invisible="state != 'cancelled'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,active,done"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" placeholder="e.g. Complete Advanced Sales Training"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="employee_id"/>
+                            <field name="manager_id"/>
+                            <field name="cycle_id"/>
+                        </group>
+                        <group>
+                            <field name="weight"/>
+                            <field name="target"/>
+                            <field name="progress" widget="progressbar"/>
+                            <field name="deadline"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Description">
+                            <field name="description"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_pms_goal_kanban" model="ir.ui.view">
+        <field name="name">bpro.pms.goal.kanban</field>
+        <field name="model">bpro.pms.goal</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="state">
+                <field name="name"/>
+                <field name="employee_id"/>
+                <field name="progress"/>
+                <templates>
+                    <t t-name="card">
+                        <div class="p-2">
+                            <strong><field name="name"/></strong>
+                            <div><field name="employee_id"/></div>
+                            <field name="progress" widget="progressbar"/>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="action_pms_goal" model="ir.actions.act_window">
+        <field name="name">Goals</field>
+        <field name="res_model">bpro.pms.goal</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Set your first performance goal</p>
+        </field>
+    </record>
+</odoo>
