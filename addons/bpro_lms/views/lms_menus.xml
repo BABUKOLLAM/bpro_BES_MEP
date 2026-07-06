@@ -8,7 +8,10 @@
         <field name="arch" type="xml">
             <notebook position="inside">
                 <page string="Training">
-                    <field name="course_ids" widget="many2many_tags"/>
+                    <group>
+                        <field name="course_ids" widget="many2many_tags"/>
+                        <field name="training_progress" widget="progressbar"/>
+                    </group>
                 </page>
             </notebook>
         </field>

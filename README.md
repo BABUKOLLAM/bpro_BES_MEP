@@ -20,6 +20,26 @@ bpro Corporate and visible to all clients; client content stays isolated per com
 | `addons/bpro_branding` | bpro branding for the platform |
 
 Test logins (local dev): `hr.a@test`, `hod.a@test`, `emp.a@test`, `hr.b@test` — password `bpro@2026`.
+**Remove all @test users before any production rollout.**
+
+## Lifecycle automation (roadmap P3)
+
+- New employee record → auto-enrolled in all visible **Induction**-tagged courses
+- **bpro LMS: Annual Re-Induction** cron (every 12 months) → re-assigns **Re-Induction**-tagged
+  courses to all client employees, resetting completion
+- Publishing a **Policy Updation**-tagged course → auto-enrolls every employee it is visible to
+- Each performance goal shows live **Training Progress %** from its linked courses
+
+## Roadmap status
+
+- [x] P0-P2: multi-company architecture, four-tier security (checklist 3.4: 10/10 green)
+- [x] P3: induction/re-induction/policy automation (certificates pending)
+- [x] P6 (seed): courses linked to goals + training progress on goals
+- [ ] P4: SCORM player / legacy content
+- [ ] P5: role dashboards (HR / HOD / bpro master)
+- [ ] P6 (full): competency models, appraisal→training-need auto-enrollment, Employee 360
+- [ ] P7: client onboarding wizard, per-client websites/branding, subscriptions billing
+- [ ] P8: pilot with 1-2 real clients
 
 ## Run locally
 

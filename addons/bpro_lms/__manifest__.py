@@ -18,6 +18,7 @@ Builds on Odoo eLearning (website_slides):
     "data": [
         "security/lms_security.xml",
         "data/course_taxonomy.xml",
+        "data/lms_cron.xml",
         "views/lms_menus.xml",
     ],
     "application": True,
