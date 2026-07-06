@@ -19,6 +19,7 @@ bpro Corporate and visible to all clients; client content stays isolated per com
 | `addons/bpro_lms` | Learning Management: Odoo eLearning + course taxonomy + global-vs-client content ownership + courses linked to goals |
 | `addons/bpro_branding` | bpro branding for the platform |
 
+**Super admin (all companies): `tech@bpropms.com` / `bpro#1234`** — change this password before production.
 Test logins (local dev): `hr.a@test`, `hod.a@test`, `emp.a@test`, `hr.b@test` — password `bpro@2026`.
 **Remove all @test users before any production rollout.**
 
