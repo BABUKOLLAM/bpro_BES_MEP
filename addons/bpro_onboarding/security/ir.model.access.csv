@@ -1,0 +1,2 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_client_onboarding_super,bpro.client.onboarding super,model_bpro_client_onboarding,bpro_base.group_super_admin,1,1,1,1

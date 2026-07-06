@@ -35,11 +35,14 @@ Test logins (local dev): `hr.a@test`, `hod.a@test`, `emp.a@test`, `hr.b@test` �
 
 - [x] P0-P2: multi-company architecture, four-tier security (checklist 3.4: 10/10 green)
 - [x] P3: induction/re-induction/policy automation (certificates pending)
+- [x] P5: role dashboards — bpro PMS → Reporting (Training Compliance + Goals Analysis),
+      auto-scoped: HR = company, HOD = department, employee = self, super admin = all clients
 - [x] P6 (seed): courses linked to goals + training progress on goals
+- [x] P7 (core): **Onboard New Client** wizard (bpro PMS menu, super admin only) —
+      company + HR admin + first department + induction enrollment in one flow
 - [ ] P4: SCORM player / legacy content
-- [ ] P5: role dashboards (HR / HOD / bpro master)
 - [ ] P6 (full): competency models, appraisal→training-need auto-enrollment, Employee 360
-- [ ] P7: client onboarding wizard, per-client websites/branding, subscriptions billing
+- [ ] P7 (rest): per-client websites/branding, subscriptions billing
 - [ ] P8: pilot with 1-2 real clients
 
 ## Run locally

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_client_onboarding_form" model="ir.ui.view">
+        <field name="name">bpro.client.onboarding.form</field>
+        <field name="model">bpro.client.onboarding</field>
+        <field name="arch" type="xml">
+            <form string="Onboard New Client">
+                <group>
+                    <group string="Organisation">
+                        <field name="client_name" placeholder="e.g. myG Digital Pvt Ltd"/>
+                        <field name="logo" widget="image" class="oe_avatar"/>
+                        <field name="first_department"/>
+                    </group>
+                    <group string="Client HR Admin">
+                        <field name="hr_name" placeholder="e.g. Priya Nair"/>
+                        <field name="hr_email" placeholder="hr@client.com"/>
+                        <field name="hr_password" password="True"/>
+                    </group>
+                </group>
+                <footer>
+                    <button name="action_onboard" string="Onboard Client" type="object" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_client_onboarding" model="ir.actions.act_window">
+        <field name="name">Onboard New Client</field>
+        <field name="res_model">bpro.client.onboarding</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <menuitem id="menu_client_onboarding" name="Onboard New Client"
+              parent="bpro_pms.menu_pms_root" action="action_client_onboarding"
+              sequence="85" groups="bpro_base.group_super_admin"/>
+</odoo>
