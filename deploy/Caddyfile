@@ -1,0 +1,21 @@
+# bpro LMS + PMS — reverse proxy with automatic HTTPS.
+# Add one block per client portal domain (or use a wildcard with DNS challenge).
+
+app.bprolms.com {
+    encode gzip
+
+    # Odoo live-chat / realtime uses the gevent port
+    @websocket path /websocket /websocket/*
+    reverse_proxy @websocket odoo:8072
+
+    reverse_proxy odoo:8069
+}
+
+# Example client portal (repeat per client; must match the website domain
+# set in the onboarding wizard):
+# bella.bprolms.com {
+#     encode gzip
+#     @websocket path /websocket /websocket/*
+#     reverse_proxy @websocket odoo:8072
+#     reverse_proxy odoo:8069
+# }

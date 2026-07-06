@@ -44,9 +44,13 @@ Test logins (local dev): `hr.a@test`, `hod.a@test`, `emp.a@test`, `hr.b@test` �
       training progress % on each goal
 - [x] P7 (core): **Onboard New Client** wizard (bpro PMS menu, super admin only) —
       company + HR admin + first department + induction enrollment in one flow
-- [ ] P4: SCORM player / legacy content
-- [ ] P7 (rest): per-client websites/branding, subscriptions billing
-- [ ] P8: pilot with 1-2 real clients
+- [x] P4: SCORM 1.2 — upload packages (bpro PMS → Configuration → SCORM Packages),
+      built-in player at /scorm/play/<id>, completion flows into course tracking
+- [x] P7 (rest): white-label website per client (onboarding wizard) + `bpro_billing`
+      per-seat subscriptions (bpro PMS → Billing) with daily invoice cron
+- [x] Production kit: `deploy/` (compose + Caddy HTTPS), `config/odoo.prod.conf`,
+      `scripts/backup.sh`, `scripts/remove_test_data.py` — see **DEPLOY.md**
+- [ ] P8: pilot with 1-2 real clients (needs a server + domain — see DEPLOY.md)
 
 ## Run locally
 
