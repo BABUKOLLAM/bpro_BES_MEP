@@ -1,0 +1,9 @@
+// bpro brand palette — loaded before Odoo's primary variables so the
+// !default assignments pick these up.
+// Navy from the BPro logo background, red from the infinity mark.
+
+$o-brand-odoo: #0D2B4E;      // top navbar / backend accents
+$o-brand-primary: #C93A24;   // primary buttons and links (logo red, darkened for contrast)
+
+$o-community-color: #0D2B4E;
+$o-enterprise-color: #0D2B4E;

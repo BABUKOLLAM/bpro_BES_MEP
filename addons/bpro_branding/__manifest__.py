@@ -10,6 +10,11 @@
     "data": [
         "data/branding_data.xml",
     ],
+    "assets": {
+        "web._assets_primary_variables": [
+            ("prepend", "bpro_branding/static/src/scss/bpro_variables.scss"),
+        ],
+    },
     "installable": True,
     "auto_install": False,
 }
