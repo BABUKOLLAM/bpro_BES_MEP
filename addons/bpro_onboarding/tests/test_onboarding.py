@@ -37,6 +37,30 @@ class TestOnboarding(TransactionCase):
         )
         self.assertEqual(website.company_id, company)
 
+    def test_new_client_site_has_no_starter_kit_content(self):
+        """A freshly onboarded client must go straight to login, not
+        Odoo's generic 'Your Company' starter marketing site."""
+        self._wizard().action_onboard()
+        website = self.env["website"].search(
+            [("name", "=", "Onboard Test Client Portal")]
+        )
+        self.assertEqual(website.homepage_url, "/web/login")
+        stray_pages = self.env["website.page"].search(
+            [
+                ("website_id", "=", website.id),
+                ("url", "!=", "/"),
+                ("is_published", "=", True),
+            ]
+        )
+        self.assertFalse(stray_pages, "no published starter-kit pages should remain")
+        stray_menus = self.env["website.menu"].search(
+            [
+                ("website_id", "=", website.id),
+                ("url", "not in", ["/", "/slides", "/default-main-menu"]),
+            ]
+        )
+        self.assertFalse(stray_menus, "no starter-kit menu items should remain")
+
     def test_duplicate_company_rejected(self):
         self._wizard().action_onboard()
         with self.assertRaises(UserError):

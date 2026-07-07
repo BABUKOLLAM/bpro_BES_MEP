@@ -17,5 +17,6 @@ Client onboarding wizard for bpro Super Admins:
         "security/ir.model.access.csv",
         "wizard/client_onboarding_views.xml",
     ],
+    "post_init_hook": "_post_init_hook",
     "installable": True,
 }

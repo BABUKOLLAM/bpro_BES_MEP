@@ -67,7 +67,7 @@ class ClientOnboarding(models.TransientModel):
             }
         )
         # white-label portal: one website per client company (roadmap sec. 4)
-        self.env["website"].sudo().create(
+        website = self.env["website"].sudo().create(
             {
                 "name": f"{self.client_name} Portal",
                 "company_id": company.id,
@@ -75,6 +75,7 @@ class ClientOnboarding(models.TransientModel):
                 "logo": self.logo or master.logo,
             }
         )
+        website._bpro_strip_starter_content()
 
         # employee record triggers global Induction auto-enrollment
         self.env["hr.employee"].sudo().create(
