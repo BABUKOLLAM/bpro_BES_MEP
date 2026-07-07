@@ -19,11 +19,15 @@ class Website(models.Model):
     def _bpro_strip_starter_content(self):
         """Send visitors straight to login instead of Odoo's generic
         'Your Company' starter homepage, drop the placeholder marketing
-        pages/menu items that come with the website module, and scrub
-        any leftover fake contact details (phone/email/address) baked
-        into that site's own header/footer views."""
+        pages/menu items that come with the website module, scrub any
+        leftover fake contact details (phone/email/address) baked into
+        that site's own header/footer views, and make sure the site's
+        own logo (a field distinct from res.company.logo) is the real
+        one rather than Odoo's generic placeholder graphic."""
         for site in self:
             site.homepage_url = "/web/login"
+            if site.company_id.logo:
+                site.logo = site.company_id.logo
             pages = self.env["website.page"].sudo().search(
                 [("website_id", "=", site.id), ("url", "not in", ["/"])]
             )

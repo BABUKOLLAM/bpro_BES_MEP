@@ -1,5 +1,14 @@
+import base64
+
 from odoo.exceptions import UserError
 from odoo.tests.common import TransactionCase
+
+# smallest valid PNG (1x1 transparent pixel) - Odoo validates logo/image
+# fields are real images, so tests can't just use arbitrary bytes
+TINY_PNG = base64.b64decode(
+    "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42Y"
+    "AAAAASUVORK5CYII="
+)
 
 
 class TestOnboarding(TransactionCase):
@@ -60,6 +69,22 @@ class TestOnboarding(TransactionCase):
             ]
         )
         self.assertFalse(stray_menus, "no starter-kit menu items should remain")
+
+    def test_strip_starter_content_syncs_real_logo(self):
+        """website.logo is a field distinct from res.company.logo and
+        defaults to Odoo's generic 'Your Logo' placeholder graphic when
+        a site is auto-created (e.g. the master site on first install,
+        before any of our code ever touches it) - _bpro_strip_starter_
+        content must copy the real company logo onto the site."""
+        company = self.env["res.company"].create(
+            {"name": "Logo Test Co", "logo": base64.b64encode(TINY_PNG).decode()}
+        )
+        website = self.env["website"].create(
+            {"name": "Logo Test Site", "company_id": company.id}
+        )
+        self.assertNotEqual(website.logo, company.logo, "starts out mismatched")
+        website._bpro_strip_starter_content()
+        self.assertEqual(website.logo, company.logo)
 
     def test_scrub_removes_fake_contact_details(self):
         """Odoo's website starter kit bakes literal placeholder contact
