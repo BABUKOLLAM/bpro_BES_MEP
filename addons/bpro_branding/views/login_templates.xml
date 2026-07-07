@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- The stock mobile header nav includes a placeholder phone/email
+         row (Odoo demo content: "+1 555-555-5556" etc). Not relevant to
+         a backend HR/LMS platform - drop it globally, for every site. -->
+    <template id="header_mobile_no_placeholder_contact"
+              inherit_id="website.template_header_mobile">
+        <xpath expr="//t[@t-call='website.placeholder_header_text_element']"
+               position="replace"/>
+    </template>
+
+    <template id="login_show_password" inherit_id="web.login">
+        <xpath expr="//input[@id='password']" position="replace">
+            <div class="position-relative bpro-password-wrap">
+                <input type="password" placeholder="Password" name="password" id="password"
+                       class="form-control" required="required"
+                       autocomplete="current-password" maxlength="4096"
+                       t-att-autofocus="'autofocus' if login else None"/>
+                <button type="button"
+                        class="btn btn-link bpro-toggle-password position-absolute end-0 top-0 me-1 p-1"
+                        aria-label="Show password"
+                        tabindex="-1">
+                    <i class="fa fa-eye" role="img"></i>
+                </button>
+            </div>
+        </xpath>
+    </template>
+</odoo>

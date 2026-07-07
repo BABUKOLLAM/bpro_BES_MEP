@@ -1,0 +1,10 @@
+.bpro-toggle-password {
+    z-index: 5;
+    color: #888;
+    &:hover {
+        color: #0D2B4E;
+    }
+}
+#password {
+    padding-right: 2.5rem;
+}

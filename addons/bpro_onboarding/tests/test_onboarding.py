@@ -61,6 +61,29 @@ class TestOnboarding(TransactionCase):
         )
         self.assertFalse(stray_menus, "no starter-kit menu items should remain")
 
+    def test_scrub_removes_fake_contact_details(self):
+        """Odoo's website starter kit bakes literal placeholder contact
+        info ("+1 555-555-5556" etc) into per-site header/footer views.
+        The scrub must strip the whole wrapping block, not just hide it."""
+        self._wizard().action_onboard()
+        website = self.env["website"].search(
+            [("name", "=", "Onboard Test Client Portal")]
+        )
+        view = self.env["ir.ui.view"].create(
+            {
+                "name": "Fake footer for test",
+                "type": "qweb",
+                "website_id": website.id,
+                "arch": (
+                    '<div><p class="mb-1">123 Fake St</p>'
+                    '<ul><li><a href="tel:+1 555-555-5556">'
+                    "+1 555-555-5556</a></li></ul></div>"
+                ),
+            }
+        )
+        website._bpro_scrub_fake_contact_details()
+        self.assertNotIn("555-555-5556", view.arch_db)
+
     def test_duplicate_company_rejected(self):
         self._wizard().action_onboard()
         with self.assertRaises(UserError):
