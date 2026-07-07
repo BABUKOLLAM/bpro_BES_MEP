@@ -57,6 +57,11 @@ class PmsGoal(models.Model):
             "CHECK(progress >= 0 AND progress <= 100)",
             "Progress must be between 0 and 100.",
         ),
+        (
+            "weight_range",
+            "CHECK(weight >= 0 AND weight <= 100)",
+            "Weight must be between 0 and 100.",
+        ),
     ]
 
     def action_activate(self):

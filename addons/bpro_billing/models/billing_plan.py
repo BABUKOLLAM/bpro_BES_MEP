@@ -20,3 +20,11 @@ class BillingPlan(models.Model):
     )
     description = fields.Text(string="Includes")
     active = fields.Boolean(default=True)
+
+    _sql_constraints = [
+        (
+            "price_positive",
+            "CHECK(price_per_seat >= 0)",
+            "The price per seat cannot be negative.",
+        ),
+    ]

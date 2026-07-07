@@ -27,6 +27,14 @@ class PmsCycle(models.Model):
         "res.company", default=lambda self: self.env.company, required=True
     )
 
+    _sql_constraints = [
+        (
+            "dates_order",
+            "CHECK(date_end >= date_start)",
+            "The cycle end date must be after the start date.",
+        ),
+    ]
+
     @api.depends("goal_ids", "appraisal_ids")
     def _compute_counts(self):
         for cycle in self:

@@ -72,6 +72,22 @@ docker compose exec odoo odoo -c /etc/odoo/odoo.conf -d <dbname> -u bpro_pms,bpr
 docker compose restart odoo
 ```
 
+## Running the tests
+
+24 automated tests cover goals/appraisals/security scoping, the LMS automations,
+billing, onboarding and SCORM parsing. Run them on a throwaway DB (the live
+server keeps port 8069, so tests use 8071):
+
+```bash
+docker compose exec odoo odoo -c /etc/odoo/odoo.conf -d bpro_test --http-port 8071 \
+  -i bpro_base,bpro_pms,bpro_lms,bpro_branding,bpro_onboarding,bpro_billing,bpro_scorm,website_payment \
+  --test-tags /bpro_pms,/bpro_lms,/bpro_billing,/bpro_onboarding,/bpro_scorm \
+  --stop-after-init --without-demo=all
+docker compose exec db psql -U odoo -d postgres -c 'DROP DATABASE bpro_test;'
+```
+
+Expected: `0 failed, 0 error(s) of 24 tests`. Run before every production update.
+
 ## Multi-tenant SaaS model
 
 Each client organisation gets its own Odoo database (`list_db = True` locally;

@@ -75,6 +75,8 @@ class ScormPackage(models.Model):
             shutil.rmtree(target, ignore_errors=True)
             os.makedirs(target, exist_ok=True)
             data = base64.b64decode(rec.zip_file)
+            if len(data) > 300 * 1024 * 1024:
+                raise UserError("SCORM package exceeds the 300 MB limit.")
             try:
                 with zipfile.ZipFile(io.BytesIO(data)) as zf:
                     for member in zf.namelist():
