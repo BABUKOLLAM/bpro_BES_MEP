@@ -1,6 +1,6 @@
 {
-    "name": "bpro HR — Employee Lifecycle & Expense Approval Gaps",
-    "summary": "Departure deactivates the linked user login; threshold-gated Finance approval for expense claims (BES HR & Payroll module)",
+    "name": "bpro HR — Employee Lifecycle, Expense Approval & History Gaps",
+    "summary": "Departure deactivates the linked user login; threshold-gated Finance approval for expense claims; auto-tracked employment history (BES HR & Payroll module)",
     "description": """
 Fills the gaps between native Odoo HR (hr_contract, hr_holidays, hr_attendance,
 hr_expense) and a BES-style HR & Payroll module. Payroll itself is out of
@@ -23,6 +23,14 @@ conversation rather than bundled into this pass.
   cancel, feeding _compute_state) - reusing the mixin's field name would
   silently redefine those selection values and break native state
   computation.
+* Employment history: native Odoo has no structured, queryable timeline of
+  an employee's internal job/department/manager/company changes - job_id
+  and department_id are chatter-tracked (unstructured, not reportable) and
+  parent_id (Manager) isn't tracked at all. bpro.hr.employment.history is
+  auto-populated (not manually entered) from hr.employee's own create/write,
+  closing the currently-open period and opening a new one whenever one of
+  those fields changes, shown as a read-only timeline on the employee form
+  plus a company-wide report.
 
 Employee records, departments, contracts (with native expiry reminders),
 leave/time-off (with native manager/HR/double validation and negative-cap
@@ -43,7 +51,9 @@ configuration only.
         "hr_expense",
     ],
     "data": [
+        "security/ir.model.access.csv",
         "views/hr_expense_sheet_views.xml",
+        "views/hr_employment_history_views.xml",
     ],
     "installable": True,
     "application": False,

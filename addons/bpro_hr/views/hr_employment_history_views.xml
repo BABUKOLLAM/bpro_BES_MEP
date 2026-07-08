@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_hr_employee_form_bpro_history" model="ir.ui.view">
+        <field name="name">hr.employee.form.bpro.history</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='hr_settings']" position="after">
+                <page name="bpro_employment_history" string="Employment History"
+                      groups="hr.group_hr_user">
+                    <field name="bpro_employment_history_ids" readonly="1">
+                        <list>
+                            <field name="date_start"/>
+                            <field name="date_end"/>
+                            <field name="job_id"/>
+                            <field name="department_id"/>
+                            <field name="manager_id"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </list>
+                    </field>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_bpro_hr_employment_history_list" model="ir.ui.view">
+        <field name="name">bpro.hr.employment.history.list</field>
+        <field name="model">bpro.hr.employment.history</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="employee_id"/>
+                <field name="date_start"/>
+                <field name="date_end"/>
+                <field name="job_id"/>
+                <field name="department_id"/>
+                <field name="manager_id"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_bpro_hr_employment_history_pivot" model="ir.ui.view">
+        <field name="name">bpro.hr.employment.history.pivot</field>
+        <field name="model">bpro.hr.employment.history</field>
+        <field name="arch" type="xml">
+            <pivot>
+                <field name="department_id" type="row"/>
+                <field name="date_start" type="col" interval="month"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="action_bpro_hr_employment_history" model="ir.actions.act_window">
+        <field name="name">Employment History</field>
+        <field name="res_model">bpro.hr.employment.history</field>
+        <field name="view_mode">list,pivot</field>
+    </record>
+
+    <menuitem id="menu_bpro_hr_employment_history" name="Employment History"
+              parent="hr.hr_menu_hr_reports" action="action_bpro_hr_employment_history"
+              groups="hr.group_hr_user" sequence="20"/>
+</odoo>

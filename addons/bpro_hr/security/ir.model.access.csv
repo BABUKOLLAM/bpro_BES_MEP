@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_bpro_hr_employment_history_manager,bpro.hr.employment.history manager,model_bpro_hr_employment_history,hr.group_hr_manager,1,1,1,1
+access_bpro_hr_employment_history_user,bpro.hr.employment.history user,model_bpro_hr_employment_history,hr.group_hr_user,1,0,0,0
