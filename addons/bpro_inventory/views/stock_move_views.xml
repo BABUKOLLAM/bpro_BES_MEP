@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- FR-INV-003/004: stock_barcode (native scanning app) is
+         Enterprise-only and unavailable here - this exposes the fallback
+         validated text field (a keyboard-wedge scanner just types into
+         it + Enter) directly in the receipt/delivery Operations tab. -->
+    <record id="view_picking_form_bpro_scan" model="ir.ui.view">
+        <field name="name">stock.picking.form.bpro.scan</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.view_picking_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='move_ids_without_package']//field[@name='quantity']"
+                   position="after">
+                <field name="bpro_scanned_code" optional="show"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

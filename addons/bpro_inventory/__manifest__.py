@@ -1,6 +1,6 @@
 {
-    "name": "bpro Inventory — Stock Adjustment Approval",
-    "summary": "Threshold-gated approval for manual stock adjustments (BES Inventory & Warehouse module)",
+    "name": "bpro Inventory — Adjustment Approval, Reorder Levels & Scan Validation",
+    "summary": "Threshold-gated stock adjustment approval, auto-calculated reorder levels, and barcode scan validation (BES Inventory & Warehouse module)",
     "description": """
 Fills the gaps between native Odoo Inventory and the BES BRD's
 Inventory & Warehouse Management requirements:
@@ -16,10 +16,18 @@ Inventory & Warehouse Management requirements:
   consumption in manufacturing for BOM components, added together), plus
   an "Apply Suggested Levels" button - a deliberate action, not an
   automatic overwrite.
+* Barcode receive/pick confirmation (FR-INV-003/004): stock_barcode (the
+  native scanning app) is Enterprise-only and unavailable in this image -
+  the planned fallback is a validated text field on each receipt/delivery
+  line (a keyboard-wedge scanner just types into it) that must match the
+  line's expected product barcode/internal reference/lot if anything is
+  entered - scanning stays optional (real scanner hardware integration is
+  a separately deferred NFR), but whatever is scanned is validated
+  immediately and again at write time.
 
-Bin-level stock tracking, barcode receive/pick, and allocation/no-oversell
-are native Odoo Inventory features, enabled via configuration (Settings >
-Inventory > Storage Locations) rather than custom code.
+Bin-level stock tracking and allocation/no-oversell are native Odoo
+Inventory features, enabled via configuration (Settings > Inventory >
+Storage Locations) rather than custom code.
 """,
     "version": "18.0.1.0.0",
     "category": "Inventory/Inventory",
@@ -30,6 +38,7 @@ Inventory > Storage Locations) rather than custom code.
     "data": [
         "views/stock_quant_views.xml",
         "views/stock_warehouse_orderpoint_views.xml",
+        "views/stock_move_views.xml",
     ],
     "installable": True,
     "application": False,
