@@ -24,4 +24,20 @@
             </button>
         </field>
     </record>
+
+    <!-- Product form's "Update Quantity" button (action_view_quants) uses this
+         view instead of view_stock_quant_tree_inventory_editable above - it's
+         the only one that can create a brand-new quant for a product/location
+         with no prior stock, so the reason field must be reachable here too,
+         or a first-ever stock count has no UI path to complete (FR-INV-005). -->
+    <record id="view_stock_quant_tree_editable_bpro" model="ir.ui.view">
+        <field name="name">stock.quant.list.editable.bpro</field>
+        <field name="model">stock.quant</field>
+        <field name="inherit_id" ref="stock.view_stock_quant_tree_editable"/>
+        <field name="arch" type="xml">
+            <field name="inventory_quantity_auto_apply" position="after">
+                <field name="bpro_adjustment_reason" optional="show"/>
+            </field>
+        </field>
+    </record>
 </odoo>

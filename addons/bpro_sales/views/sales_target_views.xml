@@ -10,7 +10,7 @@
                 <field name="date_to"/>
                 <field name="target_amount"/>
                 <field name="actual_amount"/>
-                <field name="attainment_pct" widget="percentage"/>
+                <field name="attainment_pct"/>
             </list>
         </field>
     </record>

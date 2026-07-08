@@ -104,6 +104,26 @@ class TestStockAdjustmentApproval(TransactionCase):
         with self.assertRaises(AccessError):
             quant.with_user(self.stock_user).action_approve()
 
+    def test_first_ever_stock_count_with_reason_succeeds(self):
+        # A product/location with zero prior on-hand has no existing quant
+        # row - the "Update Quantity" screen must create one and let the
+        # reason be set in the same flow, exactly like the fixed
+        # view_stock_quant_tree_editable_bpro view now exposes.
+        new_location = self.env["stock.location"].create(
+            {"name": "Fresh Bin", "usage": "internal", "company_id": self.company.id}
+        )
+        quant = self.env["stock.quant"].create(
+            {
+                "product_id": self.product.id,
+                "location_id": new_location.id,
+                "inventory_quantity": 5.0,
+                "bpro_adjustment_reason": "initial stock load",
+            }
+        )
+        quant.action_apply_inventory()
+        self.assertEqual(quant.quantity, 5.0)
+        self.assertEqual(quant.approval_state, "none")
+
     def test_rejection_discards_the_count(self):
         quant = self._quant()
         quant.write({"inventory_quantity": 20.0, "bpro_adjustment_reason": "large variance"})

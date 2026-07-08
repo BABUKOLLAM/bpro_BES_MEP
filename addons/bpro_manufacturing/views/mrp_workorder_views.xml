@@ -17,7 +17,7 @@
                         string="Record Reject" class="btn-secondary"
                         invisible="not bpro_reject_qty_input"/>
                 <field name="bpro_variance_qty" readonly="1"/>
-                <field name="bpro_variance_pct" readonly="1" widget="percentage"/>
+                <field name="bpro_variance_pct" readonly="1"/>
             </field>
         </field>
     </record>
@@ -29,7 +29,7 @@
         <field name="arch" type="xml">
             <field name="qty_remaining" position="after">
                 <field name="bpro_qty_rejected" optional="show"/>
-                <field name="bpro_variance_pct" optional="show" widget="percentage"/>
+                <field name="bpro_variance_pct" optional="show"/>
             </field>
         </field>
     </record>
