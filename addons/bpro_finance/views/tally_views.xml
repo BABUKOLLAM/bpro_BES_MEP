@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_bpro_tally_export_batch_form" model="ir.ui.view">
+        <field name="name">bpro.tally.export.batch.form</field>
+        <field name="model">bpro.tally.export.batch</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_export" type="object" string="Export"
+                            class="btn-primary" invisible="state == 'done'"/>
+                </header>
+                <sheet>
+                    <group>
+                        <field name="date_from"/>
+                        <field name="date_to"/>
+                        <field name="state" widget="statusbar"/>
+                        <field name="voucher_count" readonly="1"/>
+                        <field name="xml_file" filename="xml_filename" readonly="1"
+                               invisible="state != 'done'"/>
+                        <field name="xml_filename" invisible="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_bpro_tally_export_batch" model="ir.actions.act_window">
+        <field name="name">Tally Export</field>
+        <field name="res_model">bpro.tally.export.batch</field>
+        <field name="view_mode">form,list</field>
+    </record>
+
+    <record id="view_bpro_tally_import_batch_form" model="ir.ui.view">
+        <field name="name">bpro.tally.import.batch.form</field>
+        <field name="model">bpro.tally.import.batch</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_import" type="object" string="Import"
+                            class="btn-primary" invisible="state == 'done'"/>
+                </header>
+                <sheet>
+                    <group>
+                        <field name="xml_file" filename="xml_filename"
+                               invisible="state == 'done'"/>
+                        <field name="xml_filename"/>
+                        <field name="state" widget="statusbar"/>
+                        <field name="imported_count" readonly="1"/>
+                    </group>
+                    <field name="exception_ids" readonly="1">
+                        <list>
+                            <field name="voucher_number"/>
+                            <field name="reason"/>
+                        </list>
+                    </field>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_bpro_tally_import_batch" model="ir.actions.act_window">
+        <field name="name">Tally Import</field>
+        <field name="res_model">bpro.tally.import.batch</field>
+        <field name="view_mode">form,list</field>
+    </record>
+
+    <menuitem id="menu_bpro_tally_root" name="Tally Sync"
+              parent="account.menu_finance_configuration" sequence="50"/>
+    <menuitem id="menu_bpro_tally_export" name="Export to Tally"
+              parent="menu_bpro_tally_root" action="action_bpro_tally_export_batch"
+              sequence="10"/>
+    <menuitem id="menu_bpro_tally_import" name="Import from Tally"
+              parent="menu_bpro_tally_root" action="action_bpro_tally_import_batch"
+              sequence="20"/>
+</odoo>

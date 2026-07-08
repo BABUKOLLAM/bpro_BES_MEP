@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_bpro_ar_aging_wizard_form" model="ir.ui.view">
+        <field name="name">bpro.ar.aging.wizard.form</field>
+        <field name="model">bpro.ar.aging.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="as_of_date"/>
+                </group>
+                <footer>
+                    <button name="action_generate" type="object" string="Generate"
+                            class="btn-primary"/>
+                </footer>
+                <field name="line_ids" readonly="1">
+                    <list>
+                        <field name="partner_id"/>
+                        <field name="current"/>
+                        <field name="d1_30"/>
+                        <field name="d31_60"/>
+                        <field name="d61_90"/>
+                        <field name="d90_plus"/>
+                        <field name="total"/>
+                    </list>
+                </field>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_bpro_ar_aging_wizard" model="ir.actions.act_window">
+        <field name="name">AR Aging Report</field>
+        <field name="res_model">bpro.ar.aging.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <menuitem id="menu_bpro_ar_aging" name="AR Aging"
+              parent="account.menu_finance_reports"
+              action="action_bpro_ar_aging_wizard" sequence="5"/>
+</odoo>
