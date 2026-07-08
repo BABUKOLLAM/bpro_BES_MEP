@@ -1,0 +1,4 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_bpro_helpdesk_stage,bpro.helpdesk.stage all,model_bpro_helpdesk_stage,base.group_user,1,1,1,0
+access_bpro_helpdesk_team,bpro.helpdesk.team all,model_bpro_helpdesk_team,base.group_user,1,1,1,0
+access_bpro_helpdesk_ticket,bpro.helpdesk.ticket all,model_bpro_helpdesk_ticket,base.group_user,1,1,1,1

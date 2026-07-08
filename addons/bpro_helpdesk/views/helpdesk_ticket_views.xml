@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_bpro_helpdesk_ticket_form" model="ir.ui.view">
+        <field name="name">bpro.helpdesk.ticket.form</field>
+        <field name="model">bpro.helpdesk.ticket</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <field name="stage_id" widget="statusbar"/>
+                    <button name="action_bpro_close" type="object" string="Close"
+                            invisible="is_closed" class="btn-primary"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="partner_id"/>
+                            <field name="sale_order_id"
+                                   domain="[('partner_id', '=', partner_id)]"/>
+                            <field name="priority"/>
+                        </group>
+                        <group>
+                            <field name="team_id"/>
+                            <field name="user_id"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="sla_deadline" readonly="1"/>
+                            <field name="is_overdue" readonly="1"
+                                   decoration-danger="is_overdue"/>
+                            <field name="close_date" readonly="1" invisible="not close_date"/>
+                            <field name="resolution_hours" readonly="1"
+                                   invisible="not close_date"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Description" name="description">
+                            <field name="description"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_bpro_helpdesk_ticket_list" model="ir.ui.view">
+        <field name="name">bpro.helpdesk.ticket.list</field>
+        <field name="model">bpro.helpdesk.ticket</field>
+        <field name="arch" type="xml">
+            <list decoration-danger="is_overdue">
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="team_id"/>
+                <field name="user_id"/>
+                <field name="priority"/>
+                <field name="stage_id"/>
+                <field name="sla_deadline"/>
+                <field name="is_overdue"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_bpro_helpdesk_ticket_kanban" model="ir.ui.view">
+        <field name="name">bpro.helpdesk.ticket.kanban</field>
+        <field name="model">bpro.helpdesk.ticket</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="stage_id" class="o_kanban_small_column">
+                <field name="is_overdue"/>
+                <templates>
+                    <t t-name="card">
+                        <div class="d-flex justify-content-between">
+                            <strong><field name="name"/></strong>
+                        </div>
+                        <div><field name="partner_id"/></div>
+                        <div>
+                            <field name="priority" widget="priority"/>
+                            <span class="float-end text-danger" invisible="not is_overdue">
+                                Overdue
+                            </span>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="view_bpro_helpdesk_ticket_search" model="ir.ui.view">
+        <field name="name">bpro.helpdesk.ticket.search</field>
+        <field name="model">bpro.helpdesk.ticket</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="team_id"/>
+                <field name="user_id"/>
+                <filter name="overdue" string="Overdue" domain="[('is_overdue', '=', True)]"/>
+                <filter name="open" string="Open" domain="[('is_closed', '=', False)]"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_by_team" string="Team" context="{'group_by': 'team_id'}"/>
+                    <filter name="group_by_stage" string="Stage" context="{'group_by': 'stage_id'}"/>
+                    <filter name="group_by_user" string="Assignee" context="{'group_by': 'user_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_bpro_helpdesk_ticket" model="ir.actions.act_window">
+        <field name="name">Tickets</field>
+        <field name="res_model">bpro.helpdesk.ticket</field>
+        <field name="view_mode">kanban,list,form</field>
+    </record>
+
+    <menuitem id="menu_bpro_helpdesk_root" name="Helpdesk" sequence="2"/>
+    <menuitem id="menu_bpro_helpdesk_ticket" name="Tickets"
+              parent="menu_bpro_helpdesk_root" action="action_bpro_helpdesk_ticket"
+              sequence="1"/>
+
+    <record id="view_bpro_helpdesk_sla_pivot" model="ir.ui.view">
+        <field name="name">bpro.helpdesk.ticket.sla.pivot</field>
+        <field name="model">bpro.helpdesk.ticket</field>
+        <field name="arch" type="xml">
+            <pivot>
+                <field name="team_id" type="row"/>
+                <field name="is_overdue" type="measure"/>
+                <field name="resolution_hours" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="action_bpro_helpdesk_sla_report" model="ir.actions.act_window">
+        <field name="name">SLA Compliance</field>
+        <field name="res_model">bpro.helpdesk.ticket</field>
+        <field name="view_mode">pivot,list</field>
+    </record>
+
+    <menuitem id="menu_bpro_helpdesk_sla_report" name="SLA Compliance"
+              parent="menu_bpro_helpdesk_root" action="action_bpro_helpdesk_sla_report"
+              sequence="20"/>
+</odoo>

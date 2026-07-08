@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_bpro_helpdesk_team_form" model="ir.ui.view">
+        <field name="name">bpro.helpdesk.team.form</field>
+        <field name="model">bpro.helpdesk.team</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="%(action_bpro_helpdesk_ticket)d" type="action"
+                                class="oe_stat_button" icon="fa-ticket"
+                                context="{'search_default_team_id': id}">
+                            <field name="ticket_count" widget="statinfo" string="Tickets"/>
+                        </button>
+                    </div>
+                    <group>
+                        <field name="name"/>
+                        <field name="company_id" groups="base.group_multi_company"/>
+                        <field name="member_ids" widget="many2many_tags"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_bpro_helpdesk_team_list" model="ir.ui.view">
+        <field name="name">bpro.helpdesk.team.list</field>
+        <field name="model">bpro.helpdesk.team</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="ticket_count"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_bpro_helpdesk_team" model="ir.actions.act_window">
+        <field name="name">Teams</field>
+        <field name="res_model">bpro.helpdesk.team</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <menuitem id="menu_bpro_helpdesk_config" name="Configuration"
+              parent="menu_bpro_helpdesk_root" sequence="90"/>
+    <menuitem id="menu_bpro_helpdesk_team" name="Teams"
+              parent="menu_bpro_helpdesk_config" action="action_bpro_helpdesk_team"
+              sequence="10"/>
+</odoo>
