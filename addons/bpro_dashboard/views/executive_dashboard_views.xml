@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_bpro_executive_dashboard_form" model="ir.ui.view">
+        <field name="name">bpro.executive.dashboard.form</field>
+        <field name="model">bpro.executive.dashboard</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="as_of_date"/>
+                </group>
+                <field name="currency_id" invisible="1"/>
+                <group string="Sales &amp; CRM" col="4">
+                    <field name="sales_mtd_revenue" widget="monetary" string="Revenue (MTD)"/>
+                </group>
+                <group string="Manufacturing" col="4">
+                    <field name="mfg_avg_variance_pct" string="Avg Output Variance %"/>
+                </group>
+                <group string="Inventory &amp; Warehouse" col="4">
+                    <field name="inventory_pending_adjustments" string="Pending Adjustment Approvals"/>
+                </group>
+                <group string="Finance &amp; Accounts" col="4">
+                    <field name="cash_position" widget="monetary"/>
+                    <field name="total_receivables" widget="monetary"/>
+                    <field name="total_payables" widget="monetary"/>
+                    <field name="current_ratio"/>
+                </group>
+                <group string="HR" col="4">
+                    <field name="hr_pending_expense_approvals" string="Pending Expense Approvals"/>
+                </group>
+                <group string="Logistics &amp; Supply Chain" col="4">
+                    <field name="logistics_on_time_pct" string="On-Time Delivery % (MTD)"/>
+                </group>
+                <group string="Quality Management" col="4">
+                    <field name="quality_pass_rate_pct" string="Pass Rate %"/>
+                </group>
+                <group string="Plant &amp; Machinery" col="4">
+                    <field name="plant_total_asset_book_value" widget="monetary" string="Total Asset Book Value"/>
+                </group>
+                <group string="Project Management" col="4">
+                    <field name="project_pending_budget_approvals" string="Pending Budget Approvals"/>
+                </group>
+                <group string="Fleet Management" col="4">
+                    <field name="fleet_trip_cost" widget="monetary" string="Total Trip Cost"/>
+                </group>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_bpro_executive_dashboard" model="ir.actions.act_window">
+        <field name="name">Executive Dashboard</field>
+        <field name="res_model">bpro.executive.dashboard</field>
+        <field name="view_mode">form</field>
+        <field name="target">current</field>
+        <field name="context">{}</field>
+    </record>
+
+    <menuitem id="menu_bpro_executive_dashboard_root" name="Executive Dashboard"
+              sequence="1"/>
+    <menuitem id="menu_bpro_executive_dashboard" name="Executive Dashboard"
+              parent="menu_bpro_executive_dashboard_root"
+              action="action_bpro_executive_dashboard" sequence="1"/>
+</odoo>
