@@ -57,6 +57,30 @@ class TestOnboarding(TransactionCase):
         )
         self.assertEqual(website.company_id, company)
 
+    def test_onboarding_creates_a_default_warehouse(self):
+        """Native res.company.create() (stock module) sets up per-company
+        locations/sequences but never a stock.warehouse in production -
+        without one, Inventory/Manufacturing/Purchase have nowhere to
+        receive or store stock for the new company. (Under TransactionCase
+        tests specifically, that same native create() already provisions
+        one default warehouse per company for test isolation, so this
+        checks the guard doesn't duplicate it rather than asserting our
+        own code ran - the exact warehouse.code depends on which of the
+        two equivalent code paths created it.)"""
+        self._wizard().action_onboard()
+        company = self.env["res.company"].search(
+            [("name", "=", "Onboard Test Client")]
+        )
+        warehouse = self.env["stock.warehouse"].search(
+            [("company_id", "=", company.id)]
+        )
+        self.assertEqual(len(warehouse), 1)
+        self.assertEqual(warehouse.partner_id, company.partner_id)
+        self.assertTrue(
+            warehouse.lot_stock_id,
+            "a real internal stock location must exist for this company",
+        )
+
     def test_new_client_site_has_no_starter_kit_content(self):
         """A freshly onboarded client must go straight to login, not
         Odoo's generic 'Your Company' starter marketing site."""

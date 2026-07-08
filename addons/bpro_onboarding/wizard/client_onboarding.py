@@ -1,3 +1,5 @@
+import re
+
 from odoo import fields, models
 from odoo.exceptions import UserError
 
@@ -22,6 +24,16 @@ class ClientOnboarding(models.TransientModel):
         "Leave empty to configure later.",
     )
 
+    @staticmethod
+    def _bpro_warehouse_code(name):
+        """stock.warehouse.code is required, alnum, max 5 chars. Unique is
+        scoped to (code, company_id), so a same-prefix collision with an
+        unrelated company is fine - only sibling companies from very
+        similar names could collide, which is an acceptable edge case for
+        an auto-derived default the client can rename later."""
+        code = re.sub(r"[^A-Za-z0-9]", "", name).upper()[:5]
+        return code or "WH"
+
     def action_onboard(self):
         self.ensure_one()
         master = self.env["res.company"].sudo().search(
@@ -45,6 +57,29 @@ class ClientOnboarding(models.TransientModel):
         )
         # the operating super admin must be allowed on the new company
         self.env.user.sudo().write({"company_ids": [(4, company.id)]})
+
+        # native res.company.create() (stock module) sets up transit/
+        # inventory-loss/production/scrap locations and sequences for every
+        # new company, but does NOT create a stock.warehouse in production -
+        # Odoo doesn't assume one warehouse per company. Without this,
+        # Inventory, Manufacturing and Purchase are unusable for the new
+        # company until someone manually creates a warehouse (discovered
+        # live: a fresh company only has an inactive inter-company transit
+        # location). Guard with a search: under test runs specifically,
+        # that same native create() already provisions one default
+        # warehouse per company for test isolation, so this must not
+        # duplicate it.
+        if not self.env["stock.warehouse"].sudo().search_count(
+            [("company_id", "=", company.id)]
+        ):
+            self.env["stock.warehouse"].sudo().create(
+                {
+                    "name": self.client_name,
+                    "code": self._bpro_warehouse_code(self.client_name),
+                    "company_id": company.id,
+                    "partner_id": company.partner_id.id,
+                }
+            )
 
         department = False
         if self.first_department:
