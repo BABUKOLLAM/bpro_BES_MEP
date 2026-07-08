@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_mrp_workorder_form_bpro" model="ir.ui.view">
+        <field name="name">mrp.workorder.form.bpro</field>
+        <field name="model">mrp.workorder</field>
+        <field name="inherit_id" ref="mrp.mrp_production_workorder_form_view_inherit"/>
+        <field name="arch" type="xml">
+            <field name="date_start" position="after">
+                <field name="bpro_capacity_warning" invisible="not bpro_capacity_warning"
+                       class="text-warning" readonly="1" nolabel="1" colspan="2"/>
+            </field>
+            <field name="production_id" position="after">
+                <field name="bpro_qty_rejected"/>
+                <field name="bpro_reject_reason_id"/>
+                <field name="bpro_variance_qty" readonly="1"/>
+                <field name="bpro_variance_pct" readonly="1" widget="percentage"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="view_mrp_workorder_list_bpro" model="ir.ui.view">
+        <field name="name">mrp.workorder.list.bpro</field>
+        <field name="model">mrp.workorder</field>
+        <field name="inherit_id" ref="mrp.mrp_production_workorder_tree_editable_view"/>
+        <field name="arch" type="xml">
+            <field name="qty_remaining" position="after">
+                <field name="bpro_qty_rejected" optional="show"/>
+                <field name="bpro_variance_pct" optional="show" widget="percentage"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="view_mrp_workorder_pivot_bpro" model="ir.ui.view">
+        <field name="name">mrp.workorder.pivot.bpro</field>
+        <field name="model">mrp.workorder</field>
+        <field name="arch" type="xml">
+            <pivot>
+                <field name="workcenter_id" type="row"/>
+                <field name="production_id" type="row"/>
+                <field name="date_start" type="col" interval="day"/>
+                <field name="qty_production" type="measure"/>
+                <field name="qty_produced" type="measure"/>
+                <field name="bpro_variance_qty" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="action_bpro_mfg_output_report" model="ir.actions.act_window">
+        <field name="name">Output: Actual vs Planned</field>
+        <field name="res_model">mrp.workorder</field>
+        <field name="view_mode">pivot,list</field>
+        <field name="domain">[('state', '=', 'done')]</field>
+        <field name="view_id" ref="view_mrp_workorder_pivot_bpro"/>
+    </record>
+
+    <menuitem id="menu_bpro_mfg_output_report" name="Output: Actual vs Planned"
+              parent="mrp.menu_mrp_reporting" action="action_bpro_mfg_output_report"
+              sequence="20"/>
+</odoo>
