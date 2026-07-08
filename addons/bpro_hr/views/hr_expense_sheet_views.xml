@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_hr_expense_sheet_form_bpro_finance_approval" model="ir.ui.view">
+        <field name="name">hr.expense.sheet.form.bpro.finance.approval</field>
+        <field name="model">hr.expense.sheet</field>
+        <field name="inherit_id" ref="hr_expense.view_hr_expense_sheet_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <field name="bpro_finance_approval_state" invisible="1"/>
+                <button name="action_bpro_finance_approve" type="object"
+                        string="Approve (Finance)"
+                        invisible="bpro_finance_approval_state != 'pending'"
+                        class="btn-primary"
+                        groups="account.group_account_manager"/>
+                <button name="action_bpro_finance_reject" type="object"
+                        string="Reject (Finance)"
+                        invisible="bpro_finance_approval_state != 'pending'"
+                        groups="account.group_account_manager"/>
+            </xpath>
+            <xpath expr="//header" position="after">
+                <div class="alert alert-warning" role="alert"
+                     invisible="bpro_finance_approval_state != 'pending'">
+                    This expense report exceeds the company's approval threshold and is
+                    pending Finance Manager approval, in addition to the direct manager's.
+                </div>
+                <div class="alert alert-danger" role="alert"
+                     invisible="bpro_finance_approval_state != 'rejected'">
+                    Finance rejected this expense report. It cannot be approved by the
+                    direct manager until Finance reconsiders.
+                </div>
+            </xpath>
+        </field>
+    </record>
+</odoo>
