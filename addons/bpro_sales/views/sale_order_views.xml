@@ -21,6 +21,21 @@
                     pending Sales Manager approval.
                 </div>
             </xpath>
+            <xpath expr="//page[@name='other_information']//group[@name='sale_info']" position="after">
+                <group name="bpro_commission" string="Commission">
+                    <field name="bpro_commission_pct" readonly="1"/>
+                    <field name="bpro_commission_amount" readonly="1"/>
+                </group>
+                <group name="bpro_recurrence" string="Recurring Order">
+                    <field name="bpro_is_recurring"/>
+                    <field name="bpro_recurrence_interval" invisible="not bpro_is_recurring"
+                           required="bpro_is_recurring"/>
+                    <field name="bpro_next_recurrence_date" readonly="1"
+                           invisible="not bpro_is_recurring"/>
+                    <field name="bpro_recurring_parent_id" readonly="1"
+                           invisible="not bpro_recurring_parent_id"/>
+                </group>
+            </xpath>
         </field>
     </record>
 </odoo>

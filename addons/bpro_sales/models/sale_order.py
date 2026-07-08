@@ -1,10 +1,49 @@
-from odoo import _, models
+from dateutil.relativedelta import relativedelta
+
+from odoo import _, api, fields, models
 from odoo.exceptions import UserError
+
+RECURRENCE_INTERVALS = {
+    "monthly": relativedelta(months=1),
+    "quarterly": relativedelta(months=3),
+    "yearly": relativedelta(years=1),
+}
 
 
 class SaleOrder(models.Model):
     _name = "sale.order"
     _inherit = ["sale.order", "bpro.approval.mixin"]
+
+    # Commission (Should/Could FR): frozen at confirmation time, not a
+    # live compute - a later change to the salesperson's rate must not
+    # retroactively alter a commission already earned on a past order.
+    bpro_commission_pct = fields.Float(string="Commission %", readonly=True, copy=False)
+    bpro_commission_amount = fields.Monetary(
+        string="Commission Amount", readonly=True, copy=False
+    )
+
+    # Recurring orders (Should/Could FR): only the "master" order carries
+    # the recurrence config and keeps bpro_is_recurring True across
+    # renewals; each generated child is a one-off copy linked back via
+    # bpro_recurring_parent_id, not itself recurring, keeping exactly one
+    # active "next due date" per subscription.
+    bpro_is_recurring = fields.Boolean(string="Recurring Order", copy=False)
+    bpro_recurrence_interval = fields.Selection(
+        [
+            ("monthly", "Monthly"),
+            ("quarterly", "Quarterly"),
+            ("yearly", "Yearly"),
+        ],
+        string="Recurs Every",
+    )
+    bpro_next_recurrence_date = fields.Date(string="Next Renewal Date", copy=False)
+    bpro_recurring_parent_id = fields.Many2one(
+        "sale.order",
+        string="Recurring From",
+        readonly=True,
+        copy=False,
+        help="The master recurring order this one was auto-generated from.",
+    )
 
     def _approval_policy_key(self):
         return "sales_discount_pct"
@@ -100,3 +139,50 @@ class SaleOrder(models.Model):
         return _("Insufficient stock to confirm this order:\n%s") % "\n".join(
             shortages
         )
+
+    def _action_confirm(self):
+        res = super()._action_confirm()
+        for order in self:
+            rate = self.env["bpro.commission.rate"].get_rate(
+                order.company_id, order.user_id
+            )
+            order.bpro_commission_pct = rate
+            order.bpro_commission_amount = order.amount_untaxed * rate / 100.0
+            if order.bpro_is_recurring and not order.bpro_next_recurrence_date:
+                order.bpro_next_recurrence_date = order._bpro_next_date(
+                    fields.Date.context_today(order)
+                )
+        return res
+
+    def _bpro_next_date(self, from_date):
+        interval = RECURRENCE_INTERVALS.get(self.bpro_recurrence_interval)
+        return from_date + interval if interval else from_date
+
+    @api.model
+    def _bpro_cron_generate_recurring_orders(self):
+        """Daily cron: renew every master order whose next renewal date
+        has arrived. The generated child is a one-off copy (not itself
+        recurring, linked back via bpro_recurring_parent_id); the master
+        keeps recurring and has its own due date advanced, so re-running
+        the cron the same day is a no-op for orders already renewed."""
+        today = fields.Date.context_today(self)
+        masters = self.search(
+            [
+                ("bpro_is_recurring", "=", True),
+                ("bpro_next_recurrence_date", "<=", today),
+                ("state", "=", "sale"),
+            ]
+        )
+        for master in masters:
+            child = master.copy(
+                {
+                    "bpro_is_recurring": False,
+                    "bpro_recurrence_interval": False,
+                    "bpro_next_recurrence_date": False,
+                    "bpro_recurring_parent_id": master.id,
+                }
+            )
+            child.action_confirm()
+            master.bpro_next_recurrence_date = master._bpro_next_date(
+                master.bpro_next_recurrence_date
+            )
