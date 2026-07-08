@@ -29,8 +29,11 @@ class BproPolicy(models.Model):
     @api.model
     def get_value(self, company, key, default=0.0):
         """Return the configured threshold for (company, key), or default
-        if the client hasn't set one yet."""
-        policy = self.search(
+        if the client hasn't set one yet. Runs as sudo: this is looked up
+        internally by approval-mixin logic for any user role (sales rep,
+        stock user, ...), not just the Super Admins who may edit policies.
+        """
+        policy = self.sudo().search(
             [("company_id", "=", company.id), ("key", "=", key)], limit=1
         )
         return policy.numeric_value if policy else default

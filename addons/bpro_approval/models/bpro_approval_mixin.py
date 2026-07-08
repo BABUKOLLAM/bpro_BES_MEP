@@ -14,7 +14,9 @@ class BproApprovalMixin(models.AbstractModel):
 
     _name = "bpro.approval.mixin"
     _description = "Threshold-Gated Approval Workflow"
-    _inherit = ["mail.activity.mixin"]
+    # mail.activity's notification flow calls message_notify(), which lives
+    # on mail.thread - mail.activity.mixin alone isn't enough.
+    _inherit = ["mail.thread", "mail.activity.mixin"]
 
     approval_state = fields.Selection(
         [
