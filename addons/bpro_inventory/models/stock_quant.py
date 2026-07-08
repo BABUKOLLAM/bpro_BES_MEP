@@ -5,7 +5,11 @@ from odoo.tools.float_utils import float_is_zero
 
 class StockQuant(models.Model):
     _name = "stock.quant"
-    _inherit = ["stock.quant", "bpro.approval.mixin"]
+    # stock.quant has neither mail.thread nor mail.activity.mixin natively,
+    # unlike sale.order - bring them explicitly (bpro.approval.mixin itself
+    # deliberately doesn't, to avoid an MRO conflict on models that do
+    # already have them).
+    _inherit = ["stock.quant", "mail.thread", "mail.activity.mixin", "bpro.approval.mixin"]
 
     bpro_adjustment_reason = fields.Char(
         string="Adjustment Reason",

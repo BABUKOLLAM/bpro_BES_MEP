@@ -10,13 +10,19 @@ class BproApprovalMixin(models.AbstractModel):
     must override _approval_policy_key(), _approval_amount() and
     _approval_group_xmlid() — the defaults raise NotImplementedError so a
     missing override fails loudly instead of silently skipping approval.
+
+    Deliberately does NOT _inherit mail.thread/mail.activity.mixin itself
+    (needed for action_request_approval's activity_schedule call): some
+    host models already have them natively (e.g. sale.order), and this
+    mixin independently re-declaring the same bases creates a Python MRO
+    conflict when combined with those models. The host model must bring
+    mail.thread + mail.activity.mixin itself — either for free (sale.order)
+    or by listing them explicitly alongside this mixin (stock.quant does,
+    since it has neither natively).
     """
 
     _name = "bpro.approval.mixin"
     _description = "Threshold-Gated Approval Workflow"
-    # mail.activity's notification flow calls message_notify(), which lives
-    # on mail.thread - mail.activity.mixin alone isn't enough.
-    _inherit = ["mail.thread", "mail.activity.mixin"]
 
     approval_state = fields.Selection(
         [
@@ -67,6 +73,17 @@ class BproApprovalMixin(models.AbstractModel):
         return self.env.ref(self._approval_group_xmlid())
 
     def action_request_approval(self):
+        """Call this from a normal save path (write/create), not from
+        inside an action you're about to block with `raise UserError(...)`.
+        Odoo rolls back the whole transaction when an exception propagates
+        out of an action (both in real usage and in the test framework's
+        assertRaises, which wraps the block in a savepoint specifically to
+        undo it) - a request-approval write made just before such a raise,
+        in the same call, is silently discarded along with everything
+        else. Host models should request approval proactively, as soon as
+        the threshold-crossing value is saved, then have the blocked
+        action itself just read approval_state without writing to it.
+        """
         for rec in self:
             approver = self.env["res.users"].search(
                 [
