@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_task_form2_bpro_budget_approval" model="ir.ui.view">
+        <field name="name">project.task.form.bpro.budget.approval</field>
+        <field name="model">project.task</field>
+        <field name="inherit_id" ref="project.view_task_form2"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <field name="approval_state" invisible="1"/>
+                <button name="action_approve" type="object" string="Approve Budget Overrun"
+                        invisible="approval_state != 'pending'" class="btn-primary"
+                        groups="project.group_project_manager"/>
+                <button name="action_reject" type="object" string="Reject"
+                        invisible="approval_state != 'pending'"
+                        groups="project.group_project_manager"/>
+            </xpath>
+            <xpath expr="//header" position="after">
+                <div class="alert alert-warning" role="alert"
+                     invisible="approval_state != 'pending'">
+                    This task's logged hours exceed its allocated budget threshold and
+                    are pending Project Manager approval before it can be closed.
+                </div>
+                <field name="bpro_workload_warning" invisible="1"/>
+                <div class="alert alert-info" role="alert"
+                     invisible="not bpro_workload_warning">
+                    Workload: <field name="bpro_workload_warning" readonly="1" nolabel="1"/>
+                </div>
+            </xpath>
+        </field>
+    </record>
+</odoo>
