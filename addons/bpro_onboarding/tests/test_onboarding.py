@@ -36,6 +36,17 @@ class TestOnboarding(TransactionCase):
         )
         self.assertEqual(user.company_id, company)
         self.assertIn(self.env.ref("bpro_base.group_client_hr"), user.groups_id)
+        for xmlid in (
+            "sales_team.group_sale_manager",
+            "stock.group_stock_manager",
+            "purchase.group_purchase_manager",
+            "account.group_account_manager",
+        ):
+            self.assertIn(
+                self.env.ref(xmlid),
+                user.groups_id,
+                f"onboarded HR admin must get {xmlid} to configure their company's ERP apps",
+            )
         employee = self.env["hr.employee"].search(
             [("user_id", "=", user.id)]
         )

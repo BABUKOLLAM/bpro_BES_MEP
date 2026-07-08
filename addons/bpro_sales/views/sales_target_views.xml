@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_bpro_sales_target_list" model="ir.ui.view">
+        <field name="name">bpro.sales.target.list</field>
+        <field name="model">bpro.sales.target</field>
+        <field name="arch" type="xml">
+            <list editable="bottom">
+                <field name="user_id"/>
+                <field name="date_from"/>
+                <field name="date_to"/>
+                <field name="target_amount"/>
+                <field name="actual_amount"/>
+                <field name="attainment_pct"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_bpro_sales_target_pivot" model="ir.ui.view">
+        <field name="name">bpro.sales.target.pivot</field>
+        <field name="model">bpro.sales.target</field>
+        <field name="arch" type="xml">
+            <pivot>
+                <field name="user_id" type="row"/>
+                <field name="date_from" type="col" interval="month"/>
+                <field name="target_amount" type="measure"/>
+                <field name="actual_amount" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="action_bpro_sales_target" model="ir.actions.act_window">
+        <field name="name">Sales Target vs Actual</field>
+        <field name="res_model">bpro.sales.target</field>
+        <field name="view_mode">list,pivot</field>
+    </record>
+
+    <menuitem id="menu_bpro_sales_target" name="Target vs Actual"
+              parent="sale.menu_sale_report" action="action_bpro_sales_target"
+              sequence="15"/>
+</odoo>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_bpro_policy_list" model="ir.ui.view">
+        <field name="name">bpro.policy.list</field>
+        <field name="model">bpro.policy</field>
+        <field name="arch" type="xml">
+            <list editable="bottom">
+                <field name="company_id" groups="base.group_multi_company"/>
+                <field name="key"/>
+                <field name="numeric_value"/>
+                <field name="description"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_bpro_policy" model="ir.actions.act_window">
+        <field name="name">Approval Thresholds</field>
+        <field name="res_model">bpro.policy</field>
+        <field name="view_mode">list</field>
+    </record>
+
+    <menuitem id="menu_bpro_policy_config" name="bpro Approval Thresholds"
+              parent="base.menu_administration" action="action_bpro_policy"
+              sequence="99" groups="bpro_base.group_super_admin"/>
+</odoo>

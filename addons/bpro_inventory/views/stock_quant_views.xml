@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_stock_quant_tree_inventory_editable_bpro" model="ir.ui.view">
+        <field name="name">stock.quant.inventory.list.editable.bpro</field>
+        <field name="model">stock.quant</field>
+        <field name="inherit_id" ref="stock.view_stock_quant_tree_inventory_editable"/>
+        <field name="arch" type="xml">
+            <field name="inventory_diff_quantity" position="after">
+                <field name="bpro_adjustment_reason" optional="show"/>
+                <field name="approval_state" optional="show" widget="badge"
+                       decoration-warning="approval_state == 'pending'"
+                       decoration-success="approval_state == 'approved'"
+                       decoration-danger="approval_state == 'rejected'"/>
+            </field>
+            <button name="action_apply_inventory" position="after">
+                <button name="action_approve" type="object" string="Approve"
+                        class="btn-link" icon="fa-check"
+                        invisible="approval_state != 'pending'"
+                        groups="stock.group_stock_manager"/>
+                <button name="action_reject" type="object" string="Reject"
+                        class="btn-link" icon="fa-times"
+                        invisible="approval_state != 'pending'"
+                        groups="stock.group_stock_manager"/>
+            </button>
+        </field>
+    </record>
+
+    <!-- Product form's "Update Quantity" button (action_view_quants) uses this
+         view instead of view_stock_quant_tree_inventory_editable above - it's
+         the only one that can create a brand-new quant for a product/location
+         with no prior stock, so the reason field must be reachable here too,
+         or a first-ever stock count has no UI path to complete (FR-INV-005). -->
+    <record id="view_stock_quant_tree_editable_bpro" model="ir.ui.view">
+        <field name="name">stock.quant.list.editable.bpro</field>
+        <field name="model">stock.quant</field>
+        <field name="inherit_id" ref="stock.view_stock_quant_tree_editable"/>
+        <field name="arch" type="xml">
+            <field name="inventory_quantity_auto_apply" position="after">
+                <field name="bpro_adjustment_reason" optional="show"/>
+            </field>
+        </field>
+    </record>
+</odoo>

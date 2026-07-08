@@ -52,6 +52,18 @@ class ClientOnboarding(models.TransientModel):
                 {"name": self.first_department, "company_id": company.id}
             )
 
+        # Client HR Admin is this company's first administrator: also grant
+        # manager access to the ERP apps (Sales, Inventory, Purchase,
+        # Accounting) so they can configure their company's setup without
+        # a second onboarding step. Scoped to `company` via company_ids
+        # above/below — Odoo's native multi-company mechanism, not a new
+        # bpro-specific rule.
+        erp_manager_groups = [
+            "sales_team.group_sale_manager",
+            "stock.group_stock_manager",
+            "purchase.group_purchase_manager",
+            "account.group_account_manager",
+        ]
         user = self.env["res.users"].sudo().create(
             {
                 "name": self.hr_name,
@@ -63,7 +75,8 @@ class ClientOnboarding(models.TransientModel):
                 "groups_id": [
                     (4, self.env.ref("base.group_user").id),
                     (4, self.env.ref("bpro_base.group_client_hr").id),
-                ],
+                ]
+                + [(4, self.env.ref(xmlid).id) for xmlid in erp_manager_groups],
             }
         )
         # white-label portal: one website per client company (roadmap sec. 4)
