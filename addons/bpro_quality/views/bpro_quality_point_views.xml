@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_bpro_quality_point_form" model="ir.ui.view">
+        <field name="name">bpro.quality.point.form</field>
+        <field name="model">bpro.quality.point</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="operation"/>
+                        <field name="product_tmpl_id"/>
+                        <field name="product_category_id"/>
+                        <field name="company_id" groups="base.group_multi_company"/>
+                        <field name="active"/>
+                    </group>
+                    <group string="Instructions">
+                        <field name="instructions" nolabel="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_bpro_quality_point_list" model="ir.ui.view">
+        <field name="name">bpro.quality.point.list</field>
+        <field name="model">bpro.quality.point</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="operation"/>
+                <field name="product_tmpl_id"/>
+                <field name="product_category_id"/>
+                <field name="active" widget="boolean_toggle"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_bpro_quality_point" model="ir.actions.act_window">
+        <field name="name">Quality Checkpoints</field>
+        <field name="res_model">bpro.quality.point</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <menuitem id="menu_bpro_quality_point" name="Quality Checkpoints"
+              parent="stock.menu_stock_config_settings" action="action_bpro_quality_point"
+              groups="stock.group_stock_manager" sequence="60"/>
+</odoo>

@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_bpro_quality_point_manager,bpro.quality.point manager,model_bpro_quality_point,stock.group_stock_manager,1,1,1,1
+access_bpro_quality_point_user,bpro.quality.point user,model_bpro_quality_point,stock.group_stock_user,1,0,0,0
+access_bpro_quality_check_manager,bpro.quality.check manager,model_bpro_quality_check,stock.group_stock_manager,1,1,1,1
+access_bpro_quality_check_user,bpro.quality.check user,model_bpro_quality_check,stock.group_stock_user,1,1,1,0

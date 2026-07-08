@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_picking_form_bpro_quality" model="ir.ui.view">
+        <field name="name">stock.picking.form.bpro.quality</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.view_picking_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='date_done']" position="after">
+                <field name="bpro_quality_check_ids" readonly="1">
+                    <list editable="bottom" decoration-danger="result == 'fail'"
+                          decoration-success="result == 'pass'">
+                        <field name="quality_point_id"/>
+                        <field name="product_id"/>
+                        <field name="result"/>
+                        <field name="note"/>
+                        <button name="action_bpro_pass" type="object" string="Pass"
+                                invisible="result == 'pass'" class="btn-link"/>
+                        <button name="action_bpro_fail" type="object" string="Fail"
+                                invisible="result == 'fail'" class="btn-link"/>
+                    </list>
+                </field>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_mrp_workorder_form_bpro_quality" model="ir.ui.view">
+        <field name="name">mrp.workorder.form.bpro.quality</field>
+        <field name="model">mrp.workorder</field>
+        <field name="inherit_id" ref="mrp.mrp_production_workorder_form_view_inherit"/>
+        <field name="arch" type="xml">
+            <field name="production_id" position="after">
+                <field name="bpro_quality_check_ids" readonly="1">
+                    <list editable="bottom" decoration-danger="result == 'fail'"
+                          decoration-success="result == 'pass'">
+                        <field name="quality_point_id"/>
+                        <field name="product_id"/>
+                        <field name="result"/>
+                        <field name="note"/>
+                        <button name="action_bpro_pass" type="object" string="Pass"
+                                invisible="result == 'pass'" class="btn-link"/>
+                        <button name="action_bpro_fail" type="object" string="Fail"
+                                invisible="result == 'fail'" class="btn-link"/>
+                    </list>
+                </field>
+            </field>
+        </field>
+    </record>
+
+    <record id="view_bpro_quality_check_list" model="ir.ui.view">
+        <field name="name">bpro.quality.check.list</field>
+        <field name="model">bpro.quality.check</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="product_id"/>
+                <field name="quality_point_id"/>
+                <field name="picking_id"/>
+                <field name="workorder_id"/>
+                <field name="result"/>
+                <field name="checked_by"/>
+                <field name="checked_at"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_bpro_quality_check_pivot" model="ir.ui.view">
+        <field name="name">bpro.quality.check.pivot</field>
+        <field name="model">bpro.quality.check</field>
+        <field name="arch" type="xml">
+            <pivot>
+                <field name="product_id" type="row"/>
+                <field name="result" type="col"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="action_bpro_quality_check_report" model="ir.actions.act_window">
+        <field name="name">Quality Pass/Fail Rate</field>
+        <field name="res_model">bpro.quality.check</field>
+        <field name="view_mode">pivot,list</field>
+        <field name="domain">[("result", "!=", "none")]</field>
+    </record>
+
+    <menuitem id="menu_bpro_quality_check_report" name="Quality Pass/Fail Rate"
+              parent="stock.menu_warehouse_report" action="action_bpro_quality_check_report"
+              groups="stock.group_stock_manager" sequence="21"/>
+</odoo>
