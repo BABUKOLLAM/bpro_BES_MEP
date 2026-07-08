@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_mrp_workcenter_form_bpro_equipment" model="ir.ui.view">
+        <field name="name">mrp.workcenter.form.bpro.equipment</field>
+        <field name="model">mrp.workcenter</field>
+        <field name="inherit_id" ref="mrp.mrp_workcenter_view"/>
+        <field name="arch" type="xml">
+            <notebook position="inside">
+                <page string="Equipment" name="bpro_equipment">
+                    <field name="bpro_equipment_ids">
+                        <list editable="bottom">
+                            <field name="name"/>
+                            <field name="category_id"/>
+                            <field name="warranty_date"/>
+                        </list>
+                    </field>
+                </page>
+            </notebook>
+        </field>
+    </record>
+
+    <record id="view_mrp_workorder_form_bpro_plant" model="ir.ui.view">
+        <field name="name">mrp.workorder.form.bpro.plant</field>
+        <field name="model">mrp.workorder</field>
+        <field name="inherit_id" ref="mrp.mrp_production_workorder_form_view_inherit"/>
+        <field name="arch" type="xml">
+            <field name="production_id" position="after">
+                <field name="bpro_plant_maintenance_warning"
+                       invisible="not bpro_plant_maintenance_warning"
+                       class="text-warning" readonly="1" nolabel="1" colspan="2"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="view_bpro_downtime_pivot" model="ir.ui.view">
+        <field name="name">maintenance.request.bpro.downtime.pivot</field>
+        <field name="model">maintenance.request</field>
+        <field name="arch" type="xml">
+            <pivot>
+                <field name="equipment_id" type="row"/>
+                <field name="bpro_downtime_hours" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="action_bpro_downtime_report" model="ir.actions.act_window">
+        <field name="name">Equipment Downtime</field>
+        <field name="res_model">maintenance.request</field>
+        <field name="view_mode">pivot,list</field>
+        <field name="domain">[("maintenance_type", "=", "corrective"), ("done", "=", True)]</field>
+    </record>
+
+    <menuitem id="menu_bpro_downtime_report" name="Equipment Downtime"
+              parent="mrp.menu_mrp_reporting" action="action_bpro_downtime_report"
+              sequence="21"/>
+</odoo>

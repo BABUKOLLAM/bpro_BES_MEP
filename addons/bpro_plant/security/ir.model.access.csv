@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_bpro_plant_asset_manager,bpro.plant.asset manager,model_bpro_plant_asset,mrp.group_mrp_manager,1,1,1,1
+access_bpro_plant_asset_user,bpro.plant.asset user,model_bpro_plant_asset,mrp.group_mrp_user,1,0,0,0
+access_bpro_plant_asset_depreciation_line_manager,bpro.plant.asset.depreciation.line manager,model_bpro_plant_asset_depreciation_line,mrp.group_mrp_manager,1,1,1,1
+access_bpro_plant_asset_depreciation_line_user,bpro.plant.asset.depreciation.line user,model_bpro_plant_asset_depreciation_line,mrp.group_mrp_user,1,0,0,0

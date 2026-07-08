@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_bpro_plant_asset_form" model="ir.ui.view">
+        <field name="name">bpro.plant.asset.form</field>
+        <field name="model">bpro.plant.asset</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_confirm" type="object" string="Confirm"
+                            invisible="state != 'draft'" class="btn-primary"/>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="equipment_id"/>
+                            <field name="workcenter_id"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                        <group>
+                            <field name="acquisition_date"/>
+                            <field name="acquisition_cost"/>
+                            <field name="salvage_value"/>
+                            <field name="useful_life_months"/>
+                            <field name="monthly_depreciation" readonly="1"/>
+                            <field name="accumulated_depreciation" readonly="1"/>
+                            <field name="book_value" readonly="1"/>
+                        </group>
+                    </group>
+                    <group string="Accounting">
+                        <field name="depreciation_expense_account_id"/>
+                        <field name="accumulated_depreciation_account_id"/>
+                    </group>
+                    <notebook>
+                        <page string="Depreciation Schedule" name="schedule">
+                            <field name="depreciation_line_ids" readonly="1">
+                                <list decoration-muted="state == 'posted'">
+                                    <field name="period_date"/>
+                                    <field name="amount"/>
+                                    <field name="state"/>
+                                    <field name="move_id"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_bpro_plant_asset_list" model="ir.ui.view">
+        <field name="name">bpro.plant.asset.list</field>
+        <field name="model">bpro.plant.asset</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="equipment_id"/>
+                <field name="acquisition_date"/>
+                <field name="acquisition_cost"/>
+                <field name="accumulated_depreciation"/>
+                <field name="book_value"/>
+                <field name="state"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_bpro_plant_asset" model="ir.actions.act_window">
+        <field name="name">Plant &amp; Machinery Assets</field>
+        <field name="res_model">bpro.plant.asset</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <menuitem id="menu_bpro_plant_asset" name="Plant &amp; Machinery Assets"
+              parent="mrp.menu_mrp_configuration" action="action_bpro_plant_asset"
+              groups="mrp.group_mrp_manager" sequence="90"/>
+</odoo>
