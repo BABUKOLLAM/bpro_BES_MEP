@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="stock_picking_batch_form_bpro_fleet" model="ir.ui.view">
+        <field name="name">stock.picking.batch.form.bpro.fleet</field>
+        <field name="model">stock.picking.batch</field>
+        <field name="inherit_id" ref="stock_fleet.stock_picking_batch_form"/>
+        <field name="arch" type="xml">
+            <field name="vehicle_category_id" position="after">
+                <field name="currency_id" invisible="1"/>
+                <field name="bpro_trip_cost"
+                       invisible="not vehicle_id or vehicle_id.bpro_ownership_type != 'hired'"/>
+            </field>
+            <xpath expr="//header" position="inside">
+                <field name="bpro_transporter_bill_id" invisible="1"/>
+                <button name="action_bpro_create_transporter_bill" type="object"
+                        string="Create Transporter Bill"
+                        invisible="state != 'done' or not vehicle_id or vehicle_id.bpro_ownership_type != 'hired' or bpro_transporter_bill_id"
+                        class="btn-primary"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_bpro_fleet_cost_pivot" model="ir.ui.view">
+        <field name="name">stock.picking.batch.bpro.fleet.cost.pivot</field>
+        <field name="model">stock.picking.batch</field>
+        <field name="arch" type="xml">
+            <pivot>
+                <field name="vehicle_id" type="row"/>
+                <field name="bpro_trip_cost" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="action_bpro_fleet_cost_report" model="ir.actions.act_window">
+        <field name="name">Fleet Cost Report</field>
+        <field name="res_model">stock.picking.batch</field>
+        <field name="view_mode">pivot,list</field>
+        <field name="view_id" ref="view_bpro_fleet_cost_pivot"/>
+        <field name="domain">[("state", "=", "done"), ("vehicle_id", "!=", False)]</field>
+    </record>
+
+    <menuitem id="menu_bpro_fleet_cost_report" name="Fleet Cost Report"
+              parent="stock.menu_warehouse_report" action="action_bpro_fleet_cost_report"
+              groups="stock.group_stock_manager" sequence="22"/>
+</odoo>

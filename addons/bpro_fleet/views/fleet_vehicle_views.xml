@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_fleet_vehicle_form_bpro_ownership" model="ir.ui.view">
+        <field name="name">fleet.vehicle.form.bpro.ownership</field>
+        <field name="model">fleet.vehicle</field>
+        <field name="inherit_id" ref="fleet.fleet_vehicle_view_form"/>
+        <field name="arch" type="xml">
+            <field name="company_id" position="after">
+                <field name="bpro_ownership_type"/>
+                <field name="bpro_transporter_id" invisible="bpro_ownership_type != 'hired'"/>
+                <field name="bpro_trip_rate" invisible="bpro_ownership_type != 'hired'"/>
+                <field name="bpro_trip_expense_account_id"
+                       invisible="bpro_ownership_type != 'hired'"/>
+            </field>
+        </field>
+    </record>
+</odoo>
