@@ -20,7 +20,9 @@ Rules) rather than custom code.
     "website": "https://bpropms.com",
     "license": "LGPL-3",
     "depends": ["bpro_base", "bpro_approval", "stock"],
-    "data": [],
+    "data": [
+        "views/stock_quant_views.xml",
+    ],
     "installable": True,
     "application": False,
 }

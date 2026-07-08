@@ -22,6 +22,7 @@ Lead capture, pipeline view, quotation generation from price lists/tax, and quot
         "security/ir.model.access.csv",
         "security/sales_target_security.xml",
         "views/sales_target_views.xml",
+        "views/sale_order_views.xml",
     ],
     "installable": True,
     "application": False,

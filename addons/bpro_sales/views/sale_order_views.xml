@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_order_form_bpro_approval" model="ir.ui.view">
+        <field name="name">sale.order.form.bpro.approval</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form/header" position="inside">
+                <field name="approval_state" invisible="1"/>
+                <button name="action_approve" type="object" string="Approve Discount"
+                        invisible="approval_state != 'pending'" class="btn-primary"
+                        groups="sales_team.group_sale_manager"/>
+                <button name="action_reject" type="object" string="Reject Discount"
+                        invisible="approval_state != 'pending'"
+                        groups="sales_team.group_sale_manager"/>
+            </xpath>
+            <xpath expr="//form/header" position="after">
+                <div class="alert alert-warning" role="alert"
+                     invisible="approval_state != 'pending'">
+                    This order's discount exceeds the approval threshold and is
+                    pending Sales Manager approval.
+                </div>
+            </xpath>
+        </field>
+    </record>
+</odoo>

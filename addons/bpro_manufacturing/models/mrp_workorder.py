@@ -21,6 +21,10 @@ class MrpWorkorder(models.Model):
         help="Informational: the reason used on the most recent reject capture. "
         "The authoritative per-event reason lives on each stock.scrap record.",
     )
+    bpro_reject_qty_input = fields.Float(
+        string="Qty to Reject Now",
+        help="Enter a quantity and a reason above, then click 'Record Reject'.",
+    )
 
     # FR-MFG-002: native manual reschedule (write() on date_start/
     # date_finished/workcenter_id) recomputes duration but doesn't flag an
@@ -123,4 +127,18 @@ class MrpWorkorder(models.Model):
             # completing, leaving the scrap stuck in draft.
             scrap.do_scrap()
             self.bpro_reject_reason_id = reason_id
+        return True
+
+    def action_bpro_record_reject_button(self):
+        """UI entry point for action_bpro_record_production's reject path -
+        reads the two input fields the form exposes, then clears the
+        quantity input so the same field can be reused for the next
+        reject event without carrying a stale value forward."""
+        self.ensure_one()
+        if self.bpro_reject_qty_input:
+            self.action_bpro_record_production(
+                qty_rejected=self.bpro_reject_qty_input,
+                reason_id=self.bpro_reject_reason_id.id,
+            )
+            self.bpro_reject_qty_input = 0.0
         return True

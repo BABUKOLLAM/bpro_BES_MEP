@@ -10,8 +10,12 @@
                        class="text-warning" readonly="1" nolabel="1" colspan="2"/>
             </field>
             <field name="production_id" position="after">
-                <field name="bpro_qty_rejected"/>
+                <field name="bpro_qty_rejected" readonly="1"/>
                 <field name="bpro_reject_reason_id"/>
+                <field name="bpro_reject_qty_input"/>
+                <button name="action_bpro_record_reject_button" type="object"
+                        string="Record Reject" class="btn-secondary"
+                        invisible="not bpro_reject_qty_input"/>
                 <field name="bpro_variance_qty" readonly="1"/>
                 <field name="bpro_variance_pct" readonly="1" widget="percentage"/>
             </field>
