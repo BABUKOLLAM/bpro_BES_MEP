@@ -89,15 +89,19 @@ class ClientOnboarding(models.TransientModel):
 
         # Client HR Admin is this company's first administrator: also grant
         # manager access to the ERP apps (Sales, Inventory, Purchase,
-        # Accounting) so they can configure their company's setup without
-        # a second onboarding step. Scoped to `company` via company_ids
-        # above/below — Odoo's native multi-company mechanism, not a new
-        # bpro-specific rule.
+        # Accounting, HR, Plant/Maintenance, Project, Fleet) so they can
+        # configure their company's setup without a second onboarding step.
+        # Scoped to `company` via company_ids above/below — Odoo's native
+        # multi-company mechanism, not a new bpro-specific rule.
         erp_manager_groups = [
             "sales_team.group_sale_manager",
             "stock.group_stock_manager",
             "purchase.group_purchase_manager",
             "account.group_account_manager",
+            "hr.group_hr_manager",
+            "maintenance.group_equipment_manager",
+            "project.group_project_manager",
+            "fleet.fleet_group_manager",
         ]
         user = self.env["res.users"].sudo().create(
             {

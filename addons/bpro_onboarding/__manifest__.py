@@ -4,7 +4,7 @@
     "description": """
 Client onboarding wizard for bpro Super Admins:
 * Creates the client company under bpro Corporate
-* Creates the Client HR Admin user + employee, granted manager access to the client's Sales, Inventory, Purchase and Accounting apps
+* Creates the Client HR Admin user + employee, granted manager access to the client's Sales, Inventory, Purchase, Accounting, HR, Plant/Maintenance, Project and Fleet apps
 * New employees are auto-enrolled in global Induction courses
 """,
     "version": "18.0.1.0.0",
@@ -20,6 +20,9 @@ Client onboarding wizard for bpro Super Admins:
         "stock",
         "purchase",
         "account",
+        "maintenance",
+        "project",
+        "fleet",
     ],
     "data": [
         "security/ir.model.access.csv",

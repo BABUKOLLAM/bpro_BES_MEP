@@ -41,6 +41,10 @@ class TestOnboarding(TransactionCase):
             "stock.group_stock_manager",
             "purchase.group_purchase_manager",
             "account.group_account_manager",
+            "hr.group_hr_manager",
+            "maintenance.group_equipment_manager",
+            "project.group_project_manager",
+            "fleet.fleet_group_manager",
         ):
             self.assertIn(
                 self.env.ref(xmlid),
