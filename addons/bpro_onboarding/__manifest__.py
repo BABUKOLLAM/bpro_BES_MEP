@@ -23,6 +23,7 @@ Client onboarding wizard for bpro Super Admins:
         "maintenance",
         "project",
         "fleet",
+        "l10n_in",
     ],
     "data": [
         "security/ir.model.access.csv",

@@ -61,6 +61,37 @@ class TestOnboarding(TransactionCase):
         )
         self.assertEqual(website.company_id, company)
 
+    def test_onboarding_sets_address_and_tax_registration(self):
+        kerala = self.env["res.country.state"].search(
+            [("code", "=", "KL"), ("country_id", "=", self.env.ref("base.in").id)],
+            limit=1,
+        )
+        self._wizard(
+            street="1st Floor, Example Complex",
+            street2="Example Road",
+            city="Ernakulam",
+            state_id=kerala.id,
+            zip="682001",
+            phone="09876543210",
+            # real-format GSTIN/PAN required by l10n_in's validation; this is
+            # the same constant l10n_in itself uses as a "known valid" test
+            # number (see TEST_GST_NUMBER in l10n_in/models/res_partner.py),
+            # with its embedded PAN (chars 3-12) as the PAN field.
+            vat="36AABCT1332L011",
+            l10n_in_pan="AABCT1332L",
+        ).action_onboard()
+        company = self.env["res.company"].search(
+            [("name", "=", "Onboard Test Client")]
+        )
+        self.assertEqual(company.street, "1st Floor, Example Complex")
+        self.assertEqual(company.city, "Ernakulam")
+        self.assertEqual(company.state_id, kerala)
+        self.assertEqual(company.zip, "682001")
+        self.assertEqual(company.country_id, self.env.ref("base.in"))
+        self.assertEqual(company.phone, "09876543210")
+        self.assertEqual(company.vat, "36AABCT1332L011")
+        self.assertEqual(company.l10n_in_pan, "AABCT1332L")
+
     def test_onboarding_creates_a_default_warehouse(self):
         """Native res.company.create() (stock module) sets up per-company
         locations/sequences but never a stock.warehouse in production -

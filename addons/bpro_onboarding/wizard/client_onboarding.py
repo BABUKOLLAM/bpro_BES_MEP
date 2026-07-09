@@ -23,6 +23,17 @@ class ClientOnboarding(models.TransientModel):
         help="White-label portal domain, e.g. clientname.bprolms.com. "
         "Leave empty to configure later.",
     )
+    street = fields.Char(string="Street")
+    street2 = fields.Char(string="Street 2")
+    city = fields.Char(string="City")
+    state_id = fields.Many2one("res.country.state", string="State")
+    zip = fields.Char(string="PIN Code")
+    country_id = fields.Many2one(
+        "res.country", string="Country", default=lambda self: self.env.ref("base.in")
+    )
+    phone = fields.Char(string="Company Phone")
+    vat = fields.Char(string="GSTIN")
+    l10n_in_pan = fields.Char(string="PAN")
 
     @staticmethod
     def _bpro_warehouse_code(name):
@@ -53,6 +64,15 @@ class ClientOnboarding(models.TransientModel):
                 "name": self.client_name,
                 "parent_id": master.id,
                 "logo": self.logo or master.logo,
+                "street": self.street,
+                "street2": self.street2,
+                "city": self.city,
+                "state_id": self.state_id.id,
+                "zip": self.zip,
+                "country_id": self.country_id.id,
+                "phone": self.phone,
+                "vat": self.vat,
+                "l10n_in_pan": self.l10n_in_pan,
             }
         )
         # the operating super admin must be allowed on the new company

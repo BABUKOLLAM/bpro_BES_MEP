@@ -18,6 +18,23 @@
                         <field name="hr_password" password="True"/>
                     </group>
                 </group>
+                <group string="Registered Address">
+                    <group>
+                        <field name="street"/>
+                        <field name="street2"/>
+                        <field name="city"/>
+                        <field name="zip"/>
+                    </group>
+                    <group>
+                        <field name="state_id"/>
+                        <field name="country_id"/>
+                        <field name="phone"/>
+                    </group>
+                </group>
+                <group string="Tax Registration">
+                    <field name="vat" placeholder="e.g. 32AAAAA0000A1Z5"/>
+                    <field name="l10n_in_pan" placeholder="e.g. AAAAA0000A"/>
+                </group>
                 <footer>
                     <button name="action_onboard" string="Onboard Client" type="object" class="btn-primary"/>
                     <button string="Cancel" class="btn-secondary" special="cancel"/>
