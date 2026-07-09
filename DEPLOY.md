@@ -63,7 +63,21 @@ crontab -e
 
 Copy `~/bpro-backups` off-server periodically (rclone to Google Drive works well).
 
-## 6. Going live checklist
+## 6. Static downloads (e.g. the customer user manual)
+
+Caddy serves `deploy/static/` directly at `/downloads/*` — no Odoo involved,
+so it works even if the app is down. To publish a file:
+
+```bash
+cp bpro_user_manual.docx deploy/static/manuals/bpro_user_manual.docx
+docker compose -f deploy/docker-compose.prod.yml restart caddy
+```
+
+It's then reachable at `https://app.bprolms.com/downloads/manuals/bpro_user_manual.docx`
+(or under each client's own portal domain, since every site block gets the
+same `handle_path` — see `deploy/Caddyfile`).
+
+## 7. Going live checklist
 
 - [ ] `admin_passwd` changed in `config/odoo.prod.conf`
 - [ ] Strong super-admin password + 2FA on `tech@bpropms.com`
@@ -75,7 +89,7 @@ Copy `~/bpro-backups` off-server periodically (rclone to Google Drive works well
 - [ ] First real client onboarded via the wizard, portal domain added to
       Caddyfile, `docker compose ... restart caddy`
 
-## 7. Updating the app (new addon code)
+## 8. Updating the app (new addon code)
 
 ```bash
 cd bpro-lms-pms && git pull

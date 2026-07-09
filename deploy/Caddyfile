@@ -4,6 +4,13 @@
 app.bprolms.com {
     encode gzip
 
+    # Static downloads (e.g. the customer user manual) served directly by
+    # Caddy, no Odoo request involved. Drop files in deploy/static/<path>.
+    handle_path /downloads/* {
+        root * /srv/static
+        file_server
+    }
+
     # Odoo live-chat / realtime uses the gevent port
     @websocket path /websocket /websocket/*
     reverse_proxy @websocket odoo:8072
