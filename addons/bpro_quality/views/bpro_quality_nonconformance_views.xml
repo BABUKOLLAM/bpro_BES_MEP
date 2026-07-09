@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_bpro_quality_nonconformance_list" model="ir.ui.view">
+        <field name="name">bpro.quality.nonconformance.list</field>
+        <field name="model">bpro.quality.nonconformance</field>
+        <field name="arch" type="xml">
+            <list decoration-danger="state == 'open'" decoration-muted="state == 'closed'">
+                <field name="name"/>
+                <field name="product_id"/>
+                <field name="state"/>
+                <field name="responsible_user_id"/>
+                <field name="check_id"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_bpro_quality_nonconformance_form" model="ir.ui.view">
+        <field name="name">bpro.quality.nonconformance.form</field>
+        <field name="model">bpro.quality.nonconformance</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name" readonly="1"/>
+                            <field name="product_id" readonly="1"/>
+                            <field name="check_id" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="responsible_user_id"/>
+                            <field name="company_id" groups="base.group_multi_company" readonly="1"/>
+                        </group>
+                    </group>
+                    <group string="Description">
+                        <field name="description" nolabel="1"/>
+                    </group>
+                    <group string="Root Cause">
+                        <field name="root_cause" nolabel="1"/>
+                    </group>
+                    <group string="Corrective Action">
+                        <field name="corrective_action" nolabel="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_bpro_quality_nonconformance" model="ir.actions.act_window">
+        <field name="name">Non-Conformances</field>
+        <field name="res_model">bpro.quality.nonconformance</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <menuitem id="menu_bpro_quality_nonconformance" name="Non-Conformances"
+              parent="stock.menu_warehouse_report" action="action_bpro_quality_nonconformance"
+              groups="stock.group_stock_user" sequence="22"/>
+</odoo>

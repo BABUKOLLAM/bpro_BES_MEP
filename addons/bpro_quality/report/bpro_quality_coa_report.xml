@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_report_bpro_quality_coa" model="ir.actions.report">
+        <field name="name">Certificate of Analysis</field>
+        <field name="model">bpro.quality.check</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">bpro_quality.report_bpro_quality_coa_document</field>
+        <field name="report_file">bpro_quality.report_bpro_quality_coa_document</field>
+        <field name="print_report_name">'Certificate of Analysis - %s' % (object.product_id.display_name)</field>
+        <field name="binding_model_id" ref="model_bpro_quality_check"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <template id="report_bpro_quality_coa_document">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <h2>Certificate of Analysis</h2>
+                        <table class="table table-sm" style="margin-top: 16px;">
+                            <tr>
+                                <td><strong>Product</strong></td>
+                                <td><span t-field="doc.product_id.display_name"/></td>
+                                <td><strong>Quality Checkpoint</strong></td>
+                                <td><span t-field="doc.quality_point_id.name"/></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Checked By</strong></td>
+                                <td><span t-field="doc.checked_by.name"/></td>
+                                <td><strong>Checked At</strong></td>
+                                <td><span t-field="doc.checked_at"/></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Reference</strong></td>
+                                <td colspan="3">
+                                    <span t-if="doc.picking_id" t-field="doc.picking_id.name"/>
+                                    <span t-if="doc.workorder_id" t-field="doc.workorder_id.display_name"/>
+                                </td>
+                            </tr>
+                        </table>
+
+                        <h4 style="margin-top: 24px;">Test Results</h4>
+                        <table class="table table-sm table-bordered">
+                            <thead>
+                                <tr class="bg-light">
+                                    <th>Parameter</th>
+                                    <th>Min</th>
+                                    <th>Max</th>
+                                    <th>Unit</th>
+                                    <th>Measured</th>
+                                    <th>Result</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="doc.line_ids" t-as="line">
+                                    <td><span t-field="line.parameter_id.name"/></td>
+                                    <td><span t-field="line.min_value"/></td>
+                                    <td><span t-field="line.max_value"/></td>
+                                    <td><span t-field="line.uom_name"/></td>
+                                    <td><span t-field="line.measured_value"/></td>
+                                    <td>
+                                        <span t-if="line.is_within_spec" class="text-success">Within Spec</span>
+                                        <span t-if="not line.is_within_spec" class="text-danger">Out of Spec</span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <p t-if="not doc.line_ids" class="text-muted">
+                            No measured test parameters were configured for this checkpoint - overall
+                            result recorded as a simple pass/fail.
+                        </p>
+
+                        <h3 style="margin-top: 24px;">
+                            Overall Result:
+                            <span t-if="doc.result == 'pass'" class="text-success">PASS</span>
+                            <span t-if="doc.result == 'fail'" class="text-danger">FAIL</span>
+                        </h3>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

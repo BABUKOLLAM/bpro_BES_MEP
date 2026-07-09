@@ -62,6 +62,77 @@
         </field>
     </record>
 
+    <record id="view_bpro_quality_check_form" model="ir.ui.view">
+        <field name="name">bpro.quality.check.form</field>
+        <field name="model">bpro.quality.check</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_bpro_pass" string="Pass" type="object"
+                            class="btn-primary" invisible="result == 'pass'"/>
+                    <button name="action_bpro_fail" string="Fail" type="object"
+                            class="btn-secondary" invisible="result == 'fail'"/>
+                    <button name="action_print_coa" string="Print Certificate of Analysis"
+                            type="object" invisible="result != 'pass'"/>
+                    <field name="result" widget="statusbar" statusbar_visible="none,pass,fail"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="quality_point_id"/>
+                            <field name="product_id"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                        <group>
+                            <field name="picking_id" invisible="not picking_id"/>
+                            <field name="workorder_id" invisible="not workorder_id"/>
+                            <field name="checked_by" readonly="1"/>
+                            <field name="checked_at" readonly="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Test Results">
+                            <field name="line_ids">
+                                <list editable="bottom" decoration-danger="not is_within_spec">
+                                    <field name="parameter_id"/>
+                                    <field name="min_value" readonly="1"/>
+                                    <field name="max_value" readonly="1"/>
+                                    <field name="uom_name" readonly="1"/>
+                                    <field name="measured_value"/>
+                                    <field name="is_within_spec"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Non-Conformance" invisible="not nonconformance_ids">
+                            <field name="nonconformance_ids">
+                                <list editable="bottom">
+                                    <field name="name" readonly="1"/>
+                                    <field name="state"/>
+                                    <field name="responsible_user_id"/>
+                                    <field name="root_cause"/>
+                                    <field name="corrective_action"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Notes">
+                            <field name="note" nolabel="1"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_bpro_quality_check" model="ir.actions.act_window">
+        <field name="name">Quality Checks</field>
+        <field name="res_model">bpro.quality.check</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <menuitem id="menu_bpro_quality_check" name="Quality Checks"
+              parent="stock.menu_warehouse_report" action="action_bpro_quality_check"
+              groups="stock.group_stock_user" sequence="20"/>
+
     <record id="view_bpro_quality_check_pivot" model="ir.ui.view">
         <field name="name">bpro.quality.check.pivot</field>
         <field name="model">bpro.quality.check</field>

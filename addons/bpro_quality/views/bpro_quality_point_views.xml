@@ -17,6 +17,20 @@
                     <group string="Instructions">
                         <field name="instructions" nolabel="1"/>
                     </group>
+                    <notebook>
+                        <page string="Test Parameters">
+                            <field name="test_parameter_ids">
+                                <list editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="name"/>
+                                    <field name="uom_name"/>
+                                    <field name="min_value"/>
+                                    <field name="target_value"/>
+                                    <field name="max_value"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
                 </sheet>
             </form>
         </field>

@@ -18,6 +18,17 @@ built from scratch.
   shape already used for the stock-shortage and discount-approval gates
   elsewhere in this codebase.
 * A pass/fail rate report by product.
+
+Factory-level QA/QC additions:
+* bpro.quality.test.parameter: measurable specs (e.g. Thickness, Tensile
+  Strength) with min/max/target limits, configured per quality point.
+* Every check auto-creates one result line per configured parameter;
+  a check cannot be passed while any measured value is outside its
+  spec limits.
+* Failing a check auto-creates a bpro.quality.nonconformance record
+  (root cause / corrective action / responsible person / state).
+* Certificate of Analysis: a printable PDF listing every measured
+  parameter against its spec, available on any passed check.
 """,
     "version": "18.0.1.0.0",
     "category": "Manufacturing/Quality",
@@ -29,6 +40,8 @@ built from scratch.
         "security/ir.model.access.csv",
         "views/bpro_quality_point_views.xml",
         "views/bpro_quality_check_views.xml",
+        "views/bpro_quality_nonconformance_views.xml",
+        "report/bpro_quality_coa_report.xml",
     ],
     "installable": True,
     "application": False,

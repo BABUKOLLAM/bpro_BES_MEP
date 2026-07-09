@@ -3,3 +3,9 @@ access_bpro_quality_point_manager,bpro.quality.point manager,model_bpro_quality_
 access_bpro_quality_point_user,bpro.quality.point user,model_bpro_quality_point,stock.group_stock_user,1,0,0,0
 access_bpro_quality_check_manager,bpro.quality.check manager,model_bpro_quality_check,stock.group_stock_manager,1,1,1,1
 access_bpro_quality_check_user,bpro.quality.check user,model_bpro_quality_check,stock.group_stock_user,1,1,1,0
+access_bpro_quality_test_parameter_manager,bpro.quality.test.parameter manager,model_bpro_quality_test_parameter,stock.group_stock_manager,1,1,1,1
+access_bpro_quality_test_parameter_user,bpro.quality.test.parameter user,model_bpro_quality_test_parameter,stock.group_stock_user,1,0,0,0
+access_bpro_quality_check_line_manager,bpro.quality.check.line manager,model_bpro_quality_check_line,stock.group_stock_manager,1,1,1,1
+access_bpro_quality_check_line_user,bpro.quality.check.line user,model_bpro_quality_check_line,stock.group_stock_user,1,1,1,0
+access_bpro_quality_nonconformance_manager,bpro.quality.nonconformance manager,model_bpro_quality_nonconformance,stock.group_stock_manager,1,1,1,1
+access_bpro_quality_nonconformance_user,bpro.quality.nonconformance user,model_bpro_quality_nonconformance,stock.group_stock_user,1,1,1,0

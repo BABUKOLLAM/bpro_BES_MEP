@@ -26,6 +26,12 @@ class BproQualityPoint(models.Model):
         "res.company", required=True, default=lambda self: self.env.company
     )
     active = fields.Boolean(default=True)
+    test_parameter_ids = fields.One2many(
+        "bpro.quality.test.parameter", "quality_point_id", string="Test Parameters",
+        help="Measurable specs (e.g. Thickness, Tensile Strength) checked against "
+        "min/max limits every time this checkpoint is used. Leave empty for a "
+        "simple pass/fail checkpoint with no measured values.",
+    )
 
     @api.model
     def _bpro_applicable_points(self, operation, product, company):
