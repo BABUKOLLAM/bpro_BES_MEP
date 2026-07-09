@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_bpro_field_journey_plan_manager,bpro.field.journey.plan manager,model_bpro_field_journey_plan,sales_team.group_sale_manager,1,1,1,1
+access_bpro_field_journey_plan_user,bpro.field.journey.plan user,model_bpro_field_journey_plan,sales_team.group_sale_salesman,1,1,1,0
+access_bpro_field_collection_plan_manager,bpro.field.collection.plan manager,model_bpro_field_collection_plan,sales_team.group_sale_manager,1,1,1,1
+access_bpro_field_collection_plan_user,bpro.field.collection.plan user,model_bpro_field_collection_plan,sales_team.group_sale_salesman,1,1,1,0

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_bpro_field_journey_plan_list" model="ir.ui.view">
+        <field name="name">bpro.field.journey.plan.list</field>
+        <field name="model">bpro.field.journey.plan</field>
+        <field name="arch" type="xml">
+            <list decoration-success="state == 'visited'" decoration-danger="state == 'missed'">
+                <field name="visit_date"/>
+                <field name="employee_id"/>
+                <field name="partner_id"/>
+                <field name="purpose"/>
+                <field name="state"/>
+                <button name="action_mark_visited" type="object" string="Visited"
+                        invisible="state != 'planned'" class="btn-link"/>
+                <button name="action_mark_missed" type="object" string="Missed"
+                        invisible="state != 'planned'" class="btn-link"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_bpro_field_journey_plan_form" model="ir.ui.view">
+        <field name="name">bpro.field.journey.plan.form</field>
+        <field name="model">bpro.field.journey.plan</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_mark_visited" string="Mark Visited" type="object"
+                            class="btn-primary" invisible="state != 'planned'"/>
+                    <button name="action_mark_missed" string="Mark Missed" type="object"
+                            class="btn-secondary" invisible="state != 'planned'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="planned,visited,missed"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="employee_id"/>
+                            <field name="partner_id"/>
+                            <field name="visit_date"/>
+                        </group>
+                        <group>
+                            <field name="purpose"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                    </group>
+                    <group string="Visit Notes">
+                        <field name="visit_notes" nolabel="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_bpro_field_journey_plan_calendar" model="ir.ui.view">
+        <field name="name">bpro.field.journey.plan.calendar</field>
+        <field name="model">bpro.field.journey.plan</field>
+        <field name="arch" type="xml">
+            <calendar date_start="visit_date" string="Journey Plan" color="employee_id">
+                <field name="partner_id"/>
+                <field name="employee_id"/>
+            </calendar>
+        </field>
+    </record>
+
+    <record id="action_bpro_field_journey_plan" model="ir.actions.act_window">
+        <field name="name">Field Journey Plan</field>
+        <field name="res_model">bpro.field.journey.plan</field>
+        <field name="view_mode">list,calendar,form</field>
+    </record>
+
+    <menuitem id="menu_bpro_field_journey_plan" name="Field Journey Plan"
+              parent="crm.crm_menu_root" action="action_bpro_field_journey_plan"
+              sequence="25"/>
+</odoo>
