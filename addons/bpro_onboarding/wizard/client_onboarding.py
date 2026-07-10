@@ -73,6 +73,15 @@ class ClientOnboarding(models.TransientModel):
                 "phone": self.phone,
                 "vat": self.vat,
                 "l10n_in_pan": self.l10n_in_pan,
+                # Odoo enforces that a company with parent_id set must carry
+                # the *exact same* currency_id as its root company (native
+                # constraint: res.company._check_root_delegated_fields) -
+                # branches can't each bill in a different currency. Set it
+                # explicitly to the master's currency rather than relying on
+                # res.company.create()'s own default (env.company.currency_id
+                # of whichever company happens to be active when the wizard
+                # runs), so onboarding never depends on that context.
+                "currency_id": master.currency_id.id,
             }
         )
         # the operating super admin must be allowed on the new company

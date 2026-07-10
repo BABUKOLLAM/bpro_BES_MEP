@@ -93,6 +93,23 @@ class TestOnboarding(TransactionCase):
         self.assertEqual(company.vat, "36AABCT1332L011")
         self.assertEqual(company.l10n_in_pan, "AABCT1332L")
 
+    def test_onboarding_currency_always_matches_the_master_company(self):
+        """Odoo enforces that a company with parent_id set must carry the
+        exact same currency_id as its root company (native constraint:
+        res.company._check_root_delegated_fields - branches of one group
+        can't each bill in a different currency). A client's own country
+        can't override this, so onboarding must always take the master's
+        currency, whatever the client's address country is."""
+        master = self.env["res.company"].search(
+            [("parent_id", "=", False)], limit=1, order="id"
+        )
+        malaysia = self.env.ref("base.my")
+        self._wizard(country_id=malaysia.id).action_onboard()
+        company = self.env["res.company"].search(
+            [("name", "=", "Onboard Test Client")]
+        )
+        self.assertEqual(company.currency_id, master.currency_id)
+
     def test_onboarding_creates_a_default_warehouse(self):
         """Native res.company.create() (stock module) sets up per-company
         locations/sequences but never a stock.warehouse in production -
