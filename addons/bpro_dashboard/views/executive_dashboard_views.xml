@@ -4,44 +4,121 @@
         <field name="name">bpro.executive.dashboard.form</field>
         <field name="model">bpro.executive.dashboard</field>
         <field name="arch" type="xml">
-            <form>
-                <group>
-                    <field name="as_of_date"/>
-                </group>
+            <form class="bpro_dashboard_form">
                 <field name="currency_id" invisible="1"/>
-                <group string="Sales &amp; CRM" col="4">
-                    <field name="sales_mtd_revenue" widget="monetary" string="Revenue (MTD)"/>
-                </group>
-                <group string="Manufacturing" col="4">
-                    <field name="mfg_avg_variance_pct" string="Avg Output Variance %"/>
-                </group>
-                <group string="Inventory &amp; Warehouse" col="4">
-                    <field name="inventory_pending_adjustments" string="Pending Adjustment Approvals"/>
-                </group>
-                <group string="Finance &amp; Accounts" col="4">
-                    <field name="cash_position" widget="monetary"/>
-                    <field name="total_receivables" widget="monetary"/>
-                    <field name="total_payables" widget="monetary"/>
-                    <field name="current_ratio"/>
-                </group>
-                <group string="HR" col="4">
-                    <field name="hr_pending_expense_approvals" string="Pending Expense Approvals"/>
-                </group>
-                <group string="Logistics &amp; Supply Chain" col="4">
-                    <field name="logistics_on_time_pct" string="On-Time Delivery % (MTD)"/>
-                </group>
-                <group string="Quality Management" col="4">
-                    <field name="quality_pass_rate_pct" string="Pass Rate %"/>
-                </group>
-                <group string="Plant &amp; Machinery" col="4">
-                    <field name="plant_total_asset_book_value" widget="monetary" string="Total Asset Book Value"/>
-                </group>
-                <group string="Project Management" col="4">
-                    <field name="project_pending_budget_approvals" string="Pending Budget Approvals"/>
-                </group>
-                <group string="Fleet Management" col="4">
-                    <field name="fleet_trip_cost" widget="monetary" string="Total Trip Cost"/>
-                </group>
+                <div class="bpro_dashboard_header d-flex justify-content-between align-items-center flex-wrap">
+                    <h1 class="bpro_dashboard_title">Executive Dashboard</h1>
+                    <div>
+                        <label for="as_of_date" string="As of" class="me-2"/>
+                        <field name="as_of_date" class="d-inline-block"/>
+                    </div>
+                </div>
+
+                <div class="bpro_kpi_grid">
+                    <div class="bpro_kpi_card bpro_kpi_blue">
+                        <span class="bpro_kpi_label">Sales &amp; CRM</span>
+                        <span class="bpro_kpi_value">
+                            <field name="sales_mtd_revenue" widget="monetary" nolabel="1"/>
+                        </span>
+                        <span class="bpro_kpi_sublabel">Revenue (MTD)</span>
+                    </div>
+
+                    <div class="bpro_kpi_card bpro_kpi_green">
+                        <span class="bpro_kpi_label">Manufacturing</span>
+                        <span class="bpro_kpi_value">
+                            <field name="mfg_avg_variance_pct" nolabel="1"/><span class="bpro_kpi_unit"> %</span>
+                        </span>
+                        <span class="bpro_kpi_sublabel">Avg Output Variance</span>
+                    </div>
+
+                    <div class="bpro_kpi_card bpro_kpi_blue">
+                        <span class="bpro_kpi_label">Inventory &amp; Warehouse</span>
+                        <span class="bpro_kpi_value">
+                            <field name="inventory_pending_adjustments" nolabel="1"/>
+                        </span>
+                        <span class="bpro_kpi_sublabel">Pending Adjustment Approvals</span>
+                    </div>
+
+                    <div class="bpro_kpi_card bpro_kpi_green">
+                        <span class="bpro_kpi_label">Finance</span>
+                        <span class="bpro_kpi_value">
+                            <field name="cash_position" widget="monetary" nolabel="1"/>
+                        </span>
+                        <span class="bpro_kpi_sublabel">Cash Position</span>
+                    </div>
+
+                    <div class="bpro_kpi_card bpro_kpi_blue">
+                        <span class="bpro_kpi_label">Finance</span>
+                        <span class="bpro_kpi_value">
+                            <field name="total_receivables" widget="monetary" nolabel="1"/>
+                        </span>
+                        <span class="bpro_kpi_sublabel">Total Receivables</span>
+                    </div>
+
+                    <div class="bpro_kpi_card bpro_kpi_green">
+                        <span class="bpro_kpi_label">Finance</span>
+                        <span class="bpro_kpi_value">
+                            <field name="total_payables" widget="monetary" nolabel="1"/>
+                        </span>
+                        <span class="bpro_kpi_sublabel">Total Payables</span>
+                    </div>
+
+                    <div class="bpro_kpi_card bpro_kpi_blue">
+                        <span class="bpro_kpi_label">Finance</span>
+                        <span class="bpro_kpi_value">
+                            <field name="current_ratio" nolabel="1"/>
+                        </span>
+                        <span class="bpro_kpi_sublabel">Current Ratio</span>
+                    </div>
+
+                    <div class="bpro_kpi_card bpro_kpi_green">
+                        <span class="bpro_kpi_label">Human Resources</span>
+                        <span class="bpro_kpi_value">
+                            <field name="hr_pending_expense_approvals" nolabel="1"/>
+                        </span>
+                        <span class="bpro_kpi_sublabel">Pending Expense Approvals</span>
+                    </div>
+
+                    <div class="bpro_kpi_card bpro_kpi_blue">
+                        <span class="bpro_kpi_label">Logistics &amp; Supply Chain</span>
+                        <span class="bpro_kpi_value">
+                            <field name="logistics_on_time_pct" nolabel="1"/><span class="bpro_kpi_unit"> %</span>
+                        </span>
+                        <span class="bpro_kpi_sublabel">On-Time Delivery (MTD)</span>
+                    </div>
+
+                    <div class="bpro_kpi_card bpro_kpi_green">
+                        <span class="bpro_kpi_label">Quality Management</span>
+                        <span class="bpro_kpi_value">
+                            <field name="quality_pass_rate_pct" nolabel="1"/><span class="bpro_kpi_unit"> %</span>
+                        </span>
+                        <span class="bpro_kpi_sublabel">Pass Rate</span>
+                    </div>
+
+                    <div class="bpro_kpi_card bpro_kpi_blue">
+                        <span class="bpro_kpi_label">Plant &amp; Machinery</span>
+                        <span class="bpro_kpi_value">
+                            <field name="plant_total_asset_book_value" widget="monetary" nolabel="1"/>
+                        </span>
+                        <span class="bpro_kpi_sublabel">Total Asset Book Value</span>
+                    </div>
+
+                    <div class="bpro_kpi_card bpro_kpi_green">
+                        <span class="bpro_kpi_label">Project Management</span>
+                        <span class="bpro_kpi_value">
+                            <field name="project_pending_budget_approvals" nolabel="1"/>
+                        </span>
+                        <span class="bpro_kpi_sublabel">Pending Budget Approvals</span>
+                    </div>
+
+                    <div class="bpro_kpi_card bpro_kpi_blue">
+                        <span class="bpro_kpi_label">Fleet Management</span>
+                        <span class="bpro_kpi_value">
+                            <field name="fleet_trip_cost" widget="monetary" nolabel="1"/>
+                        </span>
+                        <span class="bpro_kpi_sublabel">Total Trip Cost</span>
+                    </div>
+                </div>
             </form>
         </field>
     </record>

@@ -42,6 +42,7 @@ class TestOnboarding(TransactionCase):
             "purchase.group_purchase_manager",
             "account.group_account_manager",
             "hr.group_hr_manager",
+            "mrp.group_mrp_manager",
             "maintenance.group_equipment_manager",
             "project.group_project_manager",
             "fleet.fleet_group_manager",

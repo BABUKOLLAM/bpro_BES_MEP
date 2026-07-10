@@ -1,9 +1,16 @@
 // bpro brand palette — loaded before Odoo's primary variables so the
-// !default assignments pick these up.
-// Navy from the BPro logo background, red from the infinity mark.
+// !default assignments pick these up. Blue/green: blue for trust and
+// stability (navbar, primary actions), green for growth and positive
+// progress (secondary actions) - kept distinct from Bootstrap's own
+// semantic success green so "branded" and "status" never read as the
+// same thing.
 
-$o-brand-odoo: #0D2B4E;      // top navbar / backend accents
-$o-brand-primary: #C93A24;   // primary buttons and links (logo red, darkened for contrast)
+$bpro-blue: #14486B;
+$bpro-green: #1C7C54;
 
-$o-community-color: #0D2B4E;
-$o-enterprise-color: #0D2B4E;
+$o-brand-odoo: $bpro-blue;       // top navbar / backend accents
+$o-brand-primary: $bpro-blue;    // primary buttons and links
+$o-brand-secondary: $bpro-green; // secondary buttons and accents
+
+$o-community-color: $bpro-blue;
+$o-enterprise-color: $bpro-blue;

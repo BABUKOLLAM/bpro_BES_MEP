@@ -109,16 +109,23 @@ class ClientOnboarding(models.TransientModel):
 
         # Client HR Admin is this company's first administrator: also grant
         # manager access to the ERP apps (Sales, Inventory, Purchase,
-        # Accounting, HR, Plant/Maintenance, Project, Fleet) so they can
-        # configure their company's setup without a second onboarding step.
-        # Scoped to `company` via company_ids above/below — Odoo's native
-        # multi-company mechanism, not a new bpro-specific rule.
+        # Accounting, HR, Manufacturing, Plant/Maintenance, Project, Fleet)
+        # so they can configure their company's setup without a second
+        # onboarding step. Scoped to `company` via company_ids above/below -
+        # Odoo's native multi-company mechanism, not a new bpro-specific
+        # rule. mrp.group_mrp_manager is required separately from
+        # maintenance.group_equipment_manager - bpro_plant's Plant &
+        # Machinery asset register is ACL-gated on the Manufacturing group,
+        # not the Maintenance one (discovered live: the Executive Dashboard's
+        # plant asset book value KPI was inaccessible to a client HR Admin
+        # without it).
         erp_manager_groups = [
             "sales_team.group_sale_manager",
             "stock.group_stock_manager",
             "purchase.group_purchase_manager",
             "account.group_account_manager",
             "hr.group_hr_manager",
+            "mrp.group_mrp_manager",
             "maintenance.group_equipment_manager",
             "project.group_project_manager",
             "fleet.fleet_group_manager",

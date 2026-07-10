@@ -20,6 +20,7 @@ Client onboarding wizard for bpro Super Admins:
         "stock",
         "purchase",
         "account",
+        "mrp",
         "maintenance",
         "project",
         "fleet",

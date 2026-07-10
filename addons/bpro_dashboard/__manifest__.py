@@ -40,6 +40,11 @@ Blends two kinds of signal deliberately:
         "security/ir.model.access.csv",
         "views/executive_dashboard_views.xml",
     ],
+    "assets": {
+        "web.assets_backend": [
+            "bpro_dashboard/static/src/scss/bpro_dashboard.scss",
+        ],
+    },
     "installable": True,
     "application": False,
 }

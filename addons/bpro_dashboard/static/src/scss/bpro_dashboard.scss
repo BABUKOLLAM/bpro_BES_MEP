@@ -1,0 +1,73 @@
+.bpro_dashboard_form {
+    background: #F3F6F5;
+    padding: 24px 28px;
+}
+
+.bpro_dashboard_header {
+    margin-bottom: 20px;
+
+    .bpro_dashboard_title {
+        font-size: 1.6rem;
+        font-weight: 600;
+        color: #14486B;
+        margin: 0;
+    }
+}
+
+.bpro_kpi_grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+}
+
+.bpro_kpi_card {
+    background: #FFFFFF;
+    border-radius: 10px;
+    border: 1px solid #E1E8E6;
+    border-left: 4px solid #14486B;
+    box-shadow: 0 1px 3px rgba(20, 72, 107, 0.06);
+    padding: 14px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-height: 92px;
+
+    &.bpro_kpi_green {
+        border-left-color: #1C7C54;
+    }
+
+    .bpro_kpi_label {
+        font-size: 0.72rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        color: #6B7A77;
+    }
+
+    .bpro_kpi_value {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #1A2B27;
+        line-height: 1.2;
+
+        .o_field_widget {
+            font-size: inherit;
+            font-weight: inherit;
+            color: inherit;
+        }
+
+        input {
+            font-size: inherit !important;
+            font-weight: inherit !important;
+            color: inherit !important;
+            border: none !important;
+            padding: 0 !important;
+            background: transparent !important;
+        }
+    }
+
+    .bpro_kpi_sublabel {
+        font-size: 0.78rem;
+        color: #8B9895;
+    }
+}
