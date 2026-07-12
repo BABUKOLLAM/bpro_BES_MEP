@@ -39,6 +39,7 @@ class StockWarehouseOrderpoint(models.Model):
             )
             domain = [
                 ("product_id", "=", orderpoint.product_id.id),
+                ("company_id", "=", (orderpoint.company_id or self.env.company).id),
                 ("state", "=", "done"),
                 ("date", ">=", since),
             ]

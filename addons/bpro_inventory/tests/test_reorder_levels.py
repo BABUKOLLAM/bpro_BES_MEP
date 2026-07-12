@@ -133,6 +133,38 @@ class TestReorderLevels(TransactionCase):
         orderpoint = self._orderpoint(product, lookback_days=90)
         self.assertEqual(orderpoint.bpro_avg_daily_demand, 1.0)
 
+    def test_demand_does_not_leak_across_companies(self):
+        """Deliveries of a product shared across companies (same
+        product.product with no company restriction) must not inflate a
+        different company's reorder-level suggestion - the underlying
+        stock.move search must scope by the orderpoint's own company_id."""
+        product = self.env["product.product"].create(
+            {"name": "Reorder Test Cross-Company Product", "is_storable": True}
+        )
+        self._deliver_to_customer(product, 90.0)  # demand booked under self.company
+
+        other_company = self.env["res.company"].create(
+            {"name": "Other Reorder Co", "parent_id": self.company.id}
+        )
+        other_warehouse = self.env["stock.warehouse"].search(
+            [("company_id", "=", other_company.id)], limit=1
+        )
+        other_orderpoint = self.env["stock.warehouse.orderpoint"].create(
+            {
+                "product_id": product.id,
+                "company_id": other_company.id,
+                "location_id": other_warehouse.lot_stock_id.id,
+                "warehouse_id": other_warehouse.id,
+                "bpro_lookback_days": 90,
+            }
+        )
+        self.assertEqual(
+            other_orderpoint.bpro_avg_daily_demand,
+            0.0,
+            "other_company has shipped none of this product - the main "
+            "company's demand must not leak into its suggestion",
+        )
+
     def test_production_consumption_drives_avg_daily_demand(self):
         component = self.env["product.product"].create(
             {"name": "Reorder Test Component", "is_storable": True}

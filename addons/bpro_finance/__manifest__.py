@@ -24,6 +24,7 @@ Invoice generation from a confirmed sales order and payment registration (full/p
     "depends": ["bpro_base", "bpro_approval", "account", "purchase"],
     "data": [
         "security/ir.model.access.csv",
+        "security/bpro_finance_multi_company.xml",
         "views/ar_aging_views.xml",
         "views/finance_dashboard_views.xml",
         "views/account_move_views.xml",

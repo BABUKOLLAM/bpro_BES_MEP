@@ -104,6 +104,58 @@ class TestStockAdjustmentApproval(TransactionCase):
         with self.assertRaises(AccessError):
             quant.with_user(self.stock_user).action_approve()
 
+    def test_threshold_uses_the_records_own_company_not_the_acting_users(self):
+        """_approval_threshold_exceeded() must compare against the
+        quant's own company_id's policy, not self.env.company (the
+        acting user's active company) - otherwise a back-office user
+        whose session company differs from the record's company gets
+        the wrong threshold entirely."""
+        other_company = self.env["res.company"].create(
+            {"name": "Other Adjustment Co", "parent_id": self.company.id}
+        )
+        # a much lower threshold than the main company's 500 configured above
+        self.env["bpro.policy"].create(
+            {
+                "company_id": other_company.id,
+                "key": "stock_adjustment_value",
+                "numeric_value": 50.0,
+            }
+        )
+        other_location = self.env["stock.location"].create(
+            {"name": "Other Co Bin", "usage": "internal", "company_id": other_company.id}
+        )
+        self.env["stock.quant"]._update_available_quantity(
+            self.product, other_location, 10.0
+        )
+        quant = self.env["stock.quant"]._gather(
+            self.product, other_location, strict=True
+        )
+        self.assertEqual(self.env.company, self.company, "acting user stays on the main company")
+        # 10 -> 12, diff 2 units x 100 = 200: under the main company's 500
+        # threshold, but over other_company's own 50 threshold
+        quant.write({"inventory_quantity": 12.0, "bpro_adjustment_reason": "cycle count"})
+        quant.action_apply_inventory()
+        self.assertEqual(
+            quant.approval_state,
+            "pending",
+            "must use other_company's own 50 threshold, not the acting user's "
+            "main-company 500 threshold",
+        )
+
+    def test_non_manager_cannot_bypass_approve_button_with_a_direct_write(self):
+        """action_approve()'s approver check must be enforced at write()
+        itself, not only inside the button method — otherwise any user
+        with ordinary write access to stock.quant could skip the button
+        and set approval_state='approved' directly."""
+        quant = self._quant()
+        quant.write({"inventory_quantity": 20.0, "bpro_adjustment_reason": "large variance"})
+        quant.action_apply_inventory()
+        with self.assertRaises(AccessError):
+            quant.with_user(self.stock_user).write({"approval_state": "approved"})
+        self.assertEqual(
+            quant.quantity, 10.0, "a blocked bypass write must not apply the adjustment"
+        )
+
     def test_first_ever_stock_count_with_reason_succeeds(self):
         # A product/location with zero prior on-hand has no existing quant
         # row - the "Update Quantity" screen must create one and let the

@@ -29,6 +29,7 @@ Two angles, two very different levels of native support:
     "depends": ["bpro_base", "maintenance", "mrp", "account"],
     "data": [
         "security/ir.model.access.csv",
+        "security/bpro_plant_multi_company.xml",
         "views/maintenance_equipment_views.xml",
         "views/mrp_workorder_views.xml",
         "views/bpro_plant_asset_views.xml",

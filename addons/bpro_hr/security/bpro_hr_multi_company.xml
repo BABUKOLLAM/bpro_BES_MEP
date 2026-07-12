@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="rule_bpro_hr_employment_history_multi_company" model="ir.rule">
+        <field name="name">bpro Employment History: multi-company</field>
+        <field name="model_id" ref="model_bpro_hr_employment_history"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+</odoo>

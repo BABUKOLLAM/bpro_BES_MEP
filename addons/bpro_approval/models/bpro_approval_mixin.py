@@ -1,4 +1,4 @@
-from odoo import fields, models
+from odoo import api, fields, models
 from odoo.exceptions import AccessError
 
 APPROVAL_ACTIVITY_SUMMARY = "bpro approval required"
@@ -65,7 +65,9 @@ class BproApprovalMixin(models.AbstractModel):
     def _approval_threshold_exceeded(self):
         self.ensure_one()
         threshold = self.env["bpro.policy"].get_value(
-            self.env.company, self._approval_policy_key(), default=0.0
+            self.company_id or self.env.company,
+            self._approval_policy_key(),
+            default=0.0,
         )
         return self._approval_amount() > threshold
 
@@ -88,7 +90,7 @@ class BproApprovalMixin(models.AbstractModel):
             approver = self.env["res.users"].search(
                 [
                     ("groups_id", "in", rec._approval_group().id),
-                    ("company_id", "=", rec.env.company.id),
+                    ("company_id", "=", (rec.company_id or rec.env.company).id),
                 ],
                 limit=1,
             )
@@ -114,6 +116,34 @@ class BproApprovalMixin(models.AbstractModel):
         self.ensure_one()
         if self._approval_group() not in self.env.user.groups_id:
             raise AccessError("Only an approver may decide on this request.")
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        """action_approve()/action_reject() are the only sanctioned way to
+        set approval_state to a decided value - block it at create() too,
+        not just write() below, so a record can't be born pre-approved by
+        anyone with plain create access to the host model."""
+        for vals in vals_list:
+            if vals.get("approval_state") in ("approved", "rejected"):
+                if self._approval_group() not in self.env.user.groups_id:
+                    raise AccessError(
+                        "Only an approver may create a record already in a "
+                        "decided approval state."
+                    )
+        return super().create(vals_list)
+
+    def write(self, vals):
+        """Deciding an approval must always go through action_approve()/
+        action_reject() (which call _approval_check_is_approver() before
+        writing) - without this override, any user with ordinary write
+        access to the host model (e.g. a salesperson on sale.order, a
+        stock user on stock.quant) could set approval_state='approved'
+        directly via ORM/RPC/an automation rule and skip the approver
+        check those actions exist to enforce."""
+        if vals.get("approval_state") in ("approved", "rejected"):
+            for rec in self:
+                rec._approval_check_is_approver()
+        return super().write(vals)
 
     def _approval_close_activity(self, feedback):
         self.activity_ids.filtered(

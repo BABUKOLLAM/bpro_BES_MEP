@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="rule_bpro_helpdesk_ticket_multi_company" model="ir.rule">
+        <field name="name">bpro Helpdesk Ticket: multi-company</field>
+        <field name="model_id" ref="model_bpro_helpdesk_ticket"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+
+    <record id="rule_bpro_helpdesk_team_multi_company" model="ir.rule">
+        <field name="name">bpro Helpdesk Team: multi-company</field>
+        <field name="model_id" ref="model_bpro_helpdesk_team"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+</odoo>

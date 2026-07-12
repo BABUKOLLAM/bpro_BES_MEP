@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="rule_bpro_field_journey_plan_multi_company" model="ir.rule">
+        <field name="name">bpro Field Journey Plan: multi-company</field>
+        <field name="model_id" ref="model_bpro_field_journey_plan"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+
+    <record id="rule_bpro_field_collection_plan_multi_company" model="ir.rule">
+        <field name="name">bpro Field Collection Plan: multi-company</field>
+        <field name="model_id" ref="model_bpro_field_collection_plan"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+</odoo>

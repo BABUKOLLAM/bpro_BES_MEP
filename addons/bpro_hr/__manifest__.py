@@ -52,6 +52,7 @@ configuration only.
     ],
     "data": [
         "security/ir.model.access.csv",
+        "security/bpro_hr_multi_company.xml",
         "views/hr_expense_sheet_views.xml",
         "views/hr_employment_history_views.xml",
     ],

@@ -38,6 +38,7 @@ Factory-level QA/QC additions:
     "depends": ["bpro_base", "stock", "mrp", "purchase_stock"],
     "data": [
         "security/ir.model.access.csv",
+        "security/bpro_quality_multi_company.xml",
         "views/bpro_quality_point_views.xml",
         "views/bpro_quality_check_views.xml",
         "views/bpro_quality_nonconformance_views.xml",

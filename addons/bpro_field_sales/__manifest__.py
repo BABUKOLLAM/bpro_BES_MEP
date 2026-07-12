@@ -28,6 +28,7 @@ their assigned area:
     "depends": ["bpro_base", "crm", "account"],
     "data": [
         "security/ir.model.access.csv",
+        "security/bpro_field_sales_multi_company.xml",
         "views/bpro_field_journey_plan_views.xml",
         "views/bpro_field_collection_plan_views.xml",
     ],

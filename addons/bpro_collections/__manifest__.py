@@ -30,6 +30,7 @@ is a field rep's own planned visit-by-visit collection schedule.
     "depends": ["bpro_base", "bpro_approval", "account"],
     "data": [
         "security/ir.model.access.csv",
+        "security/bpro_collections_multi_company.xml",
         "views/bpro_collections_case_views.xml",
         "data/ir_cron.xml",
     ],

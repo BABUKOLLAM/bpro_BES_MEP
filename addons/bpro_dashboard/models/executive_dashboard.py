@@ -54,7 +54,17 @@ class BproExecutiveDashboard(models.TransientModel):
                 ("date_order", "<=", as_of_dt),
             ]
         )
-        data["sales_mtd_revenue"] = sum(orders.mapped("amount_total"))
+        # amount_total is in each order's own transaction currency (which
+        # can differ from the company's - see this engagement's per-
+        # document INR pricelist for a company whose own base currency is
+        # USD) - convert before summing, not after, or a mixed-currency
+        # month's total is simply wrong, not just mislabeled.
+        data["sales_mtd_revenue"] = sum(
+            order.currency_id._convert(
+                order.amount_total, company.currency_id, company, as_of_date
+            )
+            for order in orders
+        )
 
         workorders = self.env["mrp.workorder"].search(
             [

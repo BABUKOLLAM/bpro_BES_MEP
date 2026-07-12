@@ -61,7 +61,23 @@ class BproPlantAssetDepreciationLine(models.Model):
 
     @api.model
     def _bpro_cron_post_due_depreciation(self):
+        """FOR UPDATE SKIP LOCKED (not a plain search()) so an overlapping
+        cron run - a manual trigger while the scheduled run is still mid-
+        flight, or a retry after a timeout - can't both select the same
+        draft line before either commits and double-post it."""
         today = fields.Date.context_today(self)
-        due_lines = self.search([("state", "=", "draft"), ("period_date", "<=", today)])
+        # raw SQL reads the table directly, bypassing the ORM cache - flush
+        # any pending write first (see bpro_sales's identical comment on
+        # its own cron for why).
+        self.env.flush_all()
+        self.env.cr.execute(
+            """
+            SELECT id FROM bpro_plant_asset_depreciation_line
+            WHERE state = 'draft' AND period_date <= %s
+            FOR UPDATE SKIP LOCKED
+            """,
+            (today,),
+        )
+        due_lines = self.browse(row[0] for row in self.env.cr.fetchall())
         for line in due_lines:
             line._bpro_post()

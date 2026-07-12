@@ -44,6 +44,52 @@ class TestExecutiveDashboard(TransactionCase):
         order.action_confirm()
         self.assertEqual(self._kpi()["sales_mtd_revenue"], order.amount_total)
 
+    def test_sales_mtd_revenue_converts_a_foreign_currency_order(self):
+        """An order in a currency other than the company's own must be
+        converted before being summed into the KPI, not added raw -
+        otherwise a single mixed-currency order corrupts the whole
+        month's total rather than just being mislabeled."""
+        foreign_currency = self.env.ref("base.EUR")
+        foreign_currency.active = True
+        self.env["res.currency.rate"].create(
+            {
+                "currency_id": foreign_currency.id,
+                "company_id": self.company.id,
+                "name": fields.Date.context_today(self.env.user),
+                "rate": 2.0,  # 1 company-currency unit = 2 EUR, i.e. EUR100 = 50 company-currency
+            }
+        )
+        pricelist = self.env["product.pricelist"].create(
+            {"name": "Dashboard EUR Pricelist", "currency_id": foreign_currency.id}
+        )
+        partner = self.env["res.partner"].create({"name": "Dashboard EUR Customer"})
+        product = self.env["product.product"].create(
+            {"name": "Dashboard EUR Product", "list_price": 500.0}
+        )
+        order = self.env["sale.order"].create(
+            {
+                "partner_id": partner.id,
+                "pricelist_id": pricelist.id,
+                "order_line": [
+                    (0, 0, {"product_id": product.id, "product_uom_qty": 2})
+                ],
+            }
+        )
+        order.action_confirm()
+        self.assertEqual(order.currency_id, foreign_currency)
+        expected = foreign_currency._convert(
+            order.amount_total,
+            self.company.currency_id,
+            self.company,
+            fields.Date.context_today(self.env.user),
+        )
+        self.assertEqual(self._kpi()["sales_mtd_revenue"], expected)
+        self.assertNotEqual(
+            expected,
+            order.amount_total,
+            "the test must actually exercise a real conversion, not a 1:1 rate",
+        )
+
     def test_mfg_avg_variance_pct(self):
         workcenter = self.env["mrp.workcenter"].create({"name": "Dashboard Workcenter"})
         component = self.env["product.product"].create(

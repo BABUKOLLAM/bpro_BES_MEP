@@ -164,15 +164,30 @@ class SaleOrder(models.Model):
         has arrived. The generated child is a one-off copy (not itself
         recurring, linked back via bpro_recurring_parent_id); the master
         keeps recurring and has its own due date advanced, so re-running
-        the cron the same day is a no-op for orders already renewed."""
+        the cron the same day is a no-op for orders already renewed.
+
+        FOR UPDATE SKIP LOCKED (not a plain search()) so an overlapping
+        cron run can't select the same due master before either commits
+        and generate two renewal orders for it - the search-then-write of
+        bpro_next_recurrence_date below is otherwise a classic TOCTOU gap.
+        """
         today = fields.Date.context_today(self)
-        masters = self.search(
-            [
-                ("bpro_is_recurring", "=", True),
-                ("bpro_next_recurrence_date", "<=", today),
-                ("state", "=", "sale"),
-            ]
+        # raw SQL reads the table directly, bypassing the ORM cache - any
+        # pending write still sitting in cache (e.g. this same method's own
+        # bpro_next_recurrence_date advance from an earlier iteration) must
+        # be flushed first or this query won't see it.
+        self.env.flush_all()
+        self.env.cr.execute(
+            """
+            SELECT id FROM sale_order
+            WHERE bpro_is_recurring = true
+              AND bpro_next_recurrence_date <= %s
+              AND state = 'sale'
+            FOR UPDATE SKIP LOCKED
+            """,
+            (today,),
         )
+        masters = self.browse(row[0] for row in self.env.cr.fetchall())
         for master in masters:
             child = master.copy(
                 {

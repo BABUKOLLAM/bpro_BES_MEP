@@ -28,6 +28,7 @@ built from scratch.
     "depends": ["bpro_base", "bpro_approval", "mail", "sale"],
     "data": [
         "security/ir.model.access.csv",
+        "security/bpro_helpdesk_multi_company.xml",
         "data/helpdesk_stage_data.xml",
         "views/helpdesk_ticket_views.xml",
         "views/helpdesk_team_views.xml",
