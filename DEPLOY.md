@@ -54,8 +54,13 @@ Then log in as `admin`/`admin` and **immediately**:
    entry exists, so this must happen while the database is still empty):
 
    ```bash
-   python3 scripts/setup_india_accounting.py https://app.bprolms.com bpro 'MASTER-USER-PASSWORD'
+   docker compose -f docker-compose.prod.yml exec -i odoo \
+     /entrypoint.sh odoo shell -c /etc/odoo/odoo.conf -d bpro --no-http \
+     < ../scripts/setup_india_accounting.py
    ```
+
+   (Must run inside `odoo shell`, not over XML-RPC — see the script's
+   docstring for why.)
 
 ## 4. Outgoing email
 
