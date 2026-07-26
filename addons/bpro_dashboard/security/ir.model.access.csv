@@ -1,2 +1,8 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_bpro_executive_dashboard_user,bpro.executive.dashboard user,model_bpro_executive_dashboard,base.group_user,1,1,1,1
+access_bpro_item_target_manager,bpro.item.target manager,model_bpro_item_target,sales_team.group_sale_manager,1,1,1,1
+access_bpro_item_target_mfg_manager,bpro.item.target mfg manager,model_bpro_item_target,mrp.group_mrp_manager,1,1,1,1
+access_bpro_item_target_user,bpro.item.target user,model_bpro_item_target,base.group_user,1,0,0,0
+access_bpro_dashboard_item_production_line_user,bpro.dashboard.item.production.line user,model_bpro_dashboard_item_production_line,base.group_user,1,1,1,1
+access_bpro_dashboard_item_sales_line_user,bpro.dashboard.item.sales.line user,model_bpro_dashboard_item_sales_line,base.group_user,1,1,1,1
+access_bpro_dashboard_area_sales_line_user,bpro.dashboard.area.sales.line user,model_bpro_dashboard_area_sales_line,base.group_user,1,1,1,1

@@ -1,4 +1,4 @@
-from datetime import datetime, time
+from datetime import datetime, time, timedelta
 
 from odoo import api, fields, models
 
@@ -26,12 +26,55 @@ class BproExecutiveDashboard(models.TransientModel):
     project_pending_budget_approvals = fields.Integer(compute="_compute_kpis")
     fleet_trip_cost = fields.Monetary(compute="_compute_kpis")
 
+    # Weekly MIS: reproduces the "2026 ME Weekly Meet Report" ritual
+    # (production/sales trend, item-wise achievement, area-wise sales)
+    # from live transaction data instead of a hand-copied spreadsheet.
+    weekly_production_qty = fields.Float(compute="_compute_weekly_mis", digits=(16, 2))
+    production_wow_pct = fields.Float(compute="_compute_weekly_mis", digits=(16, 2))
+    weekly_sales_amount = fields.Monetary(compute="_compute_weekly_mis")
+    sales_wow_pct = fields.Float(compute="_compute_weekly_mis", digits=(16, 2))
+    monthly_production_qty = fields.Float(compute="_compute_weekly_mis", digits=(16, 2))
+    production_mom_pct = fields.Float(compute="_compute_weekly_mis", digits=(16, 2))
+    monthly_sales_amount = fields.Monetary(compute="_compute_weekly_mis")
+    sales_mom_pct = fields.Float(compute="_compute_weekly_mis", digits=(16, 2))
+    item_production_ids = fields.One2many(
+        "bpro.dashboard.item.production.line", "dashboard_id", compute="_compute_weekly_mis"
+    )
+    item_sales_ids = fields.One2many(
+        "bpro.dashboard.item.sales.line", "dashboard_id", compute="_compute_weekly_mis"
+    )
+    area_sales_ids = fields.One2many(
+        "bpro.dashboard.area.sales.line", "dashboard_id", compute="_compute_weekly_mis"
+    )
+
     @api.depends("as_of_date")
     def _compute_kpis(self):
         for rec in self:
             data = self._get_kpi_data(self.env.company, rec.as_of_date)
             for field_name, value in data.items():
                 rec[field_name] = value
+
+    @api.depends("as_of_date")
+    def _compute_weekly_mis(self):
+        for rec in self:
+            data = self._get_weekly_mis_data(self.env.company, rec.as_of_date)
+            rec.weekly_production_qty = data["weekly_production_qty"]
+            rec.production_wow_pct = data["production_wow_pct"]
+            rec.weekly_sales_amount = data["weekly_sales_amount"]
+            rec.sales_wow_pct = data["sales_wow_pct"]
+            rec.monthly_production_qty = data["monthly_production_qty"]
+            rec.production_mom_pct = data["production_mom_pct"]
+            rec.monthly_sales_amount = data["monthly_sales_amount"]
+            rec.sales_mom_pct = data["sales_mom_pct"]
+            rec.item_production_ids = [(5, 0, 0)] + [
+                (0, 0, line) for line in data["item_production_lines"]
+            ]
+            rec.item_sales_ids = [(5, 0, 0)] + [
+                (0, 0, line) for line in data["item_sales_lines"]
+            ]
+            rec.area_sales_ids = [(5, 0, 0)] + [
+                (0, 0, line) for line in data["area_sales_lines"]
+            ]
 
     @api.model
     def _get_kpi_data(self, company, as_of_date):
@@ -144,5 +187,150 @@ class BproExecutiveDashboard(models.TransientModel):
             ]
         )
         data["fleet_trip_cost"] = sum(batches.mapped("bpro_trip_cost"))
+
+        return data
+
+    @api.model
+    def _production_qty(self, company, start_dt, end_dt):
+        workorders = self.env["mrp.workorder"].search(
+            [
+                ("company_id", "=", company.id),
+                ("state", "=", "done"),
+                ("date_finished", ">=", start_dt),
+                ("date_finished", "<=", end_dt),
+            ]
+        )
+        return sum(workorders.mapped("qty_produced")), workorders
+
+    @api.model
+    def _sales_amount(self, company, as_of_date, start_dt, end_dt):
+        orders = self.env["sale.order"].search(
+            [
+                ("company_id", "=", company.id),
+                ("state", "=", "sale"),
+                ("date_order", ">=", start_dt),
+                ("date_order", "<=", end_dt),
+            ]
+        )
+        amount = sum(
+            order.currency_id._convert(
+                order.amount_total, company.currency_id, company, as_of_date
+            )
+            for order in orders
+        )
+        return amount, orders
+
+    @api.model
+    def _pct_change(self, current, previous):
+        return ((current - previous) / previous * 100.0) if previous else 0.0
+
+    @api.model
+    def _get_weekly_mis_data(self, company, as_of_date):
+        """Plain @api.model method, directly unit testable.
+
+        Week = trailing 7 days ending on as_of_date (matches the source
+        spreadsheet's own Friday-to-Friday weekly meeting cadence without
+        assuming a fixed weekday). Month = month-to-date vs. the prior
+        full calendar month, the same convention the client's own
+        "Dashboard" tab uses for its MoM figures.
+        """
+        week_end = as_of_date
+        week_start = week_end - timedelta(days=6)
+        prev_week_end = week_start - timedelta(days=1)
+        prev_week_start = prev_week_end - timedelta(days=6)
+
+        month_start = as_of_date.replace(day=1)
+        prev_month_end = month_start - timedelta(days=1)
+        prev_month_start = prev_month_end.replace(day=1)
+
+        def bounds(d1, d2):
+            return datetime.combine(d1, time.min), datetime.combine(d2, time.max)
+
+        week_dt = bounds(week_start, week_end)
+        prev_week_dt = bounds(prev_week_start, prev_week_end)
+        month_dt = bounds(month_start, as_of_date)
+        prev_month_dt = bounds(prev_month_start, prev_month_end)
+
+        data = {}
+
+        weekly_qty, week_workorders = self._production_qty(company, *week_dt)
+        prev_weekly_qty, _ = self._production_qty(company, *prev_week_dt)
+        data["weekly_production_qty"] = weekly_qty
+        data["production_wow_pct"] = self._pct_change(weekly_qty, prev_weekly_qty)
+
+        monthly_qty, month_workorders = self._production_qty(company, *month_dt)
+        prev_monthly_qty, _ = self._production_qty(company, *prev_month_dt)
+        data["monthly_production_qty"] = monthly_qty
+        data["production_mom_pct"] = self._pct_change(monthly_qty, prev_monthly_qty)
+
+        weekly_sales, week_orders = self._sales_amount(company, as_of_date, *week_dt)
+        prev_weekly_sales, _ = self._sales_amount(company, as_of_date, *prev_week_dt)
+        data["weekly_sales_amount"] = weekly_sales
+        data["sales_wow_pct"] = self._pct_change(weekly_sales, prev_weekly_sales)
+
+        monthly_sales, _ = self._sales_amount(company, as_of_date, *month_dt)
+        prev_monthly_sales, _ = self._sales_amount(company, as_of_date, *prev_month_dt)
+        data["monthly_sales_amount"] = monthly_sales
+        data["sales_mom_pct"] = self._pct_change(monthly_sales, prev_monthly_sales)
+
+        targets = self.env["bpro.item.target"].search([("company_id", "=", company.id)])
+
+        item_production_lines = []
+        for target in targets.filtered("monthly_production_qty_target"):
+            achieved = sum(
+                month_workorders.filtered(
+                    lambda w, p=target.product_id: w.product_id == p
+                ).mapped("qty_produced")
+            )
+            balance = achieved - target.monthly_production_qty_target
+            achievement_pct = (
+                achieved / target.monthly_production_qty_target * 100.0
+                if target.monthly_production_qty_target
+                else 0.0
+            )
+            item_production_lines.append(
+                {
+                    "product_id": target.product_id.id,
+                    "achieved": achieved,
+                    "target": target.monthly_production_qty_target,
+                    "balance": balance,
+                    "achievement_pct": achievement_pct,
+                }
+            )
+        data["item_production_lines"] = item_production_lines
+
+        item_sales_lines = []
+        for target in targets.filtered("weekly_sales_qty_target"):
+            lines = self.env["sale.order.line"].search(
+                [
+                    ("order_id", "in", week_orders.ids),
+                    ("product_id", "=", target.product_id.id),
+                ]
+            )
+            actual = sum(lines.mapped("product_uom_qty"))
+            diff = actual - target.weekly_sales_qty_target
+            achievement_pct = (
+                actual / target.weekly_sales_qty_target * 100.0
+                if target.weekly_sales_qty_target
+                else 0.0
+            )
+            item_sales_lines.append(
+                {
+                    "product_id": target.product_id.id,
+                    "actual": actual,
+                    "target": target.weekly_sales_qty_target,
+                    "diff": diff,
+                    "achievement_pct": achievement_pct,
+                }
+            )
+        data["item_sales_lines"] = item_sales_lines
+
+        area_sales_lines = []
+        areas = self.env["bpro.sales.area"].search([("company_id", "=", company.id)])
+        for area in areas:
+            count = len(week_orders.filtered(lambda o, a=area: o.sales_area_id == a))
+            if count:
+                area_sales_lines.append({"sales_area_id": area.id, "order_count": count})
+        data["area_sales_lines"] = area_sales_lines
 
         return data

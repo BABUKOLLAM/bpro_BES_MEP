@@ -3,3 +3,5 @@ access_bpro_sales_target_manager,bpro.sales.target manager,model_bpro_sales_targ
 access_bpro_sales_target_salesman,bpro.sales.target salesman,model_bpro_sales_target,sales_team.group_sale_salesman,1,0,0,0
 access_bpro_commission_rate_manager,bpro.commission.rate manager,model_bpro_commission_rate,sales_team.group_sale_manager,1,1,1,1
 access_bpro_commission_rate_salesman,bpro.commission.rate salesman,model_bpro_commission_rate,sales_team.group_sale_salesman,1,0,0,0
+access_bpro_sales_area_manager,bpro.sales.area manager,model_bpro_sales_area,sales_team.group_sale_manager,1,1,1,1
+access_bpro_sales_area_salesman,bpro.sales.area salesman,model_bpro_sales_area,sales_team.group_sale_salesman,1,0,0,0

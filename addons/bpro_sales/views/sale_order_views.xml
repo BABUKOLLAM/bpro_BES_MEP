@@ -21,6 +21,9 @@
                     pending Sales Manager approval.
                 </div>
             </xpath>
+            <xpath expr="//field[@name='partner_id']" position="after">
+                <field name="sales_area_id"/>
+            </xpath>
             <xpath expr="//page[@name='other_information']//group[@name='sale_info']" position="after">
                 <group name="bpro_commission" string="Commission">
                     <field name="bpro_commission_pct" readonly="1"/>

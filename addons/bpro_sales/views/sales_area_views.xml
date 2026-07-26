@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_bpro_sales_area_list" model="ir.ui.view">
+        <field name="name">bpro.sales.area.list</field>
+        <field name="model">bpro.sales.area</field>
+        <field name="arch" type="xml">
+            <list editable="bottom">
+                <field name="name"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_bpro_sales_area" model="ir.actions.act_window">
+        <field name="name">Sales Areas</field>
+        <field name="res_model">bpro.sales.area</field>
+        <field name="view_mode">list</field>
+    </record>
+
+    <menuitem id="menu_bpro_sales_area" name="Sales Areas"
+              parent="sale.menu_sale_config" action="action_bpro_sales_area"
+              groups="sales_team.group_sale_manager" sequence="65"/>
+</odoo>

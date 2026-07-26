@@ -17,6 +17,14 @@ Blends two kinds of signal deliberately:
   adjustments, HR pending expense approvals, Project pending budget
   approvals, Plant asset book value) or where cumulative-to-date avoids
   fragile date-boundary handling (Quality pass rate, Fleet trip cost).
+
+Weekly MIS section: reproduces the client's own hand-maintained weekly
+production/sales meeting report from live data instead of a spreadsheet
+rebuilt every week - week-over-week and month-over-month trend on
+production qty and sales value, item-wise production achieved/target/
+balance (against bpro.item.target), item-wise weekly sales achieved/
+target, and area-wise sales load counts (against bpro.sales.area, from
+bpro_sales).
 """,
     "version": "18.0.1.0.0",
     "category": "Reporting",
@@ -38,7 +46,9 @@ Blends two kinds of signal deliberately:
     ],
     "data": [
         "security/ir.model.access.csv",
+        "security/bpro_item_target_multi_company.xml",
         "views/executive_dashboard_views.xml",
+        "views/item_target_views.xml",
     ],
     "assets": {
         "web.assets_backend": [

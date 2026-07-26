@@ -45,6 +45,12 @@ class SaleOrder(models.Model):
         help="The master recurring order this one was auto-generated from.",
     )
 
+    sales_area_id = fields.Many2one(
+        "bpro.sales.area",
+        string="Sales Area",
+        help="Delivery district/territory this order belongs to, for area-wise sales reporting.",
+    )
+
     def _approval_policy_key(self):
         return "sales_discount_pct"
 

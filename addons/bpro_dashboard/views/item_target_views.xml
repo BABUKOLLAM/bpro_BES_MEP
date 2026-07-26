@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_bpro_item_target_list" model="ir.ui.view">
+        <field name="name">bpro.item.target.list</field>
+        <field name="model">bpro.item.target</field>
+        <field name="arch" type="xml">
+            <list editable="bottom">
+                <field name="product_id"/>
+                <field name="monthly_production_qty_target"/>
+                <field name="weekly_sales_qty_target"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_bpro_item_target" model="ir.actions.act_window">
+        <field name="name">Item Targets</field>
+        <field name="res_model">bpro.item.target</field>
+        <field name="view_mode">list</field>
+        <field name="help">
+            Set a monthly production target and/or weekly sales target (in
+            quantity) per product. The Executive Dashboard's Weekly MIS
+            section compares actuals against whatever is configured here.
+        </field>
+    </record>
+
+    <menuitem id="menu_bpro_item_target" name="Item Targets"
+              parent="menu_bpro_executive_dashboard_root"
+              action="action_bpro_item_target" sequence="2"/>
+</odoo>

@@ -119,6 +119,82 @@
                         <span class="bpro_kpi_sublabel">Total Trip Cost</span>
                     </div>
                 </div>
+
+                <h2 class="mt-4">Weekly MIS</h2>
+                <div class="bpro_kpi_grid">
+                    <div class="bpro_kpi_card bpro_kpi_green">
+                        <span class="bpro_kpi_label">Production</span>
+                        <span class="bpro_kpi_value">
+                            <field name="weekly_production_qty" nolabel="1"/>
+                        </span>
+                        <span class="bpro_kpi_sublabel">
+                            Weekly Qty (<field name="production_wow_pct" nolabel="1"/>% WoW)
+                        </span>
+                    </div>
+
+                    <div class="bpro_kpi_card bpro_kpi_blue">
+                        <span class="bpro_kpi_label">Sales</span>
+                        <span class="bpro_kpi_value">
+                            <field name="weekly_sales_amount" widget="monetary" nolabel="1"/>
+                        </span>
+                        <span class="bpro_kpi_sublabel">
+                            Weekly Sales (<field name="sales_wow_pct" nolabel="1"/>% WoW)
+                        </span>
+                    </div>
+
+                    <div class="bpro_kpi_card bpro_kpi_green">
+                        <span class="bpro_kpi_label">Production</span>
+                        <span class="bpro_kpi_value">
+                            <field name="monthly_production_qty" nolabel="1"/>
+                        </span>
+                        <span class="bpro_kpi_sublabel">
+                            MTD Qty (<field name="production_mom_pct" nolabel="1"/>% vs last month)
+                        </span>
+                    </div>
+
+                    <div class="bpro_kpi_card bpro_kpi_blue">
+                        <span class="bpro_kpi_label">Sales</span>
+                        <span class="bpro_kpi_value">
+                            <field name="monthly_sales_amount" widget="monetary" nolabel="1"/>
+                        </span>
+                        <span class="bpro_kpi_sublabel">
+                            MTD Sales (<field name="sales_mom_pct" nolabel="1"/>% vs last month)
+                        </span>
+                    </div>
+                </div>
+
+                <group string="Item-wise Production (Month-to-Date)">
+                    <field name="item_production_ids" nolabel="1" readonly="1">
+                        <list>
+                            <field name="product_id"/>
+                            <field name="achieved"/>
+                            <field name="target"/>
+                            <field name="balance"/>
+                            <field name="achievement_pct" string="Achievement %"/>
+                        </list>
+                    </field>
+                </group>
+
+                <group string="Item-wise Sales (This Week)">
+                    <field name="item_sales_ids" nolabel="1" readonly="1">
+                        <list>
+                            <field name="product_id"/>
+                            <field name="actual"/>
+                            <field name="target"/>
+                            <field name="diff"/>
+                            <field name="achievement_pct" string="Achievement %"/>
+                        </list>
+                    </field>
+                </group>
+
+                <group string="Area-wise Sales (This Week)">
+                    <field name="area_sales_ids" nolabel="1" readonly="1">
+                        <list>
+                            <field name="sales_area_id"/>
+                            <field name="order_count"/>
+                        </list>
+                    </field>
+                </group>
             </form>
         </field>
     </record>
