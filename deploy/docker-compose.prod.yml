@@ -24,6 +24,11 @@ services:
       HOST: db
       USER: odoo
       PASSWORD: ${POSTGRES_PASSWORD}
+      # Odoo's default is 2 seconds, meant to protect workers from idle
+      # connections. That's far too short for a large (100MB+) file upload,
+      # where gaps between TCP chunks routinely exceed 2s - the socket read
+      # then raises "cannot read from timed out object" mid-request.
+      ODOO_HTTP_SOCKET_TIMEOUT: "300"
     volumes:
       - odoo-data:/var/lib/odoo
       - ../config/odoo.prod.conf:/etc/odoo/odoo.conf:ro
