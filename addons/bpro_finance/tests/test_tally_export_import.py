@@ -600,3 +600,58 @@ class TestTallyImportHandlesLedgerNamesWithBackslash(FinanceTestCommon):
             posted.line_ids.filtered(lambda l: l.account_id == backslash_account).debit,
             500.0,
         )
+
+
+class TestTallyImportIsIdempotentOnRerun(FinanceTestCommon):
+    def test_rerunning_action_import_does_not_duplicate_postings(self):
+        # A real production incident: action_import() was re-run several
+        # times on the same batch (each time after mapping more ledgers)
+        # and, since nothing removed the previous run's postings first,
+        # every successfully-resolving voucher got re-posted as a brand
+        # new journal entry on every run - one real Payment voucher ended
+        # up posted 30+ times. Re-running must always leave exactly one
+        # posted entry per voucher, never more.
+        expense_account = self.env["account.account"].search(
+            [
+                ("company_ids", "in", self.company.id),
+                ("account_type", "=", "expense"),
+            ],
+            limit=1,
+        )
+        cash_account = self.env["account.account"].search(
+            [
+                ("company_ids", "in", self.company.id),
+                ("account_type", "=", "asset_cash"),
+            ],
+            limit=1,
+        )
+        xml_content = NEGATIVE_SIGNED_PAYMENT_VOUCHER.format(
+            expense_account=expense_account.name,
+            cash_account=cash_account.name,
+        )
+        import_batch = self.env["bpro.tally.import.batch"].create(
+            {
+                "xml_file": base64.b64encode(xml_content.encode("utf-8")),
+                "xml_filename": "rerun_idempotency.xml",
+            }
+        )
+
+        import_batch.action_import()
+        import_batch.action_import()
+        import_batch.action_import()
+
+        self.assertEqual(import_batch.imported_count, 1)
+        self.assertEqual(
+            len(import_batch.move_ids),
+            1,
+            "re-running the same batch's import must replace its own "
+            "prior postings, not accumulate duplicates alongside them",
+        )
+        posted = self.env["account.move"].search([("ref", "=", "1")])
+        self.assertEqual(
+            len(posted),
+            1,
+            "exactly one journal entry for this voucher must exist after "
+            "three re-runs, not three",
+        )
+        self.assertEqual(posted.state, "posted")

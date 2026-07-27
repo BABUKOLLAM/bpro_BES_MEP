@@ -210,10 +210,23 @@ class BproTallyImportBatch(models.Model):
     exception_ids = fields.One2many(
         "bpro.tally.import.exception", "batch_id", readonly=True
     )
+    move_ids = fields.One2many(
+        "account.move", "bpro_tally_batch_id", readonly=True
+    )
 
     def action_import(self):
         self.ensure_one()
         self.exception_ids.unlink()
+        # action_import() is meant to be safely re-runnable (e.g. after
+        # mapping more ledgers and wanting a fresh, complete pass) - without
+        # this, every re-run would create a second, third, fourth... set of
+        # journal entries for every voucher that already succeeded, since
+        # nothing here previously checked for or removed a prior run's
+        # postings. Reset to a clean slate first.
+        old_moves = self.move_ids
+        if old_moves:
+            old_moves.button_draft()
+            old_moves.unlink()
         try:
             clean_bytes = sanitize_tally_xml_bytes(base64.b64decode(self.xml_file))
             root = SafeET.fromstring(clean_bytes)
@@ -354,6 +367,7 @@ class BproTallyImportBatch(models.Model):
                         "date": move_date,
                         "ref": voucher_number,
                         "line_ids": line_vals,
+                        "bpro_tally_batch_id": self.id,
                     }
                 )
                 move.action_post()
@@ -403,6 +417,18 @@ class BproTallyImportBatch(models.Model):
     @staticmethod
     def _exception(voucher_number, reason):
         return {"voucher_number": voucher_number, "reason": reason}
+
+
+class AccountMove(models.Model):
+    _inherit = "account.move"
+
+    bpro_tally_batch_id = fields.Many2one(
+        "bpro.tally.import.batch",
+        readonly=True,
+        help="The Tally import batch that created this entry, so a re-run "
+        "of that batch's import can find and replace it instead of "
+        "posting a duplicate.",
+    )
 
 
 class BproTallyImportException(models.Model):
