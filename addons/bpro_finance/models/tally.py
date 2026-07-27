@@ -1,4 +1,6 @@
 import base64
+import codecs
+import re
 import xml.etree.ElementTree as ET
 from datetime import datetime
 
@@ -6,6 +8,61 @@ import defusedxml.ElementTree as SafeET
 
 from odoo import _, fields, models
 from odoo.exceptions import UserError
+
+# XML 1.0 only permits #x9, #xA, #xD, #x20-#xD7FF, #xE000-#xFFFD,
+# #x10000-#x10FFFF. Real Tally exports have been observed emitting stray
+# control-character references (seen in practice: a literal U+0005 byte and
+# a "&#4;" reference, both inside otherwise-unremarkable classification
+# fields like VATDEALERTYPE) that violate this - not a corner case worth
+# ignoring, since a single bad byte anywhere in a multi-hundred-MB export
+# would otherwise reject the whole file. Strip anything illegal (as a
+# literal char or as a decimal/hex numeric reference) before parsing.
+_ILLEGAL_XML_CHARS_RE = re.compile(
+    "[\x00-\x08\x0b\x0c\x0e-\x1f\x7f-\x84\x86-\x9f\ufdd0-\ufdef\ufffe\uffff]"
+)
+_NUMERIC_CHARREF_RE = re.compile(r"&#(x[0-9a-fA-F]+|[0-9]+);")
+
+
+def _is_legal_xml_codepoint(cp):
+    return (
+        cp in (0x9, 0xA, 0xD)
+        or 0x20 <= cp <= 0xD7FF
+        or 0xE000 <= cp <= 0xFFFD
+        or 0x10000 <= cp <= 0x10FFFF
+    )
+
+
+def _strip_illegal_charref(match):
+    token = match.group(1)
+    cp = int(token[1:], 16) if token.lower().startswith("x") else int(token)
+    return "" if not _is_legal_xml_codepoint(cp) else match.group(0)
+
+
+def sanitize_tally_xml_bytes(raw_bytes):
+    """Decode a raw Tally export (routinely UTF-16, sometimes UTF-8) and
+    strip characters/numeric references that are illegal per XML 1.0,
+    returning clean UTF-8 bytes ready for a standard parser.
+
+    Encoding is picked from the BOM, not a decode-and-hope try/except:
+    'utf-16' will happily decode arbitrary UTF-8 bytes (any even-length
+    byte string decodes without error, just as garbage) rather than
+    raising, so a try/except would silently corrupt this module's own
+    plain-UTF-8 exports instead of falling through to the UTF-8 branch.
+    """
+    if raw_bytes.startswith(codecs.BOM_UTF16_LE) or raw_bytes.startswith(codecs.BOM_UTF16_BE):
+        text = raw_bytes.decode("utf-16")
+    elif raw_bytes.startswith(codecs.BOM_UTF8):
+        text = raw_bytes.decode("utf-8-sig")
+    else:
+        text = raw_bytes.decode("utf-8")
+    text = _ILLEGAL_XML_CHARS_RE.sub("", text)
+    text = _NUMERIC_CHARREF_RE.sub(_strip_illegal_charref, text)
+    # the now-decoded text carries no meaningful original encoding anymore;
+    # drop any encoding= attribute in the prolog so it doesn't claim to be
+    # something other than the UTF-8 bytes we're about to emit.
+    text = re.sub(r'encoding="[^"]*"', 'encoding="UTF-8"', text, count=1)
+    return text.encode("utf-8")
+
 
 VOUCHER_TYPE_MAP = {
     "out_invoice": "Sales",
@@ -145,7 +202,8 @@ class BproTallyImportBatch(models.Model):
         self.ensure_one()
         self.exception_ids.unlink()
         try:
-            root = SafeET.fromstring(base64.b64decode(self.xml_file))
+            clean_bytes = sanitize_tally_xml_bytes(base64.b64decode(self.xml_file))
+            root = SafeET.fromstring(clean_bytes)
         except Exception as exc:
             raise UserError(_("Invalid XML file: %s") % exc)
 
