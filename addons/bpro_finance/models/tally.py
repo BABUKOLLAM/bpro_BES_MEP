@@ -7,7 +7,7 @@ from datetime import datetime
 import defusedxml.ElementTree as SafeET
 
 from odoo import _, fields, models
-from odoo.exceptions import UserError
+from odoo.exceptions import UserError, ValidationError
 
 # XML 1.0 only permits #x9, #xA, #xD, #x20-#xD7FF, #xE000-#xFFFD,
 # #x10000-#x10FFFF. Real Tally exports have been observed emitting stray
@@ -282,19 +282,28 @@ class BproTallyImportBatch(models.Model):
         if not line_vals:
             return self._exception(voucher_number, _("No ledger entries found"))
 
-        move = self.env["account.move"].create(
-            {
-                "move_type": "entry",
-                "journal_id": journal.id,
-                "date": move_date,
-                "ref": voucher_number,
-                "line_ids": line_vals,
-            }
-        )
+        # A real Tally export runs to thousands of vouchers, and not every
+        # one of them is guaranteed to be well-formed from Odoo's side (a
+        # rounding mismatch, an unbalanced entry, etc.) - create() itself
+        # can raise just as easily as action_post() can. Both need to be
+        # inside one savepoint: without it, a raised UserError leaves the
+        # whole cursor's transaction aborted, and every subsequent voucher
+        # in the loop would fail too, even the perfectly valid ones after
+        # it, once the exception is caught in Python but the underlying
+        # SQL transaction was never rolled back to a clean point.
         try:
-            move.action_post()
-        except UserError as exc:
-            move.unlink()
+            with self.env.cr.savepoint():
+                move = self.env["account.move"].create(
+                    {
+                        "move_type": "entry",
+                        "journal_id": journal.id,
+                        "date": move_date,
+                        "ref": voucher_number,
+                        "line_ids": line_vals,
+                    }
+                )
+                move.action_post()
+        except (UserError, ValidationError) as exc:
             return self._exception(voucher_number, str(exc))
         return None
 

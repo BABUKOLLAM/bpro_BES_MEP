@@ -82,6 +82,104 @@ class TestTallyExportImportRoundTrip(FinanceTestCommon):
         self.assertFalse(import_batch.exception_ids)
 
 
+UNBALANCED_VOUCHER_AMONG_VALID_ONES = """<?xml version="1.0" encoding="UTF-8"?>
+<ENVELOPE>
+  <BODY>
+    <IMPORTDATA>
+      <REQUESTDATA>
+        <TALLYMESSAGE>
+          <VOUCHER VCHTYPE="Journal" ACTION="Create">
+            <DATE>20260601</DATE>
+            <VOUCHERTYPENAME>Journal</VOUCHERTYPENAME>
+            <VOUCHERNUMBER>TALLY-UNBALANCED-001</VOUCHERNUMBER>
+            <ALLLEDGERENTRIES.LIST>
+              <LEDGERNAME>{cash}</LEDGERNAME>
+              <ISDEEMEDPOSITIVE>Yes</ISDEEMEDPOSITIVE>
+              <AMOUNT>500.00</AMOUNT>
+            </ALLLEDGERENTRIES.LIST>
+            <ALLLEDGERENTRIES.LIST>
+              <LEDGERNAME>{income}</LEDGERNAME>
+              <ISDEEMEDPOSITIVE>No</ISDEEMEDPOSITIVE>
+              <AMOUNT>499.00</AMOUNT>
+            </ALLLEDGERENTRIES.LIST>
+          </VOUCHER>
+          <VOUCHER VCHTYPE="Journal" ACTION="Create">
+            <DATE>20260602</DATE>
+            <VOUCHERTYPENAME>Journal</VOUCHERTYPENAME>
+            <VOUCHERNUMBER>TALLY-VALID-AFTER-001</VOUCHERNUMBER>
+            <ALLLEDGERENTRIES.LIST>
+              <LEDGERNAME>{cash}</LEDGERNAME>
+              <ISDEEMEDPOSITIVE>Yes</ISDEEMEDPOSITIVE>
+              <AMOUNT>300.00</AMOUNT>
+            </ALLLEDGERENTRIES.LIST>
+            <ALLLEDGERENTRIES.LIST>
+              <LEDGERNAME>{income}</LEDGERNAME>
+              <ISDEEMEDPOSITIVE>No</ISDEEMEDPOSITIVE>
+              <AMOUNT>300.00</AMOUNT>
+            </ALLLEDGERENTRIES.LIST>
+          </VOUCHER>
+        </TALLYMESSAGE>
+      </REQUESTDATA>
+    </IMPORTDATA>
+  </BODY>
+</ENVELOPE>
+"""
+
+
+class TestTallyImportSurvivesAPerVoucherFailure(FinanceTestCommon):
+    def test_unbalanced_voucher_becomes_exception_not_a_crash(self):
+        # Reproduces a real failure hit against an actual client export
+        # (8127 real vouchers): one unbalanced entry used to raise
+        # UserError out of account.move.create() itself, uncaught by the
+        # try/except that only wrapped action_post() - crashing the whole
+        # batch instead of logging just that one voucher, and (without a
+        # savepoint) leaving the cursor's transaction aborted so every
+        # subsequent voucher - even valid ones - would fail too.
+        cash = self.env["account.account"].search(
+            [("company_ids", "in", self.company.id), ("account_type", "=", "asset_cash")],
+            limit=1,
+        )
+        income = self.env["account.account"].search(
+            [("company_ids", "in", self.company.id), ("account_type", "=", "income")],
+            limit=1,
+        )
+        self.assertTrue(cash and income, "test CoA must have cash/income accounts")
+
+        xml_text = UNBALANCED_VOUCHER_AMONG_VALID_ONES.format(
+            cash=cash.name, income=income.name
+        )
+        import_batch = self.env["bpro.tally.import.batch"].create(
+            {
+                "xml_file": base64.b64encode(xml_text.encode("utf-8")),
+                "xml_filename": "unbalanced_fixture.xml",
+            }
+        )
+        import_batch.action_import()
+
+        self.assertEqual(import_batch.state, "done")
+        self.assertEqual(
+            import_batch.imported_count,
+            1,
+            "the valid voucher after the bad one must still import - the "
+            "batch must not abort or silently drop it",
+        )
+        self.assertEqual(len(import_batch.exception_ids), 1)
+        self.assertEqual(
+            import_batch.exception_ids.voucher_number, "TALLY-UNBALANCED-001"
+        )
+
+        posted = self.env["account.move"].search(
+            [("ref", "=", "TALLY-VALID-AFTER-001")]
+        )
+        self.assertEqual(posted.state, "posted")
+        broken = self.env["account.move"].search(
+            [("ref", "=", "TALLY-UNBALANCED-001")]
+        )
+        self.assertFalse(
+            broken, "the failed voucher must not leave a half-created draft move behind"
+        )
+
+
 class TestTallyImportHandAuthoredFixture(FinanceTestCommon):
     def test_valid_voucher_imports_unmapped_ledger_becomes_exception(self):
         income_account = self.env["account.account"].search(
