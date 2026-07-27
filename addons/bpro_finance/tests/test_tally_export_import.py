@@ -511,3 +511,92 @@ class TestTallyImportHandlesInvoiceModeVouchers(FinanceTestCommon):
             posted.line_ids.filtered(lambda l: l.account_id == tax_account).credit,
             18.0,
         )
+
+
+BACKSLASH_LEDGER_NAME_VOUCHER = """<?xml version="1.0" encoding="UTF-8"?>
+<ENVELOPE>
+  <HEADER>
+    <TALLYREQUEST>Import Data</TALLYREQUEST>
+  </HEADER>
+  <BODY>
+    <IMPORTDATA>
+      <REQUESTDESC>
+        <REPORTNAME>Vouchers</REPORTNAME>
+      </REQUESTDESC>
+      <REQUESTDATA>
+        <TALLYMESSAGE xmlns:UDF="TallyUDF">
+          <VOUCHER VCHTYPE="Journal" ACTION="Create">
+            <DATE>20260615</DATE>
+            <VOUCHERTYPENAME>Journal</VOUCHERTYPENAME>
+            <VOUCHERNUMBER>JRNL-BACKSLASH-001</VOUCHERNUMBER>
+            <ALLLEDGERENTRIES.LIST>
+              <LEDGERNAME>{backslash_account}</LEDGERNAME>
+              <ISDEEMEDPOSITIVE>Yes</ISDEEMEDPOSITIVE>
+              <AMOUNT>500.00</AMOUNT>
+            </ALLLEDGERENTRIES.LIST>
+            <ALLLEDGERENTRIES.LIST>
+              <LEDGERNAME>{cash_account}</LEDGERNAME>
+              <ISDEEMEDPOSITIVE>No</ISDEEMEDPOSITIVE>
+              <AMOUNT>500.00</AMOUNT>
+            </ALLLEDGERENTRIES.LIST>
+          </VOUCHER>
+        </TALLYMESSAGE>
+      </REQUESTDATA>
+    </IMPORTDATA>
+  </BODY>
+</ENVELOPE>
+"""
+
+
+# A real ledger in this client's chart of accounts is literally named
+# with a backslash ("Sadik Meeran Current A\c") - Tally allows it, Odoo
+# allows it, and _resolve_ledger's own account.account.search() finds it
+# fine when queried directly. But when routed through the actual import
+# path (matching by voucher-supplied LEDGERNAME via "=ilike"), it silently
+# failed: Postgres's ILIKE treats a lone backslash as its escape
+# character, so the unescaped literal backslash in the search value
+# never matches the literal backslash stored in the row.
+class TestTallyImportHandlesLedgerNamesWithBackslash(FinanceTestCommon):
+    def test_ledger_name_containing_literal_backslash_resolves(self):
+        backslash_account = self.env["account.account"].create(
+            {
+                "name": "Sadik Meeran Current A\\c",
+                "code": "999501",
+                "account_type": "equity",
+                "company_ids": [(6, 0, [self.company.id])],
+            }
+        )
+        cash_account = self.env["account.account"].search(
+            [
+                ("company_ids", "in", self.company.id),
+                ("account_type", "=", "asset_cash"),
+            ],
+            limit=1,
+        )
+        self.assertTrue(cash_account, "test CoA must have a cash account")
+
+        xml_content = BACKSLASH_LEDGER_NAME_VOUCHER.format(
+            backslash_account=backslash_account.name,
+            cash_account=cash_account.name,
+        )
+        import_batch = self.env["bpro.tally.import.batch"].create(
+            {
+                "xml_file": base64.b64encode(xml_content.encode("utf-8")),
+                "xml_filename": "backslash_ledger_name.xml",
+            }
+        )
+        import_batch.action_import()
+
+        self.assertEqual(
+            import_batch.imported_count,
+            1,
+            "a ledger name containing a literal backslash must still resolve",
+        )
+        self.assertFalse(import_batch.exception_ids)
+
+        posted = self.env["account.move"].search([("ref", "=", "JRNL-BACKSLASH-001")])
+        self.assertEqual(posted.state, "posted")
+        self.assertEqual(
+            posted.line_ids.filtered(lambda l: l.account_id == backslash_account).debit,
+            500.0,
+        )

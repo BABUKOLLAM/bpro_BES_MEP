@@ -364,8 +364,18 @@ class BproTallyImportBatch(models.Model):
     def _resolve_ledger(self, ledger_name, voucher_type):
         if not ledger_name:
             return None
+        # Postgres's ILIKE (which "=ilike" compiles to) treats backslash as
+        # its pattern escape character, so a ledger name containing a
+        # literal backslash - seen in this client's real data, e.g. "Sadik
+        # Meeran Current A\c" - silently fails to match its own exact
+        # record otherwise. "%"/"_" are ILIKE wildcards for the same
+        # reason. All three need escaping to make "=ilike" behave as the
+        # plain case-insensitive exact match it's meant to be here.
+        escaped_name = (
+            ledger_name.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
+        )
         partner = self.env["res.partner"].search(
-            [("name", "=ilike", ledger_name)], limit=1
+            [("name", "=ilike", escaped_name)], limit=1
         )
         if partner:
             # party ledgers (the export side writes the partner's name as
@@ -385,7 +395,7 @@ class BproTallyImportBatch(models.Model):
         return self.env["account.account"].search(
             [
                 ("company_ids", "in", self.company_id.id),
-                ("name", "=ilike", ledger_name),
+                ("name", "=ilike", escaped_name),
             ],
             limit=1,
         )
