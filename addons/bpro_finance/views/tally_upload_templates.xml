@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="tally_large_upload_page" name="Tally Large File Upload">
+        <html>
+            <head>
+                <title>Tally Import — Large File Upload</title>
+                <meta charset="utf-8"/>
+                <style>
+                    body { font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+                           background: #f6f4ef; color: #17281f; max-width: 640px; margin: 4rem auto; padding: 0 1.5rem; }
+                    h1 { font-size: 1.4rem; margin-bottom: .3rem; }
+                    p.help { color: #5b6a61; margin-top: 0; margin-bottom: 1.8rem; }
+                    form { background: #fff; border: 1px solid #e3ded2; border-radius: 10px; padding: 1.8rem; }
+                    input[type=file] { display: block; margin-bottom: 1.2rem; width: 100%; }
+                    button { background: #1f3327; color: #fff; border: none; padding: .7rem 1.5rem;
+                             border-radius: 4px; font-weight: 600; cursor: pointer; }
+                    button:hover { background: #16241c; }
+                    .error { color: #b0281f; margin-bottom: 1rem; }
+                </style>
+            </head>
+            <body>
+                <h1>Tally Import — Large File Upload</h1>
+                <p class="help">Use this page only for files too large for the normal "Import from Tally"
+                    screen (over ~100MB). Otherwise, use the standard Tally Sync menu.</p>
+                <t t-if="error">
+                    <p class="error" t-esc="error"/>
+                </t>
+                <form action="/bpro_finance/tally_import/upload" method="post" enctype="multipart/form-data">
+                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                    <input type="file" name="xml_file" accept=".xml" required="required"/>
+                    <button type="submit">Upload and Create Import Batch</button>
+                </form>
+            </body>
+        </html>
+    </template>
+</odoo>

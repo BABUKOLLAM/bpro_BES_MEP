@@ -29,6 +29,7 @@ Invoice generation from a confirmed sales order and payment registration (full/p
         "views/finance_dashboard_views.xml",
         "views/account_move_views.xml",
         "views/tally_views.xml",
+        "views/tally_upload_templates.xml",
     ],
     "installable": True,
     "application": False,

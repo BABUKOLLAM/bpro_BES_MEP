@@ -72,4 +72,13 @@
     <menuitem id="menu_bpro_tally_import" name="Import from Tally"
               parent="menu_bpro_tally_root" action="action_bpro_tally_import_batch"
               sequence="20"/>
+
+    <record id="action_bpro_tally_import_large_upload" model="ir.actions.act_url">
+        <field name="name">Import from Tally (Large File, &gt;100MB)</field>
+        <field name="url">/bpro_finance/tally_import/upload</field>
+        <field name="target">self</field>
+    </record>
+    <menuitem id="menu_bpro_tally_import_large" name="Import from Tally (Large File, &gt;100MB)"
+              parent="menu_bpro_tally_root" action="action_bpro_tally_import_large_upload"
+              sequence="30"/>
 </odoo>
