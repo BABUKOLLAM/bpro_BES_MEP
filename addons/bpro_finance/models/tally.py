@@ -78,7 +78,20 @@ KNOWN_VOUCHER_TYPES = {
     "Journal",
     "Credit Note",
     "Debit Note",
+    # Real installations routinely rename/extend these once GST is enabled,
+    # or use built-in Tally types this module didn't originally cover -
+    # seen verbatim in a real client's export, alongside the generic names
+    # above which some vouchers in the same file still used unchanged.
+    "Stock Journal",
+    "GST SALES",
+    "GST Purchase",
+    "Contra",
 }
+# Voucher types whose PARTYLEDGERNAME/ledger lines should resolve to a
+# partner's payable (not receivable) account when the ledger name matches
+# a partner - see _resolve_ledger. "GST Purchase" is this same relationship
+# as "Purchase", just under the GST-specific voucher type name.
+PAYABLE_PREFERRING_VOUCHER_TYPES = ("Purchase", "GST Purchase", "Payment", "Debit Note")
 
 
 class BproTallyExportBatch(models.Model):
@@ -319,7 +332,7 @@ class BproTallyImportBatch(models.Model):
             # partner's receivable or payable account, chosen by voucher
             # direction - not to a partner record directly, which isn't a
             # valid account.move.line.account_id.
-            if voucher_type in ("Purchase", "Payment", "Debit Note"):
+            if voucher_type in PAYABLE_PREFERRING_VOUCHER_TYPES:
                 return (
                     partner.property_account_payable_id
                     or partner.property_account_receivable_id

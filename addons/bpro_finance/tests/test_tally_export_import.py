@@ -82,6 +82,100 @@ class TestTallyExportImportRoundTrip(FinanceTestCommon):
         self.assertFalse(import_batch.exception_ids)
 
 
+REAL_WORLD_VOUCHER_TYPE_NAMES = """<?xml version="1.0" encoding="UTF-8"?>
+<ENVELOPE>
+  <BODY>
+    <IMPORTDATA>
+      <REQUESTDATA>
+        <TALLYMESSAGE>
+          <VOUCHER VCHTYPE="GST Purchase" ACTION="Create">
+            <DATE>20260601</DATE>
+            <VOUCHERTYPENAME>GST Purchase</VOUCHERTYPENAME>
+            <VOUCHERNUMBER>TALLY-GSTPUR-001</VOUCHERNUMBER>
+            <PARTYLEDGERNAME>{vendor}</PARTYLEDGERNAME>
+            <ALLLEDGERENTRIES.LIST>
+              <LEDGERNAME>{vendor}</LEDGERNAME>
+              <ISDEEMEDPOSITIVE>No</ISDEEMEDPOSITIVE>
+              <AMOUNT>1200.00</AMOUNT>
+            </ALLLEDGERENTRIES.LIST>
+            <ALLLEDGERENTRIES.LIST>
+              <LEDGERNAME>{expense}</LEDGERNAME>
+              <ISDEEMEDPOSITIVE>Yes</ISDEEMEDPOSITIVE>
+              <AMOUNT>1200.00</AMOUNT>
+            </ALLLEDGERENTRIES.LIST>
+          </VOUCHER>
+          <VOUCHER VCHTYPE="Contra" ACTION="Create">
+            <DATE>20260602</DATE>
+            <VOUCHERTYPENAME>Contra</VOUCHERTYPENAME>
+            <VOUCHERNUMBER>TALLY-CONTRA-001</VOUCHERNUMBER>
+            <ALLLEDGERENTRIES.LIST>
+              <LEDGERNAME>{cash}</LEDGERNAME>
+              <ISDEEMEDPOSITIVE>No</ISDEEMEDPOSITIVE>
+              <AMOUNT>500.00</AMOUNT>
+            </ALLLEDGERENTRIES.LIST>
+            <ALLLEDGERENTRIES.LIST>
+              <LEDGERNAME>{expense}</LEDGERNAME>
+              <ISDEEMEDPOSITIVE>Yes</ISDEEMEDPOSITIVE>
+              <AMOUNT>500.00</AMOUNT>
+            </ALLLEDGERENTRIES.LIST>
+          </VOUCHER>
+        </TALLYMESSAGE>
+      </REQUESTDATA>
+    </IMPORTDATA>
+  </BODY>
+</ENVELOPE>
+"""
+
+
+class TestTallyImportRecognizesRealWorldVoucherTypeNames(FinanceTestCommon):
+    def test_gst_purchase_and_contra_import_with_correct_ledger_direction(self):
+        # A real client's Tally install had renamed/extended voucher types
+        # this module didn't originally recognize at all: "GST Purchase"
+        # and "Contra" (Contra - cash<->bank transfer - is a standard
+        # built-in Tally voucher type that was simply missing from the
+        # original known-types list).
+        vendor = self.env["res.partner"].create({"name": "Tally Test Vendor Ltd"})
+        expense = self.env["account.account"].search(
+            [("company_ids", "in", self.company.id), ("account_type", "=", "expense")],
+            limit=1,
+        )
+        cash = self.env["account.account"].search(
+            [("company_ids", "in", self.company.id), ("account_type", "=", "asset_cash")],
+            limit=1,
+        )
+        self.assertTrue(expense and cash, "test CoA must have expense/cash accounts")
+
+        xml_text = REAL_WORLD_VOUCHER_TYPE_NAMES.format(
+            vendor=vendor.name, expense=expense.name, cash=cash.name
+        )
+        import_batch = self.env["bpro.tally.import.batch"].create(
+            {
+                "xml_file": base64.b64encode(xml_text.encode("utf-8")),
+                "xml_filename": "real_world_voucher_types.xml",
+            }
+        )
+        import_batch.action_import()
+
+        self.assertEqual(import_batch.state, "done")
+        self.assertFalse(
+            import_batch.exception_ids,
+            f"unexpected exceptions: {import_batch.exception_ids.mapped('reason')}",
+        )
+        self.assertEqual(import_batch.imported_count, 2)
+
+        gst_purchase_move = self.env["account.move"].search(
+            [("ref", "=", "TALLY-GSTPUR-001")]
+        )
+        vendor_line = gst_purchase_move.line_ids.filtered(
+            lambda l: l.account_id == vendor.property_account_payable_id
+        )
+        self.assertTrue(
+            vendor_line,
+            "GST Purchase must resolve the party ledger to the vendor's "
+            "PAYABLE account, same as plain Purchase - not receivable",
+        )
+
+
 UNBALANCED_VOUCHER_AMONG_VALID_ONES = """<?xml version="1.0" encoding="UTF-8"?>
 <ENVELOPE>
   <BODY>
