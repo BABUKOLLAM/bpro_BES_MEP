@@ -273,7 +273,13 @@ class BproTallyImportBatch(models.Model):
                     voucher_number, _("Unmapped ledger: %s") % ledger_name
                 )
             try:
-                amount = float(entry.findtext("AMOUNT") or "0")
+                # ISDEEMEDPOSITIVE alone carries debit/credit direction, but
+                # real-world exports (observed in this client's actual Day
+                # Book) also sign AMOUNT itself for some voucher types (e.g.
+                # Payment), giving a negative debit that can never balance
+                # against its positive credit counterpart. Only the
+                # magnitude is meaningful here.
+                amount = abs(float(entry.findtext("AMOUNT") or "0"))
             except ValueError:
                 return self._exception(
                     voucher_number, _("Invalid amount for ledger %s") % ledger_name

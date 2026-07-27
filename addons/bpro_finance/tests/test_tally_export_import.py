@@ -323,3 +323,85 @@ class TestTallyImportHandAuthoredFixture(FinanceTestCommon):
         # the actual debit total rather than amount_total, which is
         # computed for invoice-type moves, not plain journal entries
         self.assertEqual(sum(posted.line_ids.mapped("debit")), 5000.0)
+
+
+# A real client Day Book export (Payment voucher type) signs the debit
+# line's AMOUNT itself as negative, even though ISDEEMEDPOSITIVE="Yes"
+# already marks it as a debit - discovered only once enough ledgers were
+# mapped for these vouchers to reach the balance check at all; every
+# Payment voucher in that ~8000-voucher file hit this same pattern.
+NEGATIVE_SIGNED_PAYMENT_VOUCHER = """<?xml version="1.0" encoding="UTF-8"?>
+<ENVELOPE>
+  <HEADER>
+    <TALLYREQUEST>Import Data</TALLYREQUEST>
+  </HEADER>
+  <BODY>
+    <IMPORTDATA>
+      <REQUESTDESC>
+        <REPORTNAME>Vouchers</REPORTNAME>
+      </REQUESTDESC>
+      <REQUESTDATA>
+        <TALLYMESSAGE xmlns:UDF="TallyUDF">
+          <VOUCHER VCHTYPE="Payment" ACTION="Create">
+            <DATE>20260615</DATE>
+            <VOUCHERTYPENAME>Payment</VOUCHERTYPENAME>
+            <VOUCHERNUMBER>1</VOUCHERNUMBER>
+            <ALLLEDGERENTRIES.LIST>
+              <LEDGERNAME>{expense_account}</LEDGERNAME>
+              <ISDEEMEDPOSITIVE>Yes</ISDEEMEDPOSITIVE>
+              <AMOUNT>-100.00</AMOUNT>
+            </ALLLEDGERENTRIES.LIST>
+            <ALLLEDGERENTRIES.LIST>
+              <LEDGERNAME>{cash_account}</LEDGERNAME>
+              <ISDEEMEDPOSITIVE>No</ISDEEMEDPOSITIVE>
+              <AMOUNT>100.00</AMOUNT>
+            </ALLLEDGERENTRIES.LIST>
+          </VOUCHER>
+        </TALLYMESSAGE>
+      </REQUESTDATA>
+    </IMPORTDATA>
+  </BODY>
+</ENVELOPE>
+"""
+
+
+class TestTallyImportHandlesNegativeSignedAmounts(FinanceTestCommon):
+    def test_payment_voucher_with_negative_debit_amount_still_balances(self):
+        expense_account = self.env["account.account"].search(
+            [
+                ("company_ids", "in", self.company.id),
+                ("account_type", "=", "expense"),
+            ],
+            limit=1,
+        )
+        cash_account = self.env["account.account"].search(
+            [
+                ("company_ids", "in", self.company.id),
+                ("account_type", "=", "asset_cash"),
+            ],
+            limit=1,
+        )
+        self.assertTrue(expense_account and cash_account, "test CoA must have expense/cash accounts")
+
+        xml_content = NEGATIVE_SIGNED_PAYMENT_VOUCHER.format(
+            expense_account=expense_account.name,
+            cash_account=cash_account.name,
+        )
+        import_batch = self.env["bpro.tally.import.batch"].create(
+            {
+                "xml_file": base64.b64encode(xml_content.encode("utf-8")),
+                "xml_filename": "negative_signed_payment.xml",
+            }
+        )
+        import_batch.action_import()
+
+        self.assertEqual(
+            import_batch.imported_count,
+            1,
+            "a debit amount signed negative in the source XML must still balance and post",
+        )
+        self.assertFalse(import_batch.exception_ids)
+
+        posted = self.env["account.move"].search([("ref", "=", "1")])
+        self.assertEqual(posted.state, "posted")
+        self.assertEqual(sum(posted.line_ids.mapped("debit")), 100.0)
