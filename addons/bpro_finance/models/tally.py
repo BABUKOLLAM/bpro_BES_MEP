@@ -246,6 +246,42 @@ class BproTallyImportBatch(models.Model):
             )
         return journal
 
+    @staticmethod
+    def _ledger_entries(voucher_el):
+        """Yields (ledger_name, entry_element) pairs covering both Tally
+        voucher XML layouts actually seen in this client's real export:
+
+        - "voucher mode" (Payment/Receipt/Journal/Contra/Stock Journal):
+          ALLLEDGERENTRIES.LIST, LEDGERNAME carries the ledger directly.
+        - "invoice mode" (Sales/Purchase/GST SALES/GST Purchase/Credit
+          Note/Debit Note): the party and any tax ledgers appear as
+          LEDGERENTRIES.LIST, while each stock item's own ledger side
+          appears in ALLINVENTORYENTRIES.LIST under GSTLEDGERSOURCE -
+          invoice-mode entries carry no LEDGERNAME at all. Verified
+          against real vouchers of every affected type: summing both
+          lists' amounts (direction from ISDEEMEDPOSITIVE) balances to
+          the paisa.
+
+        GSTLEDGERSOURCE is only populated when Tally's GST
+        classification for that line came from a ledger override
+        (GSTSOURCETYPE="Ledger"); when it's sourced from the stock
+        item's own master data instead (GSTSOURCETYPE="Stock Item" or
+        "Company"), there is no ledger name in this export at all -
+        that line falls through to an "Unmapped ledger" exception
+        rather than being guessed, since resolving it correctly needs
+        the stock item's own default sales/purchase ledger, which only
+        a separate Stock Item Master export would provide.
+        """
+        entries = voucher_el.findall("ALLLEDGERENTRIES.LIST")
+        if entries:
+            for entry in entries:
+                yield (entry.findtext("LEDGERNAME") or "").strip(), entry
+            return
+        for entry in voucher_el.findall("LEDGERENTRIES.LIST"):
+            yield (entry.findtext("LEDGERNAME") or "").strip(), entry
+        for entry in voucher_el.findall("ALLINVENTORYENTRIES.LIST"):
+            yield (entry.findtext("GSTLEDGERSOURCE") or "").strip(), entry
+
     def _import_one_voucher(self, voucher_el, journal):
         """Returns a dict of bpro.tally.import.exception vals if the
         voucher couldn't be imported, or None if it was posted."""
@@ -265,8 +301,7 @@ class BproTallyImportBatch(models.Model):
             return self._exception(voucher_number, _("Invalid or missing date"))
 
         line_vals = []
-        for entry in voucher_el.findall("ALLLEDGERENTRIES.LIST"):
-            ledger_name = (entry.findtext("LEDGERNAME") or "").strip()
+        for ledger_name, entry in self._ledger_entries(voucher_el):
             account = self._resolve_ledger(ledger_name, voucher_type)
             if not account:
                 return self._exception(

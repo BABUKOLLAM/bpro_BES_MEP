@@ -405,3 +405,109 @@ class TestTallyImportHandlesNegativeSignedAmounts(FinanceTestCommon):
         posted = self.env["account.move"].search([("ref", "=", "1")])
         self.assertEqual(posted.state, "posted")
         self.assertEqual(sum(posted.line_ids.mapped("debit")), 100.0)
+
+
+# GST-enabled Sales/Purchase vouchers in Tally's "invoice mode" use a
+# completely different layout from the plain-voucher-mode fixtures above:
+# the party (and any tax) ledgers sit in LEDGERENTRIES.LIST while the
+# stock item's own ledger side is only in ALLINVENTORYENTRIES.LIST under
+# GSTLEDGERSOURCE - there is no ALLLEDGERENTRIES.LIST or LEDGERNAME at
+# all for the item lines. Modeled on a real "GST SALES" voucher from this
+# client's actual Day Book export (party debit split across a tax ledger
+# and a sales ledger, verified to balance to the paisa against the source).
+GST_INVOICE_MODE_SALES_VOUCHER = """<?xml version="1.0" encoding="UTF-8"?>
+<ENVELOPE>
+  <HEADER>
+    <TALLYREQUEST>Import Data</TALLYREQUEST>
+  </HEADER>
+  <BODY>
+    <IMPORTDATA>
+      <REQUESTDESC>
+        <REPORTNAME>Vouchers</REPORTNAME>
+      </REQUESTDESC>
+      <REQUESTDATA>
+        <TALLYMESSAGE xmlns:UDF="TallyUDF">
+          <VOUCHER VCHTYPE="GST SALES" ACTION="Create">
+            <DATE>20260615</DATE>
+            <VOUCHERTYPENAME>GST SALES</VOUCHERTYPENAME>
+            <VOUCHERNUMBER>INV-001</VOUCHERNUMBER>
+            <PARTYLEDGERNAME>{customer}</PARTYLEDGERNAME>
+            <LEDGERENTRIES.LIST>
+              <LEDGERNAME>{customer}</LEDGERNAME>
+              <ISDEEMEDPOSITIVE>Yes</ISDEEMEDPOSITIVE>
+              <ISPARTYLEDGER>Yes</ISPARTYLEDGER>
+              <AMOUNT>-118.00</AMOUNT>
+            </LEDGERENTRIES.LIST>
+            <LEDGERENTRIES.LIST>
+              <LEDGERNAME>{tax_account}</LEDGERNAME>
+              <ISDEEMEDPOSITIVE>No</ISDEEMEDPOSITIVE>
+              <ISPARTYLEDGER>No</ISPARTYLEDGER>
+              <AMOUNT>18.00</AMOUNT>
+            </LEDGERENTRIES.LIST>
+            <ALLINVENTORYENTRIES.LIST>
+              <STOCKITEMNAME>Test Stock Item</STOCKITEMNAME>
+              <GSTSOURCETYPE>Ledger</GSTSOURCETYPE>
+              <GSTLEDGERSOURCE>{income_account}</GSTLEDGERSOURCE>
+              <ISDEEMEDPOSITIVE>No</ISDEEMEDPOSITIVE>
+              <AMOUNT>100.00</AMOUNT>
+            </ALLINVENTORYENTRIES.LIST>
+          </VOUCHER>
+        </TALLYMESSAGE>
+      </REQUESTDATA>
+    </IMPORTDATA>
+  </BODY>
+</ENVELOPE>
+"""
+
+
+class TestTallyImportHandlesInvoiceModeVouchers(FinanceTestCommon):
+    def test_gst_sales_voucher_combines_ledgerentries_and_inventoryentries(self):
+        tax_account = self.env["account.account"].search(
+            [
+                ("company_ids", "in", self.company.id),
+                ("account_type", "=", "liability_current"),
+            ],
+            limit=1,
+        )
+        income_account = self.env["account.account"].search(
+            [
+                ("company_ids", "in", self.company.id),
+                ("account_type", "=", "income"),
+            ],
+            limit=1,
+        )
+        self.assertTrue(tax_account and income_account, "test CoA must have liability/income accounts")
+
+        xml_content = GST_INVOICE_MODE_SALES_VOUCHER.format(
+            customer=self.customer.name,
+            tax_account=tax_account.name,
+            income_account=income_account.name,
+        )
+        import_batch = self.env["bpro.tally.import.batch"].create(
+            {
+                "xml_file": base64.b64encode(xml_content.encode("utf-8")),
+                "xml_filename": "gst_invoice_mode.xml",
+            }
+        )
+        import_batch.action_import()
+
+        self.assertEqual(
+            import_batch.imported_count,
+            1,
+            "an invoice-mode voucher (no ALLLEDGERENTRIES.LIST, ledger data "
+            "split across LEDGERENTRIES.LIST and ALLINVENTORYENTRIES.LIST) "
+            "must still import",
+        )
+        self.assertFalse(import_batch.exception_ids)
+
+        posted = self.env["account.move"].search([("ref", "=", "INV-001")])
+        self.assertEqual(posted.state, "posted")
+        self.assertEqual(sum(posted.line_ids.mapped("debit")), 118.0)
+        self.assertEqual(
+            posted.line_ids.filtered(lambda l: l.account_id == income_account).credit,
+            100.0,
+        )
+        self.assertEqual(
+            posted.line_ids.filtered(lambda l: l.account_id == tax_account).credit,
+            18.0,
+        )
