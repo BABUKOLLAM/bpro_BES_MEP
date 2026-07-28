@@ -315,6 +315,17 @@ class TestTallyImportHandAuthoredFixture(FinanceTestCommon):
             "Some Vendor Not In Odoo", import_batch.exception_ids.reason
         )
 
+        # A line resolved via a partner's receivable/payable property must
+        # carry that partner on partner_id, not just post to the right
+        # account total - otherwise AR aging and per-partner statement
+        # reports have nothing to group by, even though the account
+        # balance itself is correct.
+        posted = self.env["account.move"].search([("ref", "=", "TALLY-INV-001")])
+        customer_line = posted.line_ids.filtered(
+            lambda l: l.account_id == self.customer.property_account_receivable_id
+        )
+        self.assertEqual(customer_line.partner_id, self.customer)
+
         posted = self.env["account.move"].search(
             [("ref", "=", "TALLY-INV-001")]
         )

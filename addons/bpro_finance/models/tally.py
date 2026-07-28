@@ -315,7 +315,7 @@ class BproTallyImportBatch(models.Model):
 
         line_vals = []
         for ledger_name, entry in self._ledger_entries(voucher_el):
-            account = self._resolve_ledger(ledger_name, voucher_type)
+            account, partner = self._resolve_ledger(ledger_name, voucher_type)
             if not account:
                 return self._exception(
                     voucher_number, _("Unmapped ledger: %s") % ledger_name
@@ -339,6 +339,7 @@ class BproTallyImportBatch(models.Model):
                     0,
                     {
                         "account_id": account.id,
+                        "partner_id": partner.id if partner else False,
                         "name": voucher_number,
                         "debit": amount if is_debit else 0.0,
                         "credit": 0.0 if is_debit else amount,
@@ -376,8 +377,15 @@ class BproTallyImportBatch(models.Model):
         return None
 
     def _resolve_ledger(self, ledger_name, voucher_type):
+        """Returns (account, partner) - partner is the matched party when
+        the ledger resolved via a partner's receivable/payable property,
+        else None. Callers need both: the account to post to, and the
+        partner to stamp on the line so per-customer/per-vendor reports
+        (AR aging, partner statements) can actually attribute it - without
+        this, every imported line would carry the right account balance
+        but no partner_id at all, silently breaking those reports."""
         if not ledger_name:
-            return None
+            return None, None
         # Postgres's ILIKE (which "=ilike" compiles to) treats backslash as
         # its pattern escape character, so a ledger name containing a
         # literal backslash - seen in this client's real data, e.g. "Sadik
@@ -398,21 +406,24 @@ class BproTallyImportBatch(models.Model):
             # direction - not to a partner record directly, which isn't a
             # valid account.move.line.account_id.
             if voucher_type in PAYABLE_PREFERRING_VOUCHER_TYPES:
-                return (
+                account = (
                     partner.property_account_payable_id
                     or partner.property_account_receivable_id
                 )
-            return (
-                partner.property_account_receivable_id
-                or partner.property_account_payable_id
-            )
-        return self.env["account.account"].search(
+            else:
+                account = (
+                    partner.property_account_receivable_id
+                    or partner.property_account_payable_id
+                )
+            return account, partner
+        account = self.env["account.account"].search(
             [
                 ("company_ids", "in", self.company_id.id),
                 ("name", "=ilike", escaped_name),
             ],
             limit=1,
         )
+        return account, None
 
     @staticmethod
     def _exception(voucher_number, reason):
