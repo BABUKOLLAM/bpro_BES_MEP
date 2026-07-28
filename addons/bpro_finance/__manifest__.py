@@ -13,6 +13,7 @@ built from native ledger fields rather than extending an existing report.
 * 3-way match on vendor bills: compares PO ordered qty/price, received qty, and billed qty/price per line, with a per-company configurable tolerance percent; blocks bill approval on mismatch via the bpro_approval mixin (FR-FIN-004).
 * Tally XML export/import for sales/purchase/receipt/payment/journal vouchers, with ledger/voucher-type mapping validation and an exceptions report on import (FR-FIN-006/007). Fully custom - no Odoo native equivalent for any edition.
 * bpro.finance.dashboard: cash position, total receivables, total payables, and current ratio as of a selected date (FR-FIN-009).
+* Financial statement reports - Trial Balance, Balance Sheet, Profit & Loss, Cash Flow Statement (indirect method), and Fund Flow Statement - built from native ledger balances since Community has no account_reports module. Each of the Cash Flow and Fund Flow reports includes a built-in reconciliation check line that must equal zero, since both are independently derivable from the balance sheet identity.
 
 Invoice generation from a confirmed sales order and payment registration (full/partial, with automatic invoice status transitions) are native Odoo Accounting features requiring no custom code.
 """,
@@ -27,6 +28,7 @@ Invoice generation from a confirmed sales order and payment registration (full/p
         "security/bpro_finance_multi_company.xml",
         "views/ar_aging_views.xml",
         "views/finance_dashboard_views.xml",
+        "views/financial_reports_views.xml",
         "views/account_move_views.xml",
         "views/tally_views.xml",
         "views/tally_upload_templates.xml",

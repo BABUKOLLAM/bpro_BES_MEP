@@ -2,6 +2,16 @@ id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_bpro_ar_aging_wizard_user,bpro.ar.aging.wizard user,model_bpro_ar_aging_wizard,account.group_account_invoice,1,1,1,1
 access_bpro_ar_aging_line_user,bpro.ar.aging.line user,model_bpro_ar_aging_line,account.group_account_invoice,1,1,1,1
 access_bpro_finance_dashboard_user,bpro.finance.dashboard user,model_bpro_finance_dashboard,account.group_account_invoice,1,1,1,1
+access_bpro_trial_balance_wizard_user,bpro.trial.balance.wizard user,model_bpro_trial_balance_wizard,account.group_account_invoice,1,1,1,1
+access_bpro_trial_balance_line_user,bpro.trial.balance.line user,model_bpro_trial_balance_line,account.group_account_invoice,1,1,1,1
+access_bpro_balance_sheet_wizard_user,bpro.balance.sheet.wizard user,model_bpro_balance_sheet_wizard,account.group_account_invoice,1,1,1,1
+access_bpro_balance_sheet_line_user,bpro.balance.sheet.line user,model_bpro_balance_sheet_line,account.group_account_invoice,1,1,1,1
+access_bpro_profit_loss_wizard_user,bpro.profit.loss.wizard user,model_bpro_profit_loss_wizard,account.group_account_invoice,1,1,1,1
+access_bpro_profit_loss_line_user,bpro.profit.loss.line user,model_bpro_profit_loss_line,account.group_account_invoice,1,1,1,1
+access_bpro_cash_flow_wizard_user,bpro.cash.flow.wizard user,model_bpro_cash_flow_wizard,account.group_account_invoice,1,1,1,1
+access_bpro_cash_flow_line_user,bpro.cash.flow.line user,model_bpro_cash_flow_line,account.group_account_invoice,1,1,1,1
+access_bpro_fund_flow_wizard_user,bpro.fund.flow.wizard user,model_bpro_fund_flow_wizard,account.group_account_invoice,1,1,1,1
+access_bpro_fund_flow_line_user,bpro.fund.flow.line user,model_bpro_fund_flow_line,account.group_account_invoice,1,1,1,1
 access_bpro_tally_export_batch_manager,bpro.tally.export.batch manager,model_bpro_tally_export_batch,account.group_account_manager,1,1,1,1
 access_bpro_tally_export_batch_user,bpro.tally.export.batch user,model_bpro_tally_export_batch,account.group_account_invoice,1,0,0,0
 access_bpro_tally_import_batch_manager,bpro.tally.import.batch manager,model_bpro_tally_import_batch,account.group_account_manager,1,1,1,1

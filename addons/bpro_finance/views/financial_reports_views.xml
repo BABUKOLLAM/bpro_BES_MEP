@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Trial Balance -->
+    <record id="view_bpro_trial_balance_wizard_form" model="ir.ui.view">
+        <field name="name">bpro.trial.balance.wizard.form</field>
+        <field name="model">bpro.trial.balance.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_generate" type="object" string="Generate" class="btn-primary"/>
+                </header>
+                <sheet>
+                    <group col="4">
+                        <field name="date_from"/>
+                        <field name="date_to"/>
+                    </group>
+                    <field name="line_ids" readonly="1">
+                        <list>
+                            <field name="account_id"/>
+                            <field name="opening_debit" sum="Total"/>
+                            <field name="opening_credit" sum="Total"/>
+                            <field name="debit" sum="Total"/>
+                            <field name="credit" sum="Total"/>
+                            <field name="closing_debit" sum="Total"/>
+                            <field name="closing_credit" sum="Total"/>
+                        </list>
+                    </field>
+                    <group col="4">
+                        <field name="total_closing_debit"/>
+                        <field name="total_closing_credit"/>
+                    </group>
+                    <field name="currency_id" invisible="1"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="action_bpro_trial_balance_wizard" model="ir.actions.act_window">
+        <field name="name">Trial Balance</field>
+        <field name="res_model">bpro.trial.balance.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">current</field>
+    </record>
+    <menuitem id="menu_bpro_trial_balance" name="Trial Balance"
+              parent="account.menu_finance_reports"
+              action="action_bpro_trial_balance_wizard" sequence="2"/>
+
+    <!-- Balance Sheet -->
+    <record id="view_bpro_balance_sheet_wizard_form" model="ir.ui.view">
+        <field name="name">bpro.balance.sheet.wizard.form</field>
+        <field name="model">bpro.balance.sheet.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_generate" type="object" string="Generate" class="btn-primary"/>
+                </header>
+                <sheet>
+                    <group>
+                        <field name="date_to"/>
+                    </group>
+                    <field name="line_ids" readonly="1">
+                        <list decoration-bf="is_header or is_total">
+                            <field name="label"/>
+                            <field name="amount"/>
+                            <field name="is_header" column_invisible="1"/>
+                            <field name="is_total" column_invisible="1"/>
+                        </list>
+                    </field>
+                    <group col="4">
+                        <field name="total_assets"/>
+                        <field name="total_liabilities_equity"/>
+                        <field name="balance_check"/>
+                    </group>
+                    <field name="currency_id" invisible="1"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="action_bpro_balance_sheet_wizard" model="ir.actions.act_window">
+        <field name="name">Balance Sheet</field>
+        <field name="res_model">bpro.balance.sheet.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">current</field>
+    </record>
+    <menuitem id="menu_bpro_balance_sheet" name="Balance Sheet"
+              parent="account.menu_finance_reports"
+              action="action_bpro_balance_sheet_wizard" sequence="3"/>
+
+    <!-- Profit and Loss -->
+    <record id="view_bpro_profit_loss_wizard_form" model="ir.ui.view">
+        <field name="name">bpro.profit.loss.wizard.form</field>
+        <field name="model">bpro.profit.loss.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_generate" type="object" string="Generate" class="btn-primary"/>
+                </header>
+                <sheet>
+                    <group col="4">
+                        <field name="date_from"/>
+                        <field name="date_to"/>
+                    </group>
+                    <field name="line_ids" readonly="1">
+                        <list>
+                            <field name="section"/>
+                            <field name="account_id"/>
+                            <field name="amount"/>
+                        </list>
+                    </field>
+                    <group col="4">
+                        <field name="total_income"/>
+                        <field name="total_expense"/>
+                        <field name="net_profit"/>
+                    </group>
+                    <field name="currency_id" invisible="1"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="action_bpro_profit_loss_wizard" model="ir.actions.act_window">
+        <field name="name">Profit and Loss Statement</field>
+        <field name="res_model">bpro.profit.loss.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">current</field>
+    </record>
+    <menuitem id="menu_bpro_profit_loss" name="Profit and Loss"
+              parent="account.menu_finance_reports"
+              action="action_bpro_profit_loss_wizard" sequence="4"/>
+
+    <!-- Cash Flow Statement -->
+    <record id="view_bpro_cash_flow_wizard_form" model="ir.ui.view">
+        <field name="name">bpro.cash.flow.wizard.form</field>
+        <field name="model">bpro.cash.flow.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_generate" type="object" string="Generate" class="btn-primary"/>
+                </header>
+                <sheet>
+                    <group col="4">
+                        <field name="date_from"/>
+                        <field name="date_to"/>
+                    </group>
+                    <field name="line_ids" readonly="1">
+                        <list decoration-bf="is_total">
+                            <field name="section"/>
+                            <field name="label"/>
+                            <field name="amount"/>
+                            <field name="is_total" column_invisible="1"/>
+                        </list>
+                    </field>
+                    <group col="4">
+                        <field name="net_increase_in_cash"/>
+                        <field name="actual_cash_movement"/>
+                        <field name="reconciliation_diff"/>
+                    </group>
+                    <field name="currency_id" invisible="1"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="action_bpro_cash_flow_wizard" model="ir.actions.act_window">
+        <field name="name">Cash Flow Statement</field>
+        <field name="res_model">bpro.cash.flow.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">current</field>
+    </record>
+    <menuitem id="menu_bpro_cash_flow" name="Cash Flow Statement"
+              parent="account.menu_finance_reports"
+              action="action_bpro_cash_flow_wizard" sequence="5"/>
+
+    <!-- Fund Flow Statement -->
+    <record id="view_bpro_fund_flow_wizard_form" model="ir.ui.view">
+        <field name="name">bpro.fund.flow.wizard.form</field>
+        <field name="model">bpro.fund.flow.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_generate" type="object" string="Generate" class="btn-primary"/>
+                </header>
+                <sheet>
+                    <group col="4">
+                        <field name="date_from"/>
+                        <field name="date_to"/>
+                    </group>
+                    <field name="line_ids" readonly="1">
+                        <list decoration-bf="is_total">
+                            <field name="section"/>
+                            <field name="label"/>
+                            <field name="amount"/>
+                            <field name="is_total" column_invisible="1"/>
+                        </list>
+                    </field>
+                    <group col="4">
+                        <field name="net_increase_in_working_capital"/>
+                        <field name="working_capital_schedule_check"/>
+                        <field name="reconciliation_diff"/>
+                    </group>
+                    <field name="currency_id" invisible="1"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="action_bpro_fund_flow_wizard" model="ir.actions.act_window">
+        <field name="name">Fund Flow Statement</field>
+        <field name="res_model">bpro.fund.flow.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">current</field>
+    </record>
+    <menuitem id="menu_bpro_fund_flow" name="Fund Flow Statement"
+              parent="account.menu_finance_reports"
+              action="action_bpro_fund_flow_wizard" sequence="6"/>
+</odoo>
