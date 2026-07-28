@@ -92,6 +92,45 @@ KNOWN_VOUCHER_TYPES = {
 # a partner - see _resolve_ledger. "GST Purchase" is this same relationship
 # as "Purchase", just under the GST-specific voucher type name.
 PAYABLE_PREFERRING_VOUCHER_TYPES = ("Purchase", "GST Purchase", "Payment", "Debit Note")
+SALE_VOUCHER_TYPES = ("Sales", "GST SALES", "Credit Note")
+PURCHASE_VOUCHER_TYPES = ("Purchase", "GST Purchase", "Debit Note")
+
+# Confirmed-existing ledger names for the (direction, intra/inter-state, GST
+# rate) combinations actually seen among this client's inventory lines whose
+# GSTLEDGERSOURCE was blank (i.e. Tally sourced that line's GST
+# classification from the stock item's own master, not a ledger override -
+# see _ledger_entries). Deliberately only includes combinations verified
+# against the real chart of accounts; anything else is left unresolved
+# (falls through to "Unmapped ledger") rather than guessed, since a wrong
+# Sales/Purchase ledger here would misstate real GST returns.
+GST_RATE_FALLBACK_LEDGERS = {
+    ("SALE", "LOCAL", "18"): "Kerala State 18% Sales",
+    ("SALE", "INTERSTATE", "18"): "Interstate Gst Sales 18%",
+    ("PURCHASE", "INTERSTATE", "18"): "Interstate Purchase 18%",
+}
+_RATE_NUMBER_RE = re.compile(r"(\d+(?:\.\d+)?)")
+
+
+def parse_stock_item_gst_rates(raw_bytes):
+    """Parses a Tally 'GST Rate Setup' export (GSTMASTERDISPNAME /
+    GSTRATEIGSTRATE pairs) into {item_name: rate_string}, e.g. {"10mm Cork
+    Black Sheet": "18"}. This is a separate, optional export from the Day
+    Book - it only exists to fill in the GSTLEDGERSOURCE gap described on
+    _ledger_entries, not to drive the main import."""
+    text = sanitize_tally_xml_bytes(raw_bytes).decode("utf-8")
+    pairs = re.findall(
+        r"<GSTMASTERDISPNAME>(.*?)</GSTMASTERDISPNAME>\s*"
+        r"<GSTRATEAPPLFROM>[^<]*</GSTRATEAPPLFROM>\s*"
+        r"<GSTRATETAXTYPE>[^<]*</GSTRATETAXTYPE>\s*"
+        r"<GSTRATEIGSTRATE>([^<]*)</GSTRATEIGSTRATE>",
+        text,
+    )
+    rates = {}
+    for name, rate in pairs:
+        match = _RATE_NUMBER_RE.search(rate)
+        if match:
+            rates[name.strip()] = match.group(1)
+    return rates
 
 
 class BproTallyExportBatch(models.Model):
@@ -203,6 +242,15 @@ class BproTallyImportBatch(models.Model):
     )
     xml_filename = fields.Char()
     xml_file = fields.Binary(required=True)
+    gst_rate_filename = fields.Char()
+    gst_rate_file = fields.Binary(
+        help="Optional: Tally's 'GST Rate Setup' export (stock item name -> "
+        "GST rate). Only used to resolve inventory lines whose GST "
+        "classification came from the stock item's own master rather than "
+        "a ledger override (see _ledger_entries) - leave blank if you don't "
+        "have one; those lines will simply stay as Unmapped ledger "
+        "exceptions instead."
+    )
     state = fields.Selection(
         [("draft", "Draft"), ("done", "Done")], default="draft", readonly=True
     )
@@ -233,11 +281,17 @@ class BproTallyImportBatch(models.Model):
         except Exception as exc:
             raise UserError(_("Invalid XML file: %s") % exc)
 
+        item_gst_rates = (
+            parse_stock_item_gst_rates(base64.b64decode(self.gst_rate_file))
+            if self.gst_rate_file
+            else {}
+        )
+
         journal = self._default_journal()
         imported = 0
         exception_vals = []
         for voucher_el in root.iter("VOUCHER"):
-            error = self._import_one_voucher(voucher_el, journal)
+            error = self._import_one_voucher(voucher_el, journal, item_gst_rates)
             if error:
                 exception_vals.append(error)
             else:
@@ -260,7 +314,7 @@ class BproTallyImportBatch(models.Model):
         return journal
 
     @staticmethod
-    def _ledger_entries(voucher_el):
+    def _ledger_entries(voucher_el, voucher_type=None, item_gst_rates=None):
         """Yields (ledger_name, entry_element) pairs covering both Tally
         voucher XML layouts actually seen in this client's real export:
 
@@ -279,23 +333,48 @@ class BproTallyImportBatch(models.Model):
         classification for that line came from a ledger override
         (GSTSOURCETYPE="Ledger"); when it's sourced from the stock
         item's own master data instead (GSTSOURCETYPE="Stock Item" or
-        "Company"), there is no ledger name in this export at all -
-        that line falls through to an "Unmapped ledger" exception
-        rather than being guessed, since resolving it correctly needs
-        the stock item's own default sales/purchase ledger, which only
-        a separate Stock Item Master export would provide.
+        "Company"), there is no ledger name in this export at all. If an
+        item_gst_rates table was supplied (from a separate GST Rate Setup
+        export), a fallback ledger name is derived from: the item's own
+        GST rate (per-item, since one voucher can mix items at different
+        rates - a voucher-level rate can't be assumed), whether this
+        voucher's own tax lines show CGST+SGST (intra-state) or IGST
+        (inter-state), and the voucher's Sale/Purchase direction. That
+        candidate name still has to match a real existing account via the
+        normal _resolve_ledger lookup below - if GST_RATE_FALLBACK_LEDGERS
+        has no entry for this combination, or no matching account exists,
+        it falls through to "Unmapped ledger" exactly as before, never a
+        guessed posting.
         """
         entries = voucher_el.findall("ALLLEDGERENTRIES.LIST")
         if entries:
             for entry in entries:
                 yield (entry.findtext("LEDGERNAME") or "").strip(), entry
             return
-        for entry in voucher_el.findall("LEDGERENTRIES.LIST"):
+        ledger_entries = voucher_el.findall("LEDGERENTRIES.LIST")
+        for entry in ledger_entries:
             yield (entry.findtext("LEDGERNAME") or "").strip(), entry
-        for entry in voucher_el.findall("ALLINVENTORYENTRIES.LIST"):
-            yield (entry.findtext("GSTLEDGERSOURCE") or "").strip(), entry
 
-    def _import_one_voucher(self, voucher_el, journal):
+        tax_names = [(e.findtext("LEDGERNAME") or "").upper() for e in ledger_entries]
+        has_igst = any("IGST" in n for n in tax_names)
+        has_cgst_sgst = any("CGST" in n or "SGST" in n for n in tax_names)
+        state = "INTERSTATE" if has_igst else ("LOCAL" if has_cgst_sgst else None)
+        direction = (
+            "SALE"
+            if voucher_type in SALE_VOUCHER_TYPES
+            else "PURCHASE" if voucher_type in PURCHASE_VOUCHER_TYPES else None
+        )
+
+        for entry in voucher_el.findall("ALLINVENTORYENTRIES.LIST"):
+            name = (entry.findtext("GSTLEDGERSOURCE") or "").strip()
+            if not name and item_gst_rates and state and direction:
+                item = (entry.findtext("STOCKITEMNAME") or "").strip()
+                rate = item_gst_rates.get(item)
+                if rate:
+                    name = GST_RATE_FALLBACK_LEDGERS.get((direction, state, rate), "")
+            yield name, entry
+
+    def _import_one_voucher(self, voucher_el, journal, item_gst_rates=None):
         """Returns a dict of bpro.tally.import.exception vals if the
         voucher couldn't be imported, or None if it was posted."""
         voucher_number = voucher_el.findtext("VOUCHERNUMBER") or ""
@@ -314,7 +393,9 @@ class BproTallyImportBatch(models.Model):
             return self._exception(voucher_number, _("Invalid or missing date"))
 
         line_vals = []
-        for ledger_name, entry in self._ledger_entries(voucher_el):
+        for ledger_name, entry in self._ledger_entries(
+            voucher_el, voucher_type, item_gst_rates
+        ):
             account, partner = self._resolve_ledger(ledger_name, voucher_type)
             if not account:
                 return self._exception(

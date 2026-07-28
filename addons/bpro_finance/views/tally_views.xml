@@ -44,6 +44,10 @@
                         <field name="xml_file" filename="xml_filename"
                                invisible="state == 'done'"/>
                         <field name="xml_filename"/>
+                        <field name="gst_rate_file" filename="gst_rate_filename"
+                               invisible="state == 'done'"
+                               string="GST Rate Setup export (optional)"/>
+                        <field name="gst_rate_filename" invisible="1"/>
                         <field name="state" widget="statusbar"/>
                         <field name="imported_count" readonly="1"/>
                     </group>

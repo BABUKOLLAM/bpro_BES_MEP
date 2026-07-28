@@ -666,3 +666,154 @@ class TestTallyImportIsIdempotentOnRerun(FinanceTestCommon):
             "three re-runs, not three",
         )
         self.assertEqual(posted.state, "posted")
+
+
+# A hand-authored "GST Rate Setup" fixture matching this client's real Tally
+# export format (GSTMASTERDISPNAME/GSTRATEIGSTRATE pairs) - the separate,
+# optional file that resolves inventory lines whose GST classification came
+# from the stock item's own master rather than a ledger override (see
+# _ledger_entries). 335 of the real client's 8127 vouchers had this gap;
+# none of them are guessable without this second export.
+GST_RATE_SETUP_FIXTURE = """<?xml version="1.0" encoding="UTF-8"?>
+<ENVELOPE>
+ <GSTMASTERDISPNAME>Test Stock Item</GSTMASTERDISPNAME>
+ <GSTRATEAPPLFROM>1-Jul-17</GSTRATEAPPLFROM>
+ <GSTRATETAXTYPE>Taxable</GSTRATETAXTYPE>
+ <GSTRATEIGSTRATE>18 %</GSTRATEIGSTRATE>
+</ENVELOPE>
+"""
+
+# A GST SALES voucher whose stock item line has GSTSOURCETYPE="Stock Item"
+# and consequently no GSTLEDGERSOURCE at all - the exact real-world gap the
+# GST Rate Setup fallback exists for. Tax lines are CGST+SGST (not IGST),
+# matching a local/intra-state sale.
+GST_SALES_VOUCHER_MISSING_LEDGER_SOURCE = """<?xml version="1.0" encoding="UTF-8"?>
+<ENVELOPE>
+  <HEADER>
+    <TALLYREQUEST>Import Data</TALLYREQUEST>
+  </HEADER>
+  <BODY>
+    <IMPORTDATA>
+      <REQUESTDESC>
+        <REPORTNAME>Vouchers</REPORTNAME>
+      </REQUESTDESC>
+      <REQUESTDATA>
+        <TALLYMESSAGE xmlns:UDF="TallyUDF">
+          <VOUCHER VCHTYPE="GST SALES" ACTION="Create">
+            <DATE>20260615</DATE>
+            <VOUCHERTYPENAME>GST SALES</VOUCHERTYPENAME>
+            <VOUCHERNUMBER>INV-002</VOUCHERNUMBER>
+            <PARTYLEDGERNAME>{customer}</PARTYLEDGERNAME>
+            <LEDGERENTRIES.LIST>
+              <LEDGERNAME>{customer}</LEDGERNAME>
+              <ISDEEMEDPOSITIVE>Yes</ISDEEMEDPOSITIVE>
+              <ISPARTYLEDGER>Yes</ISPARTYLEDGER>
+              <AMOUNT>-118.00</AMOUNT>
+            </LEDGERENTRIES.LIST>
+            <LEDGERENTRIES.LIST>
+              <LEDGERNAME>Output CGST 9%</LEDGERNAME>
+              <ISDEEMEDPOSITIVE>No</ISDEEMEDPOSITIVE>
+              <ISPARTYLEDGER>No</ISPARTYLEDGER>
+              <AMOUNT>9.00</AMOUNT>
+            </LEDGERENTRIES.LIST>
+            <LEDGERENTRIES.LIST>
+              <LEDGERNAME>Output SGST 9%</LEDGERNAME>
+              <ISDEEMEDPOSITIVE>No</ISDEEMEDPOSITIVE>
+              <ISPARTYLEDGER>No</ISPARTYLEDGER>
+              <AMOUNT>9.00</AMOUNT>
+            </LEDGERENTRIES.LIST>
+            <ALLINVENTORYENTRIES.LIST>
+              <STOCKITEMNAME>Test Stock Item</STOCKITEMNAME>
+              <GSTSOURCETYPE>Stock Item</GSTSOURCETYPE>
+              <GSTLEDGERSOURCE></GSTLEDGERSOURCE>
+              <ISDEEMEDPOSITIVE>No</ISDEEMEDPOSITIVE>
+              <AMOUNT>100.00</AMOUNT>
+            </ALLINVENTORYENTRIES.LIST>
+          </VOUCHER>
+        </TALLYMESSAGE>
+      </REQUESTDATA>
+    </IMPORTDATA>
+  </BODY>
+</ENVELOPE>
+"""
+
+
+class TestTallyImportGstRateFallback(FinanceTestCommon):
+    def test_blank_ledger_source_stays_unmapped_without_rate_file(self):
+        xml_content = GST_SALES_VOUCHER_MISSING_LEDGER_SOURCE.format(
+            customer=self.customer.name
+        )
+        import_batch = self.env["bpro.tally.import.batch"].create(
+            {
+                "xml_file": base64.b64encode(xml_content.encode("utf-8")),
+                "xml_filename": "missing_source_no_fallback.xml",
+            }
+        )
+        import_batch.action_import()
+
+        self.assertEqual(
+            import_batch.imported_count,
+            0,
+            "without a GST Rate Setup file, a blank GSTLEDGERSOURCE line "
+            "must stay an Unmapped ledger exception, not be guessed",
+        )
+        self.assertIn("Unmapped ledger", import_batch.exception_ids.reason)
+
+    def test_blank_ledger_source_resolves_with_matching_rate_file_and_account(self):
+        kerala_18_sales = self.env["account.account"].create(
+            {
+                "name": "Kerala State 18% Sales",
+                "code": "TESTKS18",
+                "account_type": "income",
+                "company_ids": [(6, 0, [self.company.id])],
+            }
+        )
+        # the voucher's own CGST/SGST tax ledgers need to resolve too - this
+        # test is specifically about the item's blank GSTLEDGERSOURCE line,
+        # not about these, so they're just plain existing accounts.
+        self.env["account.account"].create(
+            [
+                {
+                    "name": "Output CGST 9%",
+                    "code": "TESTCGST9",
+                    "account_type": "liability_current",
+                    "company_ids": [(6, 0, [self.company.id])],
+                },
+                {
+                    "name": "Output SGST 9%",
+                    "code": "TESTSGST9",
+                    "account_type": "liability_current",
+                    "company_ids": [(6, 0, [self.company.id])],
+                },
+            ]
+        )
+        xml_content = GST_SALES_VOUCHER_MISSING_LEDGER_SOURCE.format(
+            customer=self.customer.name
+        )
+        import_batch = self.env["bpro.tally.import.batch"].create(
+            {
+                "xml_file": base64.b64encode(xml_content.encode("utf-8")),
+                "xml_filename": "missing_source_with_fallback.xml",
+                "gst_rate_file": base64.b64encode(
+                    GST_RATE_SETUP_FIXTURE.encode("utf-8")
+                ),
+                "gst_rate_filename": "gst_rate_setup.xml",
+            }
+        )
+        import_batch.action_import()
+
+        self.assertEqual(
+            import_batch.imported_count,
+            1,
+            "a blank GSTLEDGERSOURCE line must resolve once the item's GST "
+            "rate (from the rate file) and its tax lines (CGST+SGST => "
+            "local) match a real existing account_type-appropriate ledger",
+        )
+        self.assertFalse(import_batch.exception_ids)
+
+        posted = self.env["account.move"].search([("ref", "=", "INV-002")])
+        self.assertEqual(posted.state, "posted")
+        self.assertEqual(
+            posted.line_ids.filtered(lambda l: l.account_id == kerala_18_sales).credit,
+            100.0,
+        )
