@@ -31,6 +31,11 @@ docker compose -f docker-compose.prod.yml up -d
 
 Caddy obtains and renews HTTPS certificates automatically.
 
+`docker-compose.prod.yml` caps each service's logs at 10MB x 5 files
+(json-file driver, timestamped JSON per line via `docker compose logs`).
+Docker's default has no cap and will otherwise fill the disk over the
+life of the deployment - don't remove the `logging:` block per service.
+
 ## 3. First boot
 
 ```bash
@@ -77,7 +82,40 @@ crontab -e
 # 30 2 * * * /root/bpro-lms-pms/scripts/backup.sh >> /var/log/bpro-backup.log 2>&1
 ```
 
-Copy `~/bpro-backups` off-server periodically (rclone to Google Drive works well).
+**Known gap: no off-server copy is configured yet.** Backups currently land
+only on `~/bpro-backups` on the same VPS as the live database — if that
+disk or the VPS account is lost, the backups are lost with it. Copy
+`~/bpro-backups` off-server periodically; `rclone` to Google Drive is a
+reasonable option but needs an OAuth-connected remote, which requires
+whoever owns the target Drive account to run `rclone config` interactively
+— set this up before relying on it as the actual disaster-recovery plan.
+
+### Verifying a backup actually restores
+
+A backup you've never restored is a hope, not a plan. Test periodically —
+this restores into a **throwaway database**, never `bpro` itself:
+
+```bash
+cd /root/bpro-lms-pms/deploy
+LATEST=$(ls -t ~/bpro-backups/bpro-db-*.dump | head -1)
+docker compose -f docker-compose.prod.yml exec -T db psql -U odoo -d postgres \
+    -c 'CREATE DATABASE bpro_restore_test OWNER odoo;'
+docker compose -f docker-compose.prod.yml exec -T db pg_restore -U odoo \
+    -d bpro_restore_test --no-owner < "$LATEST"
+
+# sanity check: row counts should match the live db, and the ledger must
+# balance to exactly 0.00 (every journal entry's debits = credits)
+docker compose -f docker-compose.prod.yml exec -T db psql -U odoo \
+    -d bpro_restore_test -c "SELECT round(sum(balance),2) FROM account_move_line;"
+
+docker compose -f docker-compose.prod.yml exec -T db psql -U odoo -d postgres \
+    -c 'DROP DATABASE bpro_restore_test;'
+```
+
+Last verified 2026-07-31: row counts on `res_partner`, `account_move`,
+`account_move_line`, `sale_order`, `hr_employee`, and `ir_attachment` all
+matched the live database exactly, and the ledger balance summed to
+`0.00`.
 
 ## 6. Static downloads (e.g. the customer user manual)
 

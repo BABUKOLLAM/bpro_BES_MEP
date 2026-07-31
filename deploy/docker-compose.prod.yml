@@ -1,3 +1,15 @@
+x-logging: &default-logging
+  driver: json-file
+  options:
+    # Docker's json-file driver has no cap by default - left alone it
+    # grows without limit for the life of the deployment and will
+    # eventually fill the disk. 10m x 5 files = 50MB max per service,
+    # which is ample for a single-tenant deployment at this scale while
+    # still keeping a real, structured (JSON-per-line, timestamped) log
+    # history on disk instead of nothing.
+    max-size: "10m"
+    max-file: "5"
+
 services:
   db:
     image: postgres:16
@@ -13,6 +25,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 10
+    logging: *default-logging
 
   odoo:
     image: odoo:18
@@ -37,6 +50,7 @@ services:
     expose:
       - "8069"
       - "8072"
+    logging: *default-logging
 
   caddy:
     image: caddy:2
@@ -51,6 +65,7 @@ services:
       - ./static:/srv/static:ro
       - caddy-data:/data
       - caddy-config:/config
+    logging: *default-logging
 
 volumes:
   db-data:
