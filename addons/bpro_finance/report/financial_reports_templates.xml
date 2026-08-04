@@ -1,0 +1,287 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="statement_header" name="Financial Statement Header (shared)">
+        <div class="text-center mb-4">
+            <h2 t-esc="title"/>
+            <h5 t-if="date_from" class="text-muted">
+                <span t-esc="date_from"/> to <span t-esc="date_to"/>
+            </h5>
+            <h5 t-else="" class="text-muted">As of <span t-esc="date_to"/></h5>
+        </div>
+    </template>
+
+    <!-- ===================== Trial Balance ===================== -->
+    <template id="report_trial_balance">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <t t-call="bpro_finance.statement_header">
+                            <t t-set="title">Trial Balance</t>
+                            <t t-set="date_from" t-value="o.date_from"/>
+                            <t t-set="date_to" t-value="o.date_to"/>
+                        </t>
+                        <table class="table table-sm table-borderless" style="font-size:11px;">
+                            <thead>
+                                <tr style="border-bottom: 1px solid #333;">
+                                    <th>Account</th>
+                                    <th class="text-end">Opening Debit</th>
+                                    <th class="text-end">Opening Credit</th>
+                                    <th class="text-end">Debit</th>
+                                    <th class="text-end">Credit</th>
+                                    <th class="text-end">Closing Debit</th>
+                                    <th class="text-end">Closing Credit</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="o.line_ids" t-as="l">
+                                    <td t-esc="l.account_id.display_name"/>
+                                    <td class="text-end" t-esc="'%.2f' % l.opening_debit"/>
+                                    <td class="text-end" t-esc="'%.2f' % l.opening_credit"/>
+                                    <td class="text-end" t-esc="'%.2f' % l.debit"/>
+                                    <td class="text-end" t-esc="'%.2f' % l.credit"/>
+                                    <td class="text-end" t-esc="'%.2f' % l.closing_debit"/>
+                                    <td class="text-end" t-esc="'%.2f' % l.closing_credit"/>
+                                </tr>
+                            </tbody>
+                            <tfoot>
+                                <tr style="border-top: 2px solid #333; font-weight: bold;">
+                                    <td>Total</td>
+                                    <td class="text-end" t-esc="'%.2f' % o.total_opening_debit"/>
+                                    <td class="text-end" t-esc="'%.2f' % o.total_opening_credit"/>
+                                    <td class="text-end" t-esc="'%.2f' % o.total_debit"/>
+                                    <td class="text-end" t-esc="'%.2f' % o.total_credit"/>
+                                    <td class="text-end" t-esc="'%.2f' % o.total_closing_debit"/>
+                                    <td class="text-end" t-esc="'%.2f' % o.total_closing_credit"/>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <record id="action_report_trial_balance" model="ir.actions.report">
+        <field name="name">Trial Balance PDF</field>
+        <field name="model">bpro.trial.balance.wizard</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">bpro_finance.report_trial_balance</field>
+        <field name="report_file">bpro_finance.report_trial_balance</field>
+        <field name="print_report_name">'Trial Balance - %s' % (object.date_to)</field>
+        <field name="binding_model_id" ref="model_bpro_trial_balance_wizard"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <!-- ===================== Balance Sheet ===================== -->
+    <template id="report_balance_sheet">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <t t-call="bpro_finance.statement_header">
+                            <t t-set="title">Balance Sheet</t>
+                            <t t-set="date_from" t-value="False"/>
+                            <t t-set="date_to" t-value="o.date_to"/>
+                        </t>
+                        <table class="table table-sm table-borderless" style="font-size:12px;">
+                            <tbody>
+                                <tr t-foreach="o.line_ids" t-as="l"
+                                    t-att-style="'font-weight:bold;' if (l.is_header or l.is_total) else ''">
+                                    <td t-esc="l.label"
+                                        t-att-style="'padding-left: 16px;' if not (l.is_header or l.is_total) else ''"/>
+                                    <td class="text-end" t-esc="'%.2f' % l.amount if not l.is_header else ''"/>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <table class="table table-sm table-borderless mt-4" style="font-size:12px; width:50%%;">
+                            <tr>
+                                <td>Total Assets</td>
+                                <td class="text-end" t-esc="'%.2f' % o.total_assets"/>
+                            </tr>
+                            <tr>
+                                <td>Total Liabilities &amp; Equity</td>
+                                <td class="text-end" t-esc="'%.2f' % o.total_liabilities_equity"/>
+                            </tr>
+                            <tr style="font-weight:bold; border-top: 1px solid #333;">
+                                <td>Balance Check (must be 0.00)</td>
+                                <td class="text-end" t-esc="'%.2f' % o.balance_check"/>
+                            </tr>
+                        </table>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <record id="action_report_balance_sheet" model="ir.actions.report">
+        <field name="name">Balance Sheet PDF</field>
+        <field name="model">bpro.balance.sheet.wizard</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">bpro_finance.report_balance_sheet</field>
+        <field name="report_file">bpro_finance.report_balance_sheet</field>
+        <field name="print_report_name">'Balance Sheet - %s' % (object.date_to)</field>
+        <field name="binding_model_id" ref="model_bpro_balance_sheet_wizard"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <!-- ===================== Profit and Loss ===================== -->
+    <template id="report_profit_loss">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <t t-call="bpro_finance.statement_header">
+                            <t t-set="title">Profit and Loss Statement</t>
+                            <t t-set="date_from" t-value="o.date_from"/>
+                            <t t-set="date_to" t-value="o.date_to"/>
+                        </t>
+                        <h5>Income</h5>
+                        <table class="table table-sm table-borderless" style="font-size:12px;">
+                            <tr t-foreach="o.line_ids.filtered(lambda x: x.section == 'income')" t-as="l">
+                                <td t-esc="l.account_id.display_name"/>
+                                <td class="text-end" t-esc="'%.2f' % l.amount"/>
+                            </tr>
+                            <tr style="font-weight:bold; border-top: 1px solid #333;">
+                                <td>Total Income</td>
+                                <td class="text-end" t-esc="'%.2f' % o.total_income"/>
+                            </tr>
+                        </table>
+                        <h5 class="mt-4">Expenses</h5>
+                        <table class="table table-sm table-borderless" style="font-size:12px;">
+                            <tr t-foreach="o.line_ids.filtered(lambda x: x.section == 'expense')" t-as="l">
+                                <td t-esc="l.account_id.display_name"/>
+                                <td class="text-end" t-esc="'%.2f' % l.amount"/>
+                            </tr>
+                            <tr style="font-weight:bold; border-top: 1px solid #333;">
+                                <td>Total Expense</td>
+                                <td class="text-end" t-esc="'%.2f' % o.total_expense"/>
+                            </tr>
+                        </table>
+                        <table class="table table-sm table-borderless mt-4" style="font-size:13px; width:50%%;">
+                            <tr style="font-weight:bold; border-top: 2px solid #333;">
+                                <td>Net Profit / (Loss)</td>
+                                <td class="text-end" t-esc="'%.2f' % o.net_profit"/>
+                            </tr>
+                        </table>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <record id="action_report_profit_loss" model="ir.actions.report">
+        <field name="name">Profit and Loss PDF</field>
+        <field name="model">bpro.profit.loss.wizard</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">bpro_finance.report_profit_loss</field>
+        <field name="report_file">bpro_finance.report_profit_loss</field>
+        <field name="print_report_name">'Profit and Loss - %s to %s' % (object.date_from, object.date_to)</field>
+        <field name="binding_model_id" ref="model_bpro_profit_loss_wizard"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <!-- ===================== Cash Flow Statement ===================== -->
+    <template id="report_cash_flow">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <t t-call="bpro_finance.statement_header">
+                            <t t-set="title">Cash Flow Statement (Indirect Method)</t>
+                            <t t-set="date_from" t-value="o.date_from"/>
+                            <t t-set="date_to" t-value="o.date_to"/>
+                        </t>
+                        <table class="table table-sm table-borderless" style="font-size:12px;">
+                            <tbody>
+                                <tr t-foreach="o.line_ids" t-as="l"
+                                    t-att-style="'font-weight:bold;' if l.is_total else ''">
+                                    <td t-esc="l.label"/>
+                                    <td class="text-end" t-esc="'%.2f' % l.amount"/>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <table class="table table-sm table-borderless mt-4" style="font-size:12px; width:60%%;">
+                            <tr>
+                                <td>Net Increase / (Decrease) in Cash</td>
+                                <td class="text-end" t-esc="'%.2f' % o.net_increase_in_cash"/>
+                            </tr>
+                            <tr>
+                                <td>Actual Cash &amp; Bank Movement</td>
+                                <td class="text-end" t-esc="'%.2f' % o.actual_cash_movement"/>
+                            </tr>
+                            <tr style="font-weight:bold; border-top: 1px solid #333;">
+                                <td>Reconciliation Diff (must be 0.00)</td>
+                                <td class="text-end" t-esc="'%.2f' % o.reconciliation_diff"/>
+                            </tr>
+                        </table>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <record id="action_report_cash_flow" model="ir.actions.report">
+        <field name="name">Cash Flow Statement PDF</field>
+        <field name="model">bpro.cash.flow.wizard</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">bpro_finance.report_cash_flow</field>
+        <field name="report_file">bpro_finance.report_cash_flow</field>
+        <field name="print_report_name">'Cash Flow Statement - %s to %s' % (object.date_from, object.date_to)</field>
+        <field name="binding_model_id" ref="model_bpro_cash_flow_wizard"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <!-- ===================== Fund Flow Statement ===================== -->
+    <template id="report_fund_flow">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <t t-call="bpro_finance.statement_header">
+                            <t t-set="title">Fund Flow Statement</t>
+                            <t t-set="date_from" t-value="o.date_from"/>
+                            <t t-set="date_to" t-value="o.date_to"/>
+                        </t>
+                        <table class="table table-sm table-borderless" style="font-size:12px;">
+                            <tbody>
+                                <tr t-foreach="o.line_ids" t-as="l"
+                                    t-att-style="'font-weight:bold;' if l.is_total else ''">
+                                    <td t-esc="l.label"/>
+                                    <td class="text-end" t-esc="'%.2f' % l.amount"/>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <table class="table table-sm table-borderless mt-4" style="font-size:12px; width:60%%;">
+                            <tr>
+                                <td>Net Increase / (Decrease) in Working Capital</td>
+                                <td class="text-end" t-esc="'%.2f' % o.net_increase_in_working_capital"/>
+                            </tr>
+                            <tr>
+                                <td>Working Capital Schedule Check</td>
+                                <td class="text-end" t-esc="'%.2f' % o.working_capital_schedule_check"/>
+                            </tr>
+                            <tr style="font-weight:bold; border-top: 1px solid #333;">
+                                <td>Reconciliation Diff (must be 0.00)</td>
+                                <td class="text-end" t-esc="'%.2f' % o.reconciliation_diff"/>
+                            </tr>
+                        </table>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <record id="action_report_fund_flow" model="ir.actions.report">
+        <field name="name">Fund Flow Statement PDF</field>
+        <field name="model">bpro.fund.flow.wizard</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">bpro_finance.report_fund_flow</field>
+        <field name="report_file">bpro_finance.report_fund_flow</field>
+        <field name="print_report_name">'Fund Flow Statement - %s to %s' % (object.date_from, object.date_to)</field>
+        <field name="binding_model_id" ref="model_bpro_fund_flow_wizard"/>
+        <field name="binding_type">report</field>
+    </record>
+
+</odoo>

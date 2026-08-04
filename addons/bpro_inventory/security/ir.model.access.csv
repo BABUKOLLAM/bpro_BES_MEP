@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_bpro_stock_summary_wizard_user,bpro.stock.summary.wizard user,model_bpro_stock_summary_wizard,stock.group_stock_user,1,1,1,1
+access_bpro_stock_summary_line_user,bpro.stock.summary.line user,model_bpro_stock_summary_line,stock.group_stock_user,1,1,1,1

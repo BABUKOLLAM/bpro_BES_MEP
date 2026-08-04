@@ -28,6 +28,8 @@ Inventory & Warehouse Management requirements:
 Bin-level stock tracking and allocation/no-oversell are native Odoo
 Inventory features, enabled via configuration (Settings > Inventory >
 Storage Locations) rather than custom code.
+
+* bpro.stock.summary.wizard: printable PDF stock-on-hand summary (product, location, quantity, unit cost, value) across all internal locations - Community has no equivalent built-in report.
 """,
     "version": "18.0.1.0.0",
     "category": "Inventory/Inventory",
@@ -36,9 +38,12 @@ Storage Locations) rather than custom code.
     "license": "LGPL-3",
     "depends": ["bpro_base", "bpro_approval", "stock", "mrp"],
     "data": [
+        "security/ir.model.access.csv",
         "views/stock_quant_views.xml",
         "views/stock_warehouse_orderpoint_views.xml",
         "views/stock_move_views.xml",
+        "views/stock_summary_wizard_views.xml",
+        "report/stock_summary_templates.xml",
     ],
     "installable": True,
     "application": False,

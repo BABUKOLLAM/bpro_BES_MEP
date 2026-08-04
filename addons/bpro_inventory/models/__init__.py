@@ -1,3 +1,4 @@
 from . import stock_move
 from . import stock_quant
+from . import stock_summary_wizard
 from . import stock_warehouse_orderpoint
