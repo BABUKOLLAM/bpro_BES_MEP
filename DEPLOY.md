@@ -82,13 +82,55 @@ crontab -e
 # 30 2 * * * /root/bpro-lms-pms/scripts/backup.sh >> /var/log/bpro-backup.log 2>&1
 ```
 
-**Known gap: no off-server copy is configured yet.** Backups currently land
-only on `~/bpro-backups` on the same VPS as the live database — if that
-disk or the VPS account is lost, the backups are lost with it. Copy
-`~/bpro-backups` off-server periodically; `rclone` to Google Drive is a
-reasonable option but needs an OAuth-connected remote, which requires
-whoever owns the target Drive account to run `rclone config` interactively
-— set this up before relying on it as the actual disaster-recovery plan.
+### Off-server copy
+
+A macOS LaunchAgent (`com.bpro.offsitebackup`, installed on the
+operator's Mac) pulls `~/bpro-backups` down via `rsync` over SSH daily at
+9 AM. The puller lives client-side, not in this repo - the pull script is
+`~/bpro-offsite-backups/pull_backup.sh` on that Mac, logging to
+`~/bpro-offsite-backups/pull.log`. This is a real, verified off-site copy
+(different provider, different physical location) with zero new
+credentials required, but it has one real limitation: it only runs while
+that Mac is on and network-reachable, so it is not a 24/7-guaranteed
+copy. Confirm it ran recently:
+
+```bash
+tail -5 ~/bpro-offsite-backups/pull.log   # on the operator's Mac
+```
+
+**Recommended upgrade path**: move to automated cloud object storage
+(Backblaze B2, AWS S3, or similar) once ready to provision an account -
+those need only an API key/secret (no interactive OAuth), are cheap
+(cents/month at this data volume), and don't depend on any single
+laptop being powered on. `rclone` to Google Drive is also an option but
+needs an OAuth-connected remote, set up interactively by whoever owns
+the target Drive account.
+
+### Uptime monitoring
+
+`scripts/healthcheck.sh` runs every 5 minutes via cron, checks the live
+site (`https://mepcrm.in/odoo/login`) and all three containers, and logs
+every check plus a clearly marked line on any up/down state change:
+
+```bash
+crontab -e
+# */5 * * * * /root/bpro-lms-pms/scripts/healthcheck.sh
+tail -f /var/log/bpro-healthcheck.log
+```
+
+**Known gap: this logs downtime, it does not page anyone.** There is no
+outgoing alert (email/SMS/Slack) wired up - nobody gets notified in
+real time if the site goes down, only if someone happens to check the
+log. Closing this gap needs one of:
+
+- A dedicated SMTP account (separate from Odoo's own mail config, since
+  if Odoo itself is down it can't send its own downtime alert) - hand
+  over host/port/user/password and the script can be extended to email
+  on every state change, or
+- A free external monitoring service (UptimeRobot, Better Uptime,
+  Healthchecks.io) - these need an account signup, which has to be done
+  by a human, not automated; once set up, hand over the ping
+  URL/webhook and it's a small addition to the cron script.
 
 ### Verifying a backup actually restores
 
