@@ -1,0 +1,53 @@
+# Staging environment — one extra Odoo container, no extra Postgres.
+#
+# Deliberately lightweight: the VPS this runs on was sized (8 GB RAM) for
+# ONE production Odoo instance across 22 addons, and normally sits with
+# only a couple GB free. So staging:
+#   - reuses the PRODUCTION Postgres server, as a separate `bpro_staging`
+#     database (not a second Postgres instance) — cheap, but means a
+#     runaway staging query or filled disk can affect prod DB performance.
+#     Acceptable trade, chosen deliberately over paying for a second VPS.
+#   - runs Odoo with workers=0 (see config/odoo.staging.conf) — a much
+#     smaller memory footprint than prod's worker-forking mode.
+#   - joins the PRODUCTION compose project's network as external, so
+#     Caddy (already running in that stack) can reverse_proxy straight to
+#     this container without a second Caddy/second TLS setup. If the prod
+#     stack is ever redeployed under a different Compose project name,
+#     `deploy_default` below must be updated to match.
+#
+# Bring up from the deploy/ directory (needs the same .env as prod, for
+# POSTGRES_PASSWORD):
+#   docker compose -f docker-compose.staging.yml up -d
+
+services:
+  staging-odoo:
+    image: odoo:18
+    restart: unless-stopped
+    environment:
+      HOST: db
+      USER: odoo
+      PASSWORD: ${POSTGRES_PASSWORD:?set in .env}
+      ODOO_HTTP_SOCKET_TIMEOUT: "300"
+    volumes:
+      - staging-odoo-data:/var/lib/odoo
+      - ../config/odoo.staging.conf:/etc/odoo/odoo.conf:ro
+      - ../addons:/mnt/extra-addons:ro
+    command: odoo -c /etc/odoo/odoo.conf
+    expose:
+      - "8069"
+      - "8072"
+    networks:
+      default: {}
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"
+
+volumes:
+  staging-odoo-data:
+
+networks:
+  default:
+    name: deploy_default
+    external: true

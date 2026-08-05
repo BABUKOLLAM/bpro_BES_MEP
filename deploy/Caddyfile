@@ -18,6 +18,17 @@ mepcrm.in, www.mepcrm.in {
     reverse_proxy odoo:8069
 }
 
+# Staging — same code, separate database (see deploy/docker-compose.staging.yml).
+# Requires a DNS A record: staging.mepcrm.in -> this server's IP.
+staging.mepcrm.in {
+    encode gzip
+
+    @websocket path /websocket /websocket/*
+    reverse_proxy @websocket staging-odoo:8072
+
+    reverse_proxy staging-odoo:8069
+}
+
 # Example client portal (repeat per client; must match the website domain
 # set in the onboarding wizard):
 # bella.bprolms.com {
