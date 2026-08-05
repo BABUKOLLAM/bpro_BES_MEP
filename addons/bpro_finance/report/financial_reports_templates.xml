@@ -95,7 +95,7 @@
                                 </tr>
                             </tbody>
                         </table>
-                        <table class="table table-sm table-borderless mt-4" style="font-size:12px; width:50%%;">
+                        <table class="table table-sm table-borderless mt-4" style="font-size:12px; width:50%;">
                             <tr>
                                 <td>Total Assets</td>
                                 <td class="text-end" t-esc="'%.2f' % o.total_assets"/>
@@ -159,7 +159,7 @@
                                 <td class="text-end" t-esc="'%.2f' % o.total_expense"/>
                             </tr>
                         </table>
-                        <table class="table table-sm table-borderless mt-4" style="font-size:13px; width:50%%;">
+                        <table class="table table-sm table-borderless mt-4" style="font-size:13px; width:50%;">
                             <tr style="font-weight:bold; border-top: 2px solid #333;">
                                 <td>Net Profit / (Loss)</td>
                                 <td class="text-end" t-esc="'%.2f' % o.net_profit"/>
@@ -202,7 +202,7 @@
                                 </tr>
                             </tbody>
                         </table>
-                        <table class="table table-sm table-borderless mt-4" style="font-size:12px; width:60%%;">
+                        <table class="table table-sm table-borderless mt-4" style="font-size:12px; width:60%;">
                             <tr>
                                 <td>Net Increase / (Decrease) in Cash</td>
                                 <td class="text-end" t-esc="'%.2f' % o.net_increase_in_cash"/>
@@ -253,7 +253,7 @@
                                 </tr>
                             </tbody>
                         </table>
-                        <table class="table table-sm table-borderless mt-4" style="font-size:12px; width:60%%;">
+                        <table class="table table-sm table-borderless mt-4" style="font-size:12px; width:60%;">
                             <tr>
                                 <td>Net Increase / (Decrease) in Working Capital</td>
                                 <td class="text-end" t-esc="'%.2f' % o.net_increase_in_working_capital"/>
@@ -281,6 +281,71 @@
         <field name="report_file">bpro_finance.report_fund_flow</field>
         <field name="print_report_name">'Fund Flow Statement - %s to %s' % (object.date_from, object.date_to)</field>
         <field name="binding_model_id" ref="model_bpro_fund_flow_wizard"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <!-- ===================== Sales Margin / Profitability ===================== -->
+    <template id="report_sales_margin">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <t t-call="bpro_finance.statement_header">
+                            <t t-set="title">Sales Margin / Profitability</t>
+                            <t t-set="date_from" t-value="o.date_from"/>
+                            <t t-set="date_to" t-value="o.date_to"/>
+                        </t>
+                        <p class="text-muted" style="font-size:10px;">
+                            Cost is quantity sold x each product's current standard cost price
+                            (standard costing - not adjusted retroactively for cost changes
+                            after the sale).
+                        </p>
+                        <table class="table table-sm table-borderless" style="font-size:11px;">
+                            <thead>
+                                <tr style="border-bottom: 1px solid #333;">
+                                    <th>Product</th>
+                                    <th class="text-end">Qty Sold</th>
+                                    <th class="text-end">Revenue</th>
+                                    <th class="text-end">Cost</th>
+                                    <th class="text-end">Margin</th>
+                                    <th class="text-end">Margin %</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="o.line_ids" t-as="l">
+                                    <td t-esc="l.product_id.display_name"/>
+                                    <td class="text-end" t-esc="'%.2f' % l.qty_sold"/>
+                                    <td class="text-end" t-esc="'%.2f' % l.revenue"/>
+                                    <td class="text-end" t-esc="'%.2f' % l.cost"/>
+                                    <td class="text-end" t-esc="'%.2f' % l.margin"/>
+                                    <td class="text-end"><t t-esc="'%.1f' % (l.margin_pct * 100)"/>%</td>
+                                </tr>
+                            </tbody>
+                            <tfoot>
+                                <tr style="border-top: 2px solid #333; font-weight: bold;">
+                                    <td>Total</td>
+                                    <td/>
+                                    <td class="text-end" t-esc="'%.2f' % o.total_revenue"/>
+                                    <td class="text-end" t-esc="'%.2f' % o.total_cost"/>
+                                    <td class="text-end" t-esc="'%.2f' % o.total_margin"/>
+                                    <td/>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <record id="action_report_sales_margin" model="ir.actions.report">
+        <field name="name">Sales Margin PDF</field>
+        <field name="model">bpro.sales.margin.wizard</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">bpro_finance.report_sales_margin</field>
+        <field name="report_file">bpro_finance.report_sales_margin</field>
+        <field name="print_report_name">'Sales Margin - %s to %s' % (object.date_from, object.date_to)</field>
+        <field name="binding_model_id" ref="model_bpro_sales_margin_wizard"/>
         <field name="binding_type">report</field>
     </record>
 

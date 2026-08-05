@@ -3,6 +3,7 @@ from . import test_invoicing_native
 from . import test_three_way_match
 from . import test_finance_dashboard
 from . import test_financial_reports
+from . import test_sales_margin_report
 from . import test_tally_export_import
 from . import test_tally_upload_controller
 from . import test_tally_xml_sanitize

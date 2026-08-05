@@ -14,6 +14,7 @@ built from native ledger fields rather than extending an existing report.
 * Tally XML export/import for sales/purchase/receipt/payment/journal vouchers, with ledger/voucher-type mapping validation and an exceptions report on import (FR-FIN-006/007). Fully custom - no Odoo native equivalent for any edition.
 * bpro.finance.dashboard: cash position, total receivables, total payables, and current ratio as of a selected date (FR-FIN-009).
 * Financial statement reports - Trial Balance, Balance Sheet, Profit & Loss, Cash Flow Statement (indirect method), and Fund Flow Statement - built from native ledger balances since Community has no account_reports module. Each of the Cash Flow and Fund Flow reports includes a built-in reconciliation check line that must equal zero, since both are independently derivable from the balance sheet identity.
+* Sales Margin / Profitability report: revenue vs. cost (qty sold x each product's standard cost price) per product for confirmed sales in a period. Deliberately kept as a standalone report rather than automated GL-level COGS posting, since the latter requires switching the company from Continental to Anglo-Saxon accounting - a consequential change to statutory books that needs the client's explicit sign-off, not something to flip as a side effect of a reporting feature.
 
 Invoice generation from a confirmed sales order and payment registration (full/partial, with automatic invoice status transitions) are native Odoo Accounting features requiring no custom code.
 """,
@@ -29,6 +30,7 @@ Invoice generation from a confirmed sales order and payment registration (full/p
         "views/ar_aging_views.xml",
         "views/finance_dashboard_views.xml",
         "views/financial_reports_views.xml",
+        "views/sales_margin_views.xml",
         "views/account_move_views.xml",
         "views/tally_views.xml",
         "views/tally_upload_templates.xml",

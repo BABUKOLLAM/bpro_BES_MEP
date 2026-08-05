@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_bpro_sales_margin_wizard_form" model="ir.ui.view">
+        <field name="name">bpro.sales.margin.wizard.form</field>
+        <field name="model">bpro.sales.margin.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_generate" type="object" string="Generate" class="btn-primary"/>
+                </header>
+                <sheet>
+                    <group col="4">
+                        <field name="date_from"/>
+                        <field name="date_to"/>
+                    </group>
+                    <field name="line_ids" readonly="1">
+                        <list decoration-danger="margin &lt; 0">
+                            <field name="product_id"/>
+                            <field name="qty_sold" sum="Total"/>
+                            <field name="revenue" sum="Total"/>
+                            <field name="cost" sum="Total"/>
+                            <field name="margin" sum="Total"/>
+                            <field name="margin_pct" widget="percentage"/>
+                        </list>
+                    </field>
+                    <group col="4">
+                        <field name="total_revenue"/>
+                        <field name="total_cost"/>
+                        <field name="total_margin"/>
+                    </group>
+                    <field name="currency_id" invisible="1"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_bpro_sales_margin_wizard" model="ir.actions.act_window">
+        <field name="name">Sales Margin / Profitability</field>
+        <field name="res_model">bpro.sales.margin.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">current</field>
+    </record>
+    <menuitem id="menu_bpro_sales_margin" name="Sales Margin"
+              parent="account.menu_finance_reports"
+              action="action_bpro_sales_margin_wizard" sequence="7"/>
+</odoo>

@@ -18,3 +18,5 @@ access_bpro_tally_import_batch_manager,bpro.tally.import.batch manager,model_bpr
 access_bpro_tally_import_batch_user,bpro.tally.import.batch user,model_bpro_tally_import_batch,account.group_account_invoice,1,0,0,0
 access_bpro_tally_import_exception_manager,bpro.tally.import.exception manager,model_bpro_tally_import_exception,account.group_account_manager,1,1,1,1
 access_bpro_tally_import_exception_user,bpro.tally.import.exception user,model_bpro_tally_import_exception,account.group_account_invoice,1,0,0,0
+access_bpro_sales_margin_wizard_user,bpro.sales.margin.wizard user,model_bpro_sales_margin_wizard,account.group_account_invoice,1,1,1,1
+access_bpro_sales_margin_line_user,bpro.sales.margin.line user,model_bpro_sales_margin_line,account.group_account_invoice,1,1,1,1
