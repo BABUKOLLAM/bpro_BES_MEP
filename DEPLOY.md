@@ -86,6 +86,18 @@ Then log in as `admin`/`admin` and **immediately**:
      < ../scripts/set_menu_order.py
    ```
 
+6. Optional: set the public homepage content (hero, product section,
+   module highlights, login CTA). Also a script rather than addon data -
+   see the script's docstring for why an `inherit_id="website.homepage"`
+   view wouldn't actually affect the live page once the Website Builder
+   has created a per-website copy:
+
+   ```bash
+   docker compose -f docker-compose.prod.yml exec -i odoo \
+     /entrypoint.sh odoo shell -c /etc/odoo/odoo.conf -d bpro --no-http \
+     < ../scripts/set_homepage_content.py
+   ```
+
 ## 4. Outgoing email
 
 Settings → Technical → Outgoing Mail Servers:
