@@ -75,6 +75,17 @@ Then log in as `admin`/`admin` and **immediately**:
    (Must run inside `odoo shell`, not over XML-RPC — see the script's
    docstring for why.)
 
+5. Optional: reorder the Apps switcher so the client's actual business
+   apps appear before generic Odoo utility apps (Discuss, Calendar,
+   Contacts, etc.) — a per-deployment preference, re-run any time the
+   installed app list changes:
+
+   ```bash
+   docker compose -f docker-compose.prod.yml exec -i odoo \
+     /entrypoint.sh odoo shell -c /etc/odoo/odoo.conf -d bpro --no-http \
+     < ../scripts/set_menu_order.py
+   ```
+
 ## 4. Outgoing email
 
 Settings → Technical → Outgoing Mail Servers:
