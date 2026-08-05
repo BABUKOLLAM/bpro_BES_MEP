@@ -41,11 +41,19 @@ life of the deployment - don't remove the `logging:` block per service.
 ```bash
 # create + initialize the production database
 docker compose -f docker-compose.prod.yml exec odoo \
-  odoo -c /etc/odoo/odoo.conf -d bpro \
+  /entrypoint.sh odoo -c /etc/odoo/odoo.conf -d bpro \
   -i base,bpro_base,bpro_pms,bpro_lms,bpro_branding,bpro_onboarding,bpro_billing,bpro_scorm,bpro_approval,bpro_xlsx_export,bpro_inventory,bpro_sales,bpro_manufacturing,bpro_finance,bpro_hr,bpro_logistics,bpro_quality,bpro_plant,bpro_project,bpro_fleet,bpro_dashboard,bpro_helpdesk,bpro_field_sales,bpro_collections,l10n_in,website_payment \
-  --without-demo=all --stop-after-init
+  --without-demo=all --stop-after-init --no-http
 docker compose -f docker-compose.prod.yml restart odoo
 ```
+
+`/entrypoint.sh` is required, not optional - it's what translates the
+container's HOST/USER/PASSWORD env vars into the actual DB connection
+(odoo.prod.conf deliberately has none hardcoded). Calling `odoo` directly
+skips that translation and fails with a Postgres socket-connection error
+even though the DB is reachable. `--no-http` avoids a port-already-in-use
+error if the main odoo process is already running on 8069 in the same
+container (true for every use of this command except the very first).
 
 Then log in as `admin`/`admin` and **immediately**:
 
@@ -192,7 +200,7 @@ same `handle_path` — see `deploy/Caddyfile`).
 ```bash
 cd bpro-lms-pms && git pull
 docker compose -f deploy/docker-compose.prod.yml exec odoo \
-  odoo -c /etc/odoo/odoo.conf -d bpro -u bpro_base,bpro_pms,bpro_lms,bpro_branding,bpro_onboarding,bpro_billing,bpro_scorm,bpro_approval,bpro_xlsx_export,bpro_inventory,bpro_sales,bpro_manufacturing,bpro_finance,bpro_hr,bpro_logistics,bpro_quality,bpro_plant,bpro_project,bpro_fleet,bpro_dashboard,bpro_helpdesk,bpro_field_sales,bpro_collections --stop-after-init
+  /entrypoint.sh odoo -c /etc/odoo/odoo.conf -d bpro -u bpro_base,bpro_pms,bpro_lms,bpro_branding,bpro_onboarding,bpro_billing,bpro_scorm,bpro_approval,bpro_xlsx_export,bpro_inventory,bpro_sales,bpro_manufacturing,bpro_finance,bpro_hr,bpro_logistics,bpro_quality,bpro_plant,bpro_project,bpro_fleet,bpro_dashboard,bpro_helpdesk,bpro_field_sales,bpro_collections --stop-after-init --no-http
 docker compose -f deploy/docker-compose.prod.yml restart odoo
 ```
 
