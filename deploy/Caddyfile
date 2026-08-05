@@ -1,7 +1,7 @@
 # bpro LMS + PMS — reverse proxy with automatic HTTPS.
 # Add one block per client portal domain (or use a wildcard with DNS challenge).
 
-app.bprolms.com {
+mepcrm.in, www.mepcrm.in {
     encode gzip
 
     # Static downloads (e.g. the customer user manual) served directly by
