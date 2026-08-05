@@ -61,4 +61,15 @@
             </div>
         </xpath>
     </template>
+
+    <!-- Odoo's own generic copyright bar ("Copyright © Company name ·
+         Powered by Odoo - Create a free website") renders below the
+         footer above on every page - pure self-promotion boilerplate,
+         redundant with the real contact line in clean_footer above.
+         Odoo already ships an opt-in toggle for exactly this
+         (website.footer_no_copyright, shipped inactive) - activate it
+         rather than reinventing it. -->
+    <record id="website.footer_no_copyright" model="ir.ui.view">
+        <field name="active">True</field>
+    </record>
 </odoo>
