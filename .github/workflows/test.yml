@@ -1,0 +1,49 @@
+name: Regression Suite
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Start db + odoo
+        run: docker compose up -d
+
+      - name: Wait for db to be healthy
+        run: |
+          for i in $(seq 1 30); do
+            if docker compose ps db | grep -q "healthy"; then echo "db healthy"; exit 0; fi
+            sleep 2
+          done
+          echo "db never became healthy"; docker compose logs db; exit 1
+
+      - name: Run full regression suite
+        run: |
+          set -o pipefail
+          docker compose exec -T odoo odoo -c /etc/odoo/odoo.conf -d bpro_test \
+            -i bpro_base,bpro_pms,bpro_lms,bpro_branding,bpro_onboarding,bpro_billing,bpro_scorm,bpro_approval,bpro_inventory,bpro_sales,bpro_manufacturing,bpro_finance,bpro_hr,bpro_logistics,bpro_quality,bpro_plant,bpro_project,bpro_fleet,bpro_dashboard,bpro_helpdesk,bpro_field_sales,bpro_collections,l10n_in,website_payment \
+            --test-tags /bpro_pms,/bpro_lms,/bpro_billing,/bpro_onboarding,/bpro_scorm,/bpro_approval,/bpro_inventory,/bpro_sales,/bpro_manufacturing,/bpro_finance,/bpro_hr,/bpro_logistics,/bpro_quality,/bpro_plant,/bpro_project,/bpro_fleet,/bpro_dashboard,/bpro_helpdesk,/bpro_field_sales,/bpro_collections \
+            --stop-after-init --without-demo=all 2>&1 | tee /tmp/test-output.log
+
+      - name: Verify result (0 failed, 0 error)
+        run: |
+          if ! grep -qE '^[0-9-]+ [0-9:,]+ [0-9]+ (ERROR|INFO) bpro_test odoo\.tests\.result: 0 failed, 0 error\(s\)' /tmp/test-output.log; then
+            echo "Regression suite did not report a clean 0 failed, 0 error(s) result - see log above."
+            exit 1
+          fi
+          echo "Regression suite passed cleanly."
+
+      - name: Show logs on failure
+        if: failure()
+        run: docker compose logs odoo --tail=200
+
+      - name: Tear down
+        if: always()
+        run: docker compose down -v
