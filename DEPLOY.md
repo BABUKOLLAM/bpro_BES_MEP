@@ -199,6 +199,84 @@ docker compose -f deploy/docker-compose.prod.yml restart odoo
 Keep this list in sync with `ls addons/` — a module left off here silently
 never gets its migrations/data updates applied on deploy.
 
+`git pull` on the server authenticates via a **read-only deploy key**
+(`~/.ssh/bpro_deploy_key`, added to the GitHub repo's Deploy Keys, scoped
+to this repo only, can't push). `addons/` and `config/odoo.prod.conf` are
+directory/file bind mounts respectively — `addons/` changes are picked up
+live by a running container (it's a directory mount, changes inside it
+are visible immediately), but **`config/odoo.prod.conf` and
+`deploy/Caddyfile` are single-*file* bind mounts**, and `git pull`
+replaces files via unlink+recreate rather than editing in place. Docker's
+bind mount for a single file is attached to the specific inode at
+container-*creation* time, not the path — after `git pull` replaces the
+file, an already-running container keeps looking at the old, now-deleted
+inode's content. A plain `restart` does **not** fix this (it restarts the
+process, not the mount namespace). If `config/odoo.prod.conf` or
+`deploy/Caddyfile` changed, you must **force-recreate**, not just
+restart:
+
+```bash
+docker compose -f deploy/docker-compose.prod.yml up -d --force-recreate odoo   # if odoo.prod.conf changed
+docker compose -f deploy/docker-compose.prod.yml up -d --force-recreate caddy  # if Caddyfile changed
+```
+
+(Discovered 2026-08-05 setting up staging: `caddy reload` silently kept
+serving the pre-`git pull` Caddyfile because of exactly this — reload
+re-reads from the same already-open, now-stale file handle.)
+
+## 9. Staging environment
+
+A second, low-memory Odoo container running the same code against a
+**separate database** (`bpro_staging`, on the *same* Postgres server as
+production — not a second Postgres instance) and a separate Odoo
+filestore volume. Deliberately lightweight because the VPS was sized for
+one production instance and normally has only ~2 GB RAM free — see the
+comment block in `deploy/docker-compose.staging.yml` for the full
+trade-off (staging shares production's Postgres *engine*, so a runaway
+staging query could affect prod DB performance — accepted deliberately
+over paying for a second VPS).
+
+**DNS**: `staging.mepcrm.in` needs an A record pointing at this server's
+IP before Caddy can obtain it an HTTPS certificate (Caddy will keep
+retrying automatically in the background once the record exists — no
+further action needed here once DNS is added).
+
+**Bring up / tear down**:
+```bash
+cd /root/bpro-lms-pms/deploy
+docker compose -f docker-compose.staging.yml up -d      # start
+docker compose -f docker-compose.staging.yml down       # stop (keeps the DB/filestore)
+```
+
+**Refreshing staging from a production backup** (do this whenever
+staging data goes stale):
+```bash
+cd /root/bpro-lms-pms/deploy
+docker compose -f docker-compose.staging.yml down
+docker compose -f docker-compose.prod.yml exec -T db psql -U odoo -d postgres \
+    -c 'DROP DATABASE bpro_staging;'
+docker compose -f docker-compose.prod.yml exec -T db psql -U odoo -d postgres \
+    -c 'CREATE DATABASE bpro_staging OWNER odoo;'
+LATEST=$(ls -t ~/bpro-backups/bpro-db-*.dump | head -1)
+docker compose -f docker-compose.prod.yml exec -T db pg_restore -U odoo \
+    -d bpro_staging --no-owner < "$LATEST"
+
+# CRITICAL — every refresh copies real customer data including SMTP config
+# and cron jobs. Run these two before ever starting staging-odoo, or a
+# restored copy of prod data can send real emails / run real scheduled
+# jobs against real customer records:
+docker compose -f docker-compose.prod.yml exec -T db psql -U odoo -d bpro_staging \
+    -c "UPDATE ir_mail_server SET active = false;"
+docker compose -f docker-compose.prod.yml exec -T db psql -U odoo -d bpro_staging \
+    -c "UPDATE ir_cron SET active = false;"
+
+docker compose -f docker-compose.staging.yml up -d
+```
+
+Re-enable specific cron jobs individually (Settings → Technical →
+Scheduled Actions, in the staging UI) only for the ones you're actually
+testing.
+
 ## Scaling later
 
 - 8 GB RAM comfortably serves ~10 client companies of 50-100 employees
