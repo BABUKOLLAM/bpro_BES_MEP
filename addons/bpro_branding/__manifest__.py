@@ -10,6 +10,7 @@
     "data": [
         "data/branding_data.xml",
         "views/login_templates.xml",
+        "views/frontend_templates.xml",
     ],
     "assets": {
         "web._assets_primary_variables": [

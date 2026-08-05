@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- website (once installed) wraps /web/login in the full public-site
+         header/footer/cookie-banner chrome, showing Odoo's stock demo
+         nav ("Home"), footer ("Useful Links: About us/Products/Services/
+         Legal" - all dead), and a fake "About us" paragraph. Wrong for a
+         private internal system: restore the original minimal centered
+         card (same structure web.login_layout uses without website
+         installed), which already correctly shows the real company logo
+         via /web/binary/company_logo. -->
+    <template id="clean_login_layout" inherit_id="website.login_layout"
+              name="Minimal login (no public-site chrome)" priority="20">
+        <xpath expr="//t[@t-call='website.layout']" position="replace">
+            <t t-call="web.frontend_layout">
+                <t t-set="html_data" t-value="{'style': 'height: 100%;'}"/>
+                <t t-set="body_classname" t-value="'bg-100'"/>
+                <t t-set="no_header" t-value="True"/>
+                <t t-set="no_footer" t-value="True"/>
+                <div class="container py-5">
+                    <div t-attf-class="card border-0 mx-auto bg-100 {{login_card_classes}} o_database_list"
+                         style="max-width: 320px;">
+                        <div class="card-body">
+                            <div class="text-center pb-3 border-bottom mb-4">
+                                <img t-attf-src="/web/binary/company_logo{{ '?dbname='+db if db else '' }}"
+                                     alt="Logo" style="max-height:120px; max-width: 100%; width:auto"/>
+                            </div>
+                            <t t-out="0"/>
+                        </div>
+                    </div>
+                </div>
+            </t>
+        </xpath>
+    </template>
+
+    <!-- Same story for the shared site footer (visible on every other
+         page, e.g. the homepage): stock Odoo demo content with dead
+         links and a placeholder email/phone that were never edited.
+         Replace with one real, minimal line - the company's own name
+         and contact details, no invented copy. -->
+    <template id="clean_footer" inherit_id="website.footer_custom"
+              name="Minimal footer (real contact, no dead links)" priority="20">
+        <xpath expr="//div[@id='footer']" position="replace">
+            <div id="footer" class="oe_structure oe_structure_solo" t-ignore="true" t-if="not no_footer">
+                <section class="s_text_block pt24 pb24 text-center" data-snippet="s_text_block" data-name="Text">
+                    <div class="container">
+                        <p class="mb-1">
+                            <t t-esc="website.company_id.name"/> — Internal Business System
+                        </p>
+                        <p class="text-muted small mb-0">
+                            <span t-if="website.company_id.phone">
+                                <i class="fa fa-phone fa-fw me-1"/><t t-esc="website.company_id.phone"/>
+                            </span>
+                            <span t-if="website.company_id.email">
+                                <t t-if="website.company_id.phone"> · </t>
+                                <i class="fa fa-envelope fa-fw me-1"/>
+                                <a t-attf-href="mailto:{{website.company_id.email}}" t-esc="website.company_id.email"/>
+                            </span>
+                        </p>
+                    </div>
+                </section>
+            </div>
+        </xpath>
+    </template>
+</odoo>
