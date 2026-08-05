@@ -5,6 +5,7 @@ import os
 from markupsafe import Markup
 
 from odoo import fields, http
+from odoo.exceptions import AccessError
 from odoo.http import request
 
 from ..models.scorm_package import SCORM_ROOT
@@ -12,8 +13,13 @@ from ..models.scorm_package import SCORM_ROOT
 
 class ScormController(http.Controller):
     def _get_package(self, package_id):
-        package = request.env["bpro.scorm.package"].sudo().browse(package_id)
-        if not package.exists() or not package.launch_path:
+        # No sudo(): rule_scorm_package_company must apply here so a user
+        # can't reach another client's package by guessing its id.
+        package = request.env["bpro.scorm.package"].browse(package_id)
+        try:
+            if not package.exists() or not package.launch_path:
+                return None
+        except AccessError:
             return None
         return package
 
