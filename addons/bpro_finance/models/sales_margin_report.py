@@ -5,7 +5,11 @@ from odoo import api, fields, models
 
 class BproSalesMarginWizard(models.TransientModel):
     _name = "bpro.sales.margin.wizard"
+    _inherit = ["bpro.xlsx.export.mixin"]
     _description = "Sales Margin / Profitability Report"
+
+    _xlsx_line_model = "bpro.sales.margin.line"
+    _xlsx_export_fields = ["product_id", "qty_sold", "revenue", "cost", "margin", "margin_pct"]
 
     date_from = fields.Date(required=True)
     date_to = fields.Date(required=True, default=fields.Date.context_today)

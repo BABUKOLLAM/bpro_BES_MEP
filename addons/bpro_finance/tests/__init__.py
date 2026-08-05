@@ -7,3 +7,4 @@ from . import test_sales_margin_report
 from . import test_tally_export_import
 from . import test_tally_upload_controller
 from . import test_tally_xml_sanitize
+from . import test_xlsx_export

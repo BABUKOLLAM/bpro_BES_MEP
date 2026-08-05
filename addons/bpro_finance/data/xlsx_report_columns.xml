@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+
+    <!-- Trial Balance -->
+    <record id="xlsx_col_tb_account" model="bpro.report.column">
+        <field name="report_model">bpro.trial.balance.wizard</field>
+        <field name="technical_name">account_id</field>
+        <field name="name">Account</field>
+        <field name="sequence">10</field>
+    </record>
+    <record id="xlsx_col_tb_opening_debit" model="bpro.report.column">
+        <field name="report_model">bpro.trial.balance.wizard</field>
+        <field name="technical_name">opening_debit</field>
+        <field name="name">Opening Debit</field>
+        <field name="sequence">20</field>
+    </record>
+    <record id="xlsx_col_tb_opening_credit" model="bpro.report.column">
+        <field name="report_model">bpro.trial.balance.wizard</field>
+        <field name="technical_name">opening_credit</field>
+        <field name="name">Opening Credit</field>
+        <field name="sequence">30</field>
+    </record>
+    <record id="xlsx_col_tb_debit" model="bpro.report.column">
+        <field name="report_model">bpro.trial.balance.wizard</field>
+        <field name="technical_name">debit</field>
+        <field name="name">Debit</field>
+        <field name="sequence">40</field>
+    </record>
+    <record id="xlsx_col_tb_credit" model="bpro.report.column">
+        <field name="report_model">bpro.trial.balance.wizard</field>
+        <field name="technical_name">credit</field>
+        <field name="name">Credit</field>
+        <field name="sequence">50</field>
+    </record>
+    <record id="xlsx_col_tb_closing_debit" model="bpro.report.column">
+        <field name="report_model">bpro.trial.balance.wizard</field>
+        <field name="technical_name">closing_debit</field>
+        <field name="name">Closing Debit</field>
+        <field name="sequence">60</field>
+    </record>
+    <record id="xlsx_col_tb_closing_credit" model="bpro.report.column">
+        <field name="report_model">bpro.trial.balance.wizard</field>
+        <field name="technical_name">closing_credit</field>
+        <field name="name">Closing Credit</field>
+        <field name="sequence">70</field>
+    </record>
+
+    <!-- Balance Sheet -->
+    <record id="xlsx_col_bs_label" model="bpro.report.column">
+        <field name="report_model">bpro.balance.sheet.wizard</field>
+        <field name="technical_name">label</field>
+        <field name="name">Line Item</field>
+        <field name="sequence">10</field>
+    </record>
+    <record id="xlsx_col_bs_amount" model="bpro.report.column">
+        <field name="report_model">bpro.balance.sheet.wizard</field>
+        <field name="technical_name">amount</field>
+        <field name="name">Amount</field>
+        <field name="sequence">20</field>
+    </record>
+    <record id="xlsx_col_bs_is_header" model="bpro.report.column">
+        <field name="report_model">bpro.balance.sheet.wizard</field>
+        <field name="technical_name">is_header</field>
+        <field name="name">Section Header</field>
+        <field name="sequence">30</field>
+    </record>
+    <record id="xlsx_col_bs_is_total" model="bpro.report.column">
+        <field name="report_model">bpro.balance.sheet.wizard</field>
+        <field name="technical_name">is_total</field>
+        <field name="name">Subtotal Row</field>
+        <field name="sequence">40</field>
+    </record>
+
+    <!-- Profit & Loss -->
+    <record id="xlsx_col_pl_account" model="bpro.report.column">
+        <field name="report_model">bpro.profit.loss.wizard</field>
+        <field name="technical_name">account_id</field>
+        <field name="name">Account</field>
+        <field name="sequence">10</field>
+    </record>
+    <record id="xlsx_col_pl_section" model="bpro.report.column">
+        <field name="report_model">bpro.profit.loss.wizard</field>
+        <field name="technical_name">section</field>
+        <field name="name">Section</field>
+        <field name="sequence">20</field>
+    </record>
+    <record id="xlsx_col_pl_amount" model="bpro.report.column">
+        <field name="report_model">bpro.profit.loss.wizard</field>
+        <field name="technical_name">amount</field>
+        <field name="name">Amount</field>
+        <field name="sequence">30</field>
+    </record>
+
+    <!-- Cash Flow -->
+    <record id="xlsx_col_cf_section" model="bpro.report.column">
+        <field name="report_model">bpro.cash.flow.wizard</field>
+        <field name="technical_name">section</field>
+        <field name="name">Section</field>
+        <field name="sequence">10</field>
+    </record>
+    <record id="xlsx_col_cf_label" model="bpro.report.column">
+        <field name="report_model">bpro.cash.flow.wizard</field>
+        <field name="technical_name">label</field>
+        <field name="name">Line Item</field>
+        <field name="sequence">20</field>
+    </record>
+    <record id="xlsx_col_cf_amount" model="bpro.report.column">
+        <field name="report_model">bpro.cash.flow.wizard</field>
+        <field name="technical_name">amount</field>
+        <field name="name">Amount</field>
+        <field name="sequence">30</field>
+    </record>
+    <record id="xlsx_col_cf_is_total" model="bpro.report.column">
+        <field name="report_model">bpro.cash.flow.wizard</field>
+        <field name="technical_name">is_total</field>
+        <field name="name">Subtotal Row</field>
+        <field name="sequence">40</field>
+    </record>
+
+    <!-- Fund Flow -->
+    <record id="xlsx_col_ff_section" model="bpro.report.column">
+        <field name="report_model">bpro.fund.flow.wizard</field>
+        <field name="technical_name">section</field>
+        <field name="name">Section</field>
+        <field name="sequence">10</field>
+    </record>
+    <record id="xlsx_col_ff_label" model="bpro.report.column">
+        <field name="report_model">bpro.fund.flow.wizard</field>
+        <field name="technical_name">label</field>
+        <field name="name">Line Item</field>
+        <field name="sequence">20</field>
+    </record>
+    <record id="xlsx_col_ff_amount" model="bpro.report.column">
+        <field name="report_model">bpro.fund.flow.wizard</field>
+        <field name="technical_name">amount</field>
+        <field name="name">Amount</field>
+        <field name="sequence">30</field>
+    </record>
+    <record id="xlsx_col_ff_is_total" model="bpro.report.column">
+        <field name="report_model">bpro.fund.flow.wizard</field>
+        <field name="technical_name">is_total</field>
+        <field name="name">Subtotal Row</field>
+        <field name="sequence">40</field>
+    </record>
+
+    <!-- AR Aging -->
+    <record id="xlsx_col_ar_partner" model="bpro.report.column">
+        <field name="report_model">bpro.ar.aging.wizard</field>
+        <field name="technical_name">partner_id</field>
+        <field name="name">Customer</field>
+        <field name="sequence">10</field>
+    </record>
+    <record id="xlsx_col_ar_current" model="bpro.report.column">
+        <field name="report_model">bpro.ar.aging.wizard</field>
+        <field name="technical_name">current</field>
+        <field name="name">Current</field>
+        <field name="sequence">20</field>
+    </record>
+    <record id="xlsx_col_ar_d1_30" model="bpro.report.column">
+        <field name="report_model">bpro.ar.aging.wizard</field>
+        <field name="technical_name">d1_30</field>
+        <field name="name">1-30 Days</field>
+        <field name="sequence">30</field>
+    </record>
+    <record id="xlsx_col_ar_d31_60" model="bpro.report.column">
+        <field name="report_model">bpro.ar.aging.wizard</field>
+        <field name="technical_name">d31_60</field>
+        <field name="name">31-60 Days</field>
+        <field name="sequence">40</field>
+    </record>
+    <record id="xlsx_col_ar_d61_90" model="bpro.report.column">
+        <field name="report_model">bpro.ar.aging.wizard</field>
+        <field name="technical_name">d61_90</field>
+        <field name="name">61-90 Days</field>
+        <field name="sequence">50</field>
+    </record>
+    <record id="xlsx_col_ar_d90_plus" model="bpro.report.column">
+        <field name="report_model">bpro.ar.aging.wizard</field>
+        <field name="technical_name">d90_plus</field>
+        <field name="name">90+ Days</field>
+        <field name="sequence">60</field>
+    </record>
+    <record id="xlsx_col_ar_total" model="bpro.report.column">
+        <field name="report_model">bpro.ar.aging.wizard</field>
+        <field name="technical_name">total</field>
+        <field name="name">Total</field>
+        <field name="sequence">70</field>
+    </record>
+
+    <!-- Sales Margin -->
+    <record id="xlsx_col_sm_product" model="bpro.report.column">
+        <field name="report_model">bpro.sales.margin.wizard</field>
+        <field name="technical_name">product_id</field>
+        <field name="name">Product</field>
+        <field name="sequence">10</field>
+    </record>
+    <record id="xlsx_col_sm_qty" model="bpro.report.column">
+        <field name="report_model">bpro.sales.margin.wizard</field>
+        <field name="technical_name">qty_sold</field>
+        <field name="name">Qty Sold</field>
+        <field name="sequence">20</field>
+    </record>
+    <record id="xlsx_col_sm_revenue" model="bpro.report.column">
+        <field name="report_model">bpro.sales.margin.wizard</field>
+        <field name="technical_name">revenue</field>
+        <field name="name">Revenue</field>
+        <field name="sequence">30</field>
+    </record>
+    <record id="xlsx_col_sm_cost" model="bpro.report.column">
+        <field name="report_model">bpro.sales.margin.wizard</field>
+        <field name="technical_name">cost</field>
+        <field name="name">Cost</field>
+        <field name="sequence">40</field>
+    </record>
+    <record id="xlsx_col_sm_margin" model="bpro.report.column">
+        <field name="report_model">bpro.sales.margin.wizard</field>
+        <field name="technical_name">margin</field>
+        <field name="name">Margin</field>
+        <field name="sequence">50</field>
+    </record>
+    <record id="xlsx_col_sm_margin_pct" model="bpro.report.column">
+        <field name="report_model">bpro.sales.margin.wizard</field>
+        <field name="technical_name">margin_pct</field>
+        <field name="name">Margin %</field>
+        <field name="sequence">60</field>
+    </record>
+
+</odoo>

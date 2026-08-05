@@ -68,8 +68,14 @@ class BproFinancialReportMixin(models.AbstractModel):
 # ---------------------------------------------------------------------------
 class BproTrialBalanceWizard(models.TransientModel):
     _name = "bpro.trial.balance.wizard"
-    _inherit = ["bpro.financial.report.mixin"]
+    _inherit = ["bpro.financial.report.mixin", "bpro.xlsx.export.mixin"]
     _description = "Trial Balance"
+
+    _xlsx_line_model = "bpro.trial.balance.line"
+    _xlsx_export_fields = [
+        "account_id", "opening_debit", "opening_credit",
+        "debit", "credit", "closing_debit", "closing_credit",
+    ]
 
     date_from = fields.Date(required=True)
     date_to = fields.Date(required=True, default=fields.Date.context_today)
@@ -175,8 +181,11 @@ class BproTrialBalanceLine(models.TransientModel):
 # ---------------------------------------------------------------------------
 class BproBalanceSheetWizard(models.TransientModel):
     _name = "bpro.balance.sheet.wizard"
-    _inherit = ["bpro.financial.report.mixin"]
+    _inherit = ["bpro.financial.report.mixin", "bpro.xlsx.export.mixin"]
     _description = "Balance Sheet"
+
+    _xlsx_line_model = "bpro.balance.sheet.line"
+    _xlsx_export_fields = ["label", "amount", "is_header", "is_total"]
 
     date_to = fields.Date(required=True, default=fields.Date.context_today)
     line_ids = fields.One2many("bpro.balance.sheet.line", "wizard_id", readonly=True)
@@ -262,8 +271,11 @@ class BproBalanceSheetLine(models.TransientModel):
 # ---------------------------------------------------------------------------
 class BproProfitLossWizard(models.TransientModel):
     _name = "bpro.profit.loss.wizard"
-    _inherit = ["bpro.financial.report.mixin"]
+    _inherit = ["bpro.financial.report.mixin", "bpro.xlsx.export.mixin"]
     _description = "Profit and Loss Statement"
+
+    _xlsx_line_model = "bpro.profit.loss.line"
+    _xlsx_export_fields = ["account_id", "section", "amount"]
 
     date_from = fields.Date(required=True)
     date_to = fields.Date(required=True, default=fields.Date.context_today)
@@ -348,8 +360,11 @@ class BproProfitLossLine(models.TransientModel):
 # ---------------------------------------------------------------------------
 class BproCashFlowWizard(models.TransientModel):
     _name = "bpro.cash.flow.wizard"
-    _inherit = ["bpro.financial.report.mixin"]
+    _inherit = ["bpro.financial.report.mixin", "bpro.xlsx.export.mixin"]
     _description = "Cash Flow Statement (Indirect Method)"
+
+    _xlsx_line_model = "bpro.cash.flow.line"
+    _xlsx_export_fields = ["section", "label", "amount", "is_total"]
 
     date_from = fields.Date(required=True)
     date_to = fields.Date(required=True, default=fields.Date.context_today)
@@ -472,8 +487,11 @@ class BproCashFlowLine(models.TransientModel):
 # ---------------------------------------------------------------------------
 class BproFundFlowWizard(models.TransientModel):
     _name = "bpro.fund.flow.wizard"
-    _inherit = ["bpro.financial.report.mixin"]
+    _inherit = ["bpro.financial.report.mixin", "bpro.xlsx.export.mixin"]
     _description = "Fund Flow Statement"
+
+    _xlsx_line_model = "bpro.fund.flow.line"
+    _xlsx_export_fields = ["section", "label", "amount", "is_total"]
 
     date_from = fields.Date(required=True)
     date_to = fields.Date(required=True, default=fields.Date.context_today)

@@ -8,6 +8,8 @@
             <form>
                 <header>
                     <button name="action_generate" type="object" string="Generate" class="btn-primary"/>
+                    <button name="action_export_xlsx" type="object" string="Export to Excel"
+                            invisible="not line_ids"/>
                 </header>
                 <sheet>
                     <group col="4">
@@ -28,6 +30,10 @@
                     <group col="4">
                         <field name="total_closing_debit"/>
                         <field name="total_closing_credit"/>
+                    </group>
+                    <group string="Excel export columns" invisible="not line_ids">
+                        <field name="xlsx_column_ids" widget="many2many_tags" nolabel="1"
+                               domain="[('report_model', '=', 'bpro.trial.balance.wizard')]"/>
                     </group>
                     <field name="currency_id" invisible="1"/>
                 </sheet>
@@ -52,6 +58,8 @@
             <form>
                 <header>
                     <button name="action_generate" type="object" string="Generate" class="btn-primary"/>
+                    <button name="action_export_xlsx" type="object" string="Export to Excel"
+                            invisible="not line_ids"/>
                 </header>
                 <sheet>
                     <group>
@@ -69,6 +77,10 @@
                         <field name="total_assets"/>
                         <field name="total_liabilities_equity"/>
                         <field name="balance_check"/>
+                    </group>
+                    <group string="Excel export columns" invisible="not line_ids">
+                        <field name="xlsx_column_ids" widget="many2many_tags" nolabel="1"
+                               domain="[('report_model', '=', 'bpro.balance.sheet.wizard')]"/>
                     </group>
                     <field name="currency_id" invisible="1"/>
                 </sheet>
@@ -93,6 +105,8 @@
             <form>
                 <header>
                     <button name="action_generate" type="object" string="Generate" class="btn-primary"/>
+                    <button name="action_export_xlsx" type="object" string="Export to Excel"
+                            invisible="not line_ids"/>
                 </header>
                 <sheet>
                     <group col="4">
@@ -110,6 +124,10 @@
                         <field name="total_income"/>
                         <field name="total_expense"/>
                         <field name="net_profit"/>
+                    </group>
+                    <group string="Excel export columns" invisible="not line_ids">
+                        <field name="xlsx_column_ids" widget="many2many_tags" nolabel="1"
+                               domain="[('report_model', '=', 'bpro.profit.loss.wizard')]"/>
                     </group>
                     <field name="currency_id" invisible="1"/>
                 </sheet>
@@ -134,6 +152,8 @@
             <form>
                 <header>
                     <button name="action_generate" type="object" string="Generate" class="btn-primary"/>
+                    <button name="action_export_xlsx" type="object" string="Export to Excel"
+                            invisible="not line_ids"/>
                 </header>
                 <sheet>
                     <group col="4">
@@ -152,6 +172,10 @@
                         <field name="net_increase_in_cash"/>
                         <field name="actual_cash_movement"/>
                         <field name="reconciliation_diff"/>
+                    </group>
+                    <group string="Excel export columns" invisible="not line_ids">
+                        <field name="xlsx_column_ids" widget="many2many_tags" nolabel="1"
+                               domain="[('report_model', '=', 'bpro.cash.flow.wizard')]"/>
                     </group>
                     <field name="currency_id" invisible="1"/>
                 </sheet>
@@ -176,6 +200,8 @@
             <form>
                 <header>
                     <button name="action_generate" type="object" string="Generate" class="btn-primary"/>
+                    <button name="action_export_xlsx" type="object" string="Export to Excel"
+                            invisible="not line_ids"/>
                 </header>
                 <sheet>
                     <group col="4">
@@ -194,6 +220,10 @@
                         <field name="net_increase_in_working_capital"/>
                         <field name="working_capital_schedule_check"/>
                         <field name="reconciliation_diff"/>
+                    </group>
+                    <group string="Excel export columns" invisible="not line_ids">
+                        <field name="xlsx_column_ids" widget="many2many_tags" nolabel="1"
+                               domain="[('report_model', '=', 'bpro.fund.flow.wizard')]"/>
                     </group>
                     <field name="currency_id" invisible="1"/>
                 </sheet>

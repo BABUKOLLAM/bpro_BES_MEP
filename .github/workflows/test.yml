@@ -28,8 +28,8 @@ jobs:
         run: |
           set -o pipefail
           docker compose exec -T odoo odoo -c /etc/odoo/odoo.conf -d bpro_test --http-port 8071 \
-            -i bpro_base,bpro_pms,bpro_lms,bpro_branding,bpro_onboarding,bpro_billing,bpro_scorm,bpro_approval,bpro_inventory,bpro_sales,bpro_manufacturing,bpro_finance,bpro_hr,bpro_logistics,bpro_quality,bpro_plant,bpro_project,bpro_fleet,bpro_dashboard,bpro_helpdesk,bpro_field_sales,bpro_collections,l10n_in,website_payment \
-            --test-tags /bpro_pms,/bpro_lms,/bpro_billing,/bpro_onboarding,/bpro_scorm,/bpro_approval,/bpro_inventory,/bpro_sales,/bpro_manufacturing,/bpro_finance,/bpro_hr,/bpro_logistics,/bpro_quality,/bpro_plant,/bpro_project,/bpro_fleet,/bpro_dashboard,/bpro_helpdesk,/bpro_field_sales,/bpro_collections \
+            -i bpro_base,bpro_pms,bpro_lms,bpro_branding,bpro_onboarding,bpro_billing,bpro_scorm,bpro_approval,bpro_xlsx_export,bpro_inventory,bpro_sales,bpro_manufacturing,bpro_finance,bpro_hr,bpro_logistics,bpro_quality,bpro_plant,bpro_project,bpro_fleet,bpro_dashboard,bpro_helpdesk,bpro_field_sales,bpro_collections,l10n_in,website_payment \
+            --test-tags /bpro_pms,/bpro_lms,/bpro_billing,/bpro_onboarding,/bpro_scorm,/bpro_approval,/bpro_xlsx_export,/bpro_inventory,/bpro_sales,/bpro_manufacturing,/bpro_finance,/bpro_hr,/bpro_logistics,/bpro_quality,/bpro_plant,/bpro_project,/bpro_fleet,/bpro_dashboard,/bpro_helpdesk,/bpro_field_sales,/bpro_collections \
             --stop-after-init --without-demo=all 2>&1 | tee /tmp/test-output.log
 
       - name: Verify result (0 failed, 0 error)

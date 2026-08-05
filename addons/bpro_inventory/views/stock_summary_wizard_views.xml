@@ -7,6 +7,8 @@
             <form>
                 <header>
                     <button name="action_generate" type="object" string="Generate" class="btn-primary"/>
+                    <button name="action_export_xlsx" type="object" string="Export to Excel"
+                            invisible="not line_ids"/>
                 </header>
                 <sheet>
                     <group>
@@ -24,6 +26,10 @@
                     </field>
                     <group col="4">
                         <field name="total_value"/>
+                    </group>
+                    <group string="Excel export columns" invisible="not line_ids">
+                        <field name="xlsx_column_ids" widget="many2many_tags" nolabel="1"
+                               domain="[('report_model', '=', 'bpro.stock.summary.wizard')]"/>
                     </group>
                     <field name="currency_id" invisible="1"/>
                 </sheet>

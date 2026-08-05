@@ -3,7 +3,13 @@ from odoo import api, fields, models
 
 class BproStockSummaryWizard(models.TransientModel):
     _name = "bpro.stock.summary.wizard"
+    _inherit = ["bpro.xlsx.export.mixin"]
     _description = "Stock Summary"
+
+    _xlsx_line_model = "bpro.stock.summary.line"
+    _xlsx_export_fields = [
+        "product_id", "location_id", "quantity", "uom_id", "unit_cost", "value",
+    ]
 
     as_of_date = fields.Date(required=True, default=fields.Date.context_today)
     line_ids = fields.One2many("bpro.stock.summary.line", "wizard_id", readonly=True)

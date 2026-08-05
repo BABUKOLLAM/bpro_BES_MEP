@@ -7,7 +7,13 @@ BUCKETS = ("current", "d1_30", "d31_60", "d61_90", "d90_plus")
 
 class BproArAgingWizard(models.TransientModel):
     _name = "bpro.ar.aging.wizard"
+    _inherit = ["bpro.xlsx.export.mixin"]
     _description = "AR Aging Report"
+
+    _xlsx_line_model = "bpro.ar.aging.line"
+    _xlsx_export_fields = [
+        "partner_id", "current", "d1_30", "d31_60", "d61_90", "d90_plus", "total",
+    ]
 
     as_of_date = fields.Date(default=fields.Date.context_today, required=True)
     line_ids = fields.One2many("bpro.ar.aging.line", "wizard_id", readonly=True)

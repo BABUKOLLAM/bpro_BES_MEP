@@ -1,3 +1,6 @@
+import base64
+
+from odoo.exceptions import UserError
 from odoo.tests.common import TransactionCase
 
 
@@ -80,3 +83,25 @@ class TestStockSummary(TransactionCase):
         wizard.action_generate()
         self.assertTrue(len(wizard.line_ids) >= 3)
         self.assertEqual(wizard.total_value, sum(wizard.line_ids.mapped("value")))
+
+    def test_export_without_generating_raises(self):
+        wizard = self.env["bpro.stock.summary.wizard"].create({})
+        with self.assertRaises(UserError):
+            wizard.action_export_xlsx()
+
+    def test_export_produces_a_valid_xlsx_file(self):
+        wizard = self.env["bpro.stock.summary.wizard"].create({})
+        wizard.action_generate()
+        wizard.action_export_xlsx()
+        self.assertTrue(wizard.xlsx_filename.endswith(".xlsx"))
+        raw = base64.b64decode(wizard.xlsx_file)
+        self.assertEqual(raw[:4], b"PK\x03\x04")
+
+    def test_default_columns_are_all_registered_columns_for_the_report(self):
+        wizard = self.env["bpro.stock.summary.wizard"].create({})
+        wizard.action_generate()
+        available = self.env["bpro.report.column"].search(
+            [("report_model", "=", "bpro.stock.summary.wizard")]
+        )
+        self.assertTrue(available)
+        self.assertEqual(set(wizard.xlsx_column_ids.ids), set(available.ids))

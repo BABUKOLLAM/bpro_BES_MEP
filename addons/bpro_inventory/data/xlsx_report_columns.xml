@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+
+    <!-- Stock Summary -->
+    <record id="xlsx_col_ss_product" model="bpro.report.column">
+        <field name="report_model">bpro.stock.summary.wizard</field>
+        <field name="technical_name">product_id</field>
+        <field name="name">Product</field>
+        <field name="sequence">10</field>
+    </record>
+    <record id="xlsx_col_ss_location" model="bpro.report.column">
+        <field name="report_model">bpro.stock.summary.wizard</field>
+        <field name="technical_name">location_id</field>
+        <field name="name">Location</field>
+        <field name="sequence">20</field>
+    </record>
+    <record id="xlsx_col_ss_quantity" model="bpro.report.column">
+        <field name="report_model">bpro.stock.summary.wizard</field>
+        <field name="technical_name">quantity</field>
+        <field name="name">Quantity</field>
+        <field name="sequence">30</field>
+    </record>
+    <record id="xlsx_col_ss_uom" model="bpro.report.column">
+        <field name="report_model">bpro.stock.summary.wizard</field>
+        <field name="technical_name">uom_id</field>
+        <field name="name">UoM</field>
+        <field name="sequence">40</field>
+    </record>
+    <record id="xlsx_col_ss_unit_cost" model="bpro.report.column">
+        <field name="report_model">bpro.stock.summary.wizard</field>
+        <field name="technical_name">unit_cost</field>
+        <field name="name">Unit Cost</field>
+        <field name="sequence">50</field>
+    </record>
+    <record id="xlsx_col_ss_value" model="bpro.report.column">
+        <field name="report_model">bpro.stock.summary.wizard</field>
+        <field name="technical_name">value</field>
+        <field name="name">Value</field>
+        <field name="sequence">60</field>
+    </record>
+
+</odoo>
