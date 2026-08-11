@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+
+    <record id="res_company_view_form_bpro_payroll" model="ir.ui.view">
+        <field name="name">res.company.form.bpro.payroll</field>
+        <field name="model">res.company</field>
+        <field name="inherit_id" ref="base.view_company_form"/>
+        <field name="arch" type="xml">
+            <notebook position="inside">
+                <page string="Payroll — Provident Fund" name="bpro_payroll_pf">
+                    <group>
+                        <group string="Wage Base">
+                            <field name="pf_wage_ceiling"/>
+                        </group>
+                        <group string="Rates (%)">
+                            <field name="pf_employee_rate"/>
+                            <field name="pf_employer_rate"/>
+                            <field name="pf_employer_eps_rate"/>
+                            <field name="pf_edli_rate"/>
+                            <field name="pf_admin_charge_rate"/>
+                        </group>
+                    </group>
+                </page>
+                <page string="Payroll — ESI" name="bpro_payroll_esi">
+                    <group>
+                        <group string="Wage Base">
+                            <field name="esi_wage_threshold"/>
+                        </group>
+                        <group string="Rates (%)">
+                            <field name="esi_employee_rate"/>
+                            <field name="esi_employer_rate"/>
+                        </group>
+                    </group>
+                </page>
+            </notebook>
+        </field>
+    </record>
+
+</odoo>

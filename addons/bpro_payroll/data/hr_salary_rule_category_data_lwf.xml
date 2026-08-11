@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo noupdate="1">
+    <!-- LWF_EE reduces Net like PF_EE/ESI_EE/PT. LWF_ER rolls into the
+         same employer-cost category PF/ESI's employer lines use. -->
+
+    <record id="salary_rule_category_lwf_ee" model="hr.salary.rule.category">
+        <field name="name">Labour Welfare Fund (Employee)</field>
+        <field name="code">LWF_EE</field>
+        <field name="parent_id" ref="salary_rule_category_ded"/>
+    </record>
+
+    <record id="salary_rule_category_lwf_er" model="hr.salary.rule.category">
+        <field name="name">Labour Welfare Fund (Employer)</field>
+        <field name="code">LWF_ER</field>
+        <field name="parent_id" ref="salary_rule_category_pf_er"/>
+    </record>
+
+</odoo>

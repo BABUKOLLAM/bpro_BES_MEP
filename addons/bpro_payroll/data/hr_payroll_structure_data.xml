@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo noupdate="1">
+
+    <record id="structure_india_ctc" model="hr.payroll.structure">
+        <field name="name">India CTC Structure</field>
+        <field name="code">IN_CTC</field>
+        <field name="parent_id" eval="False"/>
+        <field name="note">R3.1 foundation structure - Gross side only. NET
+            currently equals GROSS because no deduction rules exist yet;
+            PF/ESI/PT/LWF/TDS (R3.2-R3.6) each add a rule under the DED
+            category without requiring changes here.
+        </field>
+    </record>
+
+    <record id="rule_basic" model="hr.salary.rule">
+        <field name="name">Basic</field>
+        <field name="code">BASIC</field>
+        <field name="sequence" eval="10"/>
+        <field name="category_id" ref="salary_rule_category_basic"/>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">result = contract.ctc_annual / 12.0 * (contract.basic_percent / 100.0)</field>
+    </record>
+
+    <record id="rule_hra" model="hr.salary.rule">
+        <field name="name">House Rent Allowance</field>
+        <field name="code">HRA</field>
+        <field name="sequence" eval="20"/>
+        <field name="category_id" ref="salary_rule_category_hra"/>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">result = categories.BASIC * (contract.hra_percent / 100.0)</field>
+    </record>
+
+    <record id="rule_lta" model="hr.salary.rule">
+        <field name="name">Leave Travel Allowance</field>
+        <field name="code">LTA</field>
+        <field name="sequence" eval="30"/>
+        <field name="category_id" ref="salary_rule_category_lta"/>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">result = current_contract.advantages.LTA</field>
+    </record>
+
+    <record id="rule_meal" model="hr.salary.rule">
+        <field name="name">Meal Vouchers</field>
+        <field name="code">MEAL</field>
+        <field name="sequence" eval="40"/>
+        <field name="category_id" ref="salary_rule_category_meal"/>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">result = current_contract.advantages.MEAL</field>
+    </record>
+
+    <record id="rule_conv" model="hr.salary.rule">
+        <field name="name">Conveyance Allowance</field>
+        <field name="code">CONV</field>
+        <field name="sequence" eval="50"/>
+        <field name="category_id" ref="salary_rule_category_conv"/>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">result = current_contract.advantages.CONV</field>
+    </record>
+
+    <record id="rule_salw" model="hr.salary.rule">
+        <field name="name">Special Allowance</field>
+        <field name="code">SALW</field>
+        <field name="sequence" eval="60"/>
+        <field name="category_id" ref="salary_rule_category_salw"/>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">result = current_contract.advantages.SALW</field>
+    </record>
+
+    <record id="rule_gross" model="hr.salary.rule">
+        <field name="name">Gross Salary</field>
+        <field name="code">GROSS</field>
+        <field name="sequence" eval="70"/>
+        <field name="category_id" ref="salary_rule_category_gross"/>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">result = categories.BASIC + categories.HRA + categories.FBP</field>
+    </record>
+
+    <record id="rule_net" model="hr.salary.rule">
+        <field name="name">Net Salary</field>
+        <field name="code">NET</field>
+        <field name="sequence" eval="80"/>
+        <field name="category_id" ref="salary_rule_category_net"/>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">result = categories.GROSS - categories.DED</field>
+    </record>
+
+    <record id="structure_india_ctc" model="hr.payroll.structure">
+        <field name="rule_ids" eval="[(6, 0, [
+            ref('rule_basic'), ref('rule_hra'), ref('rule_lta'),
+            ref('rule_meal'), ref('rule_conv'), ref('rule_salw'),
+            ref('rule_gross'), ref('rule_net'),
+        ])]"/>
+    </record>
+
+</odoo>

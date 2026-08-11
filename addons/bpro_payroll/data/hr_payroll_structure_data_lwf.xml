@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo noupdate="1">
+    <!--
+        Two rules (employee + employer, unlike PT which is 100%
+        employee-borne). Sequence 80-81 - NET is bumped from 80 to 90
+        below (a field-only override on the existing rule_net record from
+        R3.1, not a recreation) to make room without touching the R3.1
+        file. LWF_EE must still land in categories.DED before NET runs.
+
+        None of the three seeded states (Karnataka, Tamil Nadu, Andhra
+        Pradesh) vary by income - each has exactly one unbounded slab
+        line - but the lookup-by-GROSS logic is kept generic (mirroring
+        PT's slab shape) so a future income-tiered state (some states,
+        e.g. Maharashtra, do vary LWF by salary band) can be added via
+        bpro.lwf.config/bpro.lwf.slab.line data alone, no code change.
+
+        Annual/monthly periodicity both look up the slab against the
+        CURRENT month's GROSS (not an accumulated period figure like PT's
+        half-yearly rule) - LWF isn't computed on accumulated period
+        income for any state seeded here, so there's no payslips.sum()
+        call and no flush_all() need in this rule.
+    -->
+
+    <record id="rule_lwf_ee" model="hr.salary.rule">
+        <field name="name">Labour Welfare Fund (Employee)</field>
+        <field name="code">LWF_EE</field>
+        <field name="sequence" eval="80"/>
+        <field name="category_id" ref="salary_rule_category_lwf_ee"/>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute"><![CDATA[
+config = contract.lwf_state_id
+if not config:
+    result = 0.0
+else:
+    month = payslip.date_to.month
+    if config.periodicity == 'monthly':
+        is_charge_month = True
+    elif config.periodicity == 'annual':
+        is_charge_month = bool(config.charge_month_h1) and int(config.charge_month_h1) == month
+    else:  # half_yearly
+        if month in (4, 5, 6, 7, 8, 9):
+            is_charge_month = bool(config.charge_month_h1) and int(config.charge_month_h1) == month
+        else:
+            is_charge_month = bool(config.charge_month_h2) and int(config.charge_month_h2) == month
+    if not is_charge_month:
+        result = 0.0
+    else:
+        wage = categories.GROSS
+        slabs = config.slab_line_ids.filtered(lambda l: l.lower_bound <= wage and (not l.upper_bound or wage <= l.upper_bound))
+        result = slabs[0].employee_amount if slabs else 0.0
+]]></field>
+    </record>
+
+    <record id="rule_lwf_er" model="hr.salary.rule">
+        <field name="name">Labour Welfare Fund (Employer)</field>
+        <field name="code">LWF_ER</field>
+        <field name="sequence" eval="81"/>
+        <field name="category_id" ref="salary_rule_category_lwf_er"/>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute"><![CDATA[
+config = contract.lwf_state_id
+if not config:
+    result = 0.0
+else:
+    month = payslip.date_to.month
+    if config.periodicity == 'monthly':
+        is_charge_month = True
+    elif config.periodicity == 'annual':
+        is_charge_month = bool(config.charge_month_h1) and int(config.charge_month_h1) == month
+    else:  # half_yearly
+        if month in (4, 5, 6, 7, 8, 9):
+            is_charge_month = bool(config.charge_month_h1) and int(config.charge_month_h1) == month
+        else:
+            is_charge_month = bool(config.charge_month_h2) and int(config.charge_month_h2) == month
+    if not is_charge_month:
+        result = 0.0
+    else:
+        wage = categories.GROSS
+        slabs = config.slab_line_ids.filtered(lambda l: l.lower_bound <= wage and (not l.upper_bound or wage <= l.upper_bound))
+        result = slabs[0].employer_amount if slabs else 0.0
+]]></field>
+    </record>
+
+    <record id="rule_net" model="hr.salary.rule">
+        <field name="sequence" eval="90"/>
+    </record>
+
+    <record id="structure_india_ctc" model="hr.payroll.structure">
+        <field name="rule_ids" eval="[(4, ref('rule_lwf_ee')), (4, ref('rule_lwf_er'))]"/>
+    </record>
+
+</odoo>

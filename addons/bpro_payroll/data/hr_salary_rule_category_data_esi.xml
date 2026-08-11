@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo noupdate="1">
+    <!--
+        ESI_EE parents to DED (reduces Net, same shape as PF_EE). ESI_ER
+        parents to the existing PF_ER category (name "Employer Statutory
+        Contributions" is deliberately generic, not PF-specific, despite
+        its PF_ER code) so employer-borne PF + ESI costs roll up together
+        for future CTC reconciliation/compliance reporting.
+    -->
+
+    <record id="salary_rule_category_esi_ee" model="hr.salary.rule.category">
+        <field name="name">ESI (Employee)</field>
+        <field name="code">ESI_EE</field>
+        <field name="parent_id" ref="salary_rule_category_ded"/>
+    </record>
+
+    <record id="salary_rule_category_esi_er" model="hr.salary.rule.category">
+        <field name="name">ESI (Employer)</field>
+        <field name="code">ESI_ER</field>
+        <field name="parent_id" ref="salary_rule_category_pf_er"/>
+    </record>
+
+</odoo>

@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+
+    <record id="bpro_lwf_config_view_form" model="ir.ui.view">
+        <field name="name">bpro.lwf.config.form</field>
+        <field name="model">bpro.lwf.config</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="state_id"/>
+                            <field name="periodicity"/>
+                        </group>
+                        <group>
+                            <field name="charge_month_h1"/>
+                            <field name="charge_month_h2" invisible="periodicity != 'half_yearly'"/>
+                        </group>
+                    </group>
+                    <field name="note" placeholder="Applicability caveats, source, verification status..."/>
+                    <notebook>
+                        <page string="Amounts" name="amounts">
+                            <field name="slab_line_ids">
+                                <list editable="bottom">
+                                    <field name="lower_bound"/>
+                                    <field name="upper_bound"/>
+                                    <field name="employee_amount"/>
+                                    <field name="employer_amount"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="bpro_lwf_config_view_list" model="ir.ui.view">
+        <field name="name">bpro.lwf.config.list</field>
+        <field name="model">bpro.lwf.config</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="state_id"/>
+                <field name="periodicity"/>
+                <field name="charge_month_h1"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_bpro_lwf_config" model="ir.actions.act_window">
+        <field name="name">Labour Welfare Fund — States</field>
+        <field name="res_model">bpro.lwf.config</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Add a state's Labour Welfare Fund configuration
+            </p>
+            <p>
+                Kerala isn't seeded by default - its LWF coverage depends on
+                which board/establishment type applies, not a single flat
+                state rate. Once confirmed with the client, add it here:
+                no code change needed, this list is the entire configuration
+                surface for LWF.
+            </p>
+        </field>
+    </record>
+
+    <menuitem id="menu_bpro_lwf_config" name="Labour Welfare Fund States"
+              parent="hr.menu_human_resources_configuration"
+              action="action_bpro_lwf_config"/>
+
+</odoo>

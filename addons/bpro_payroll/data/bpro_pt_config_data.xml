@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo noupdate="1">
+    <!--
+        Seed data researched 2026-08-11 via current web sources (bankbazaar,
+        factohr, chhotacfo, cleartax, saachihrms, greythr — see chat/memory
+        for the search results this was built from). All four states are
+        flagged for verification against the current state gazette
+        notification before go-live; PT rates change periodically and this
+        is a snapshot, not a live feed.
+    -->
+
+    <!-- ================= KARNATAKA (monthly) ================= -->
+    <!-- Exemption threshold raised 15,000 -> 25,000 effective 1 Apr 2025
+         (Karnataka PT Amendment Act 2025). Above 25,000: Rs.200/month,
+         Rs.300 in February, totalling Rs.2,500/year (the constitutional
+         cap). Source: multiple 2026 summaries agree on Feb as the topup
+         month, but this is the single least-certain date in this file -
+         verify before go-live. -->
+    <record id="pt_config_karnataka" model="bpro.pt.config">
+        <field name="name">Karnataka</field>
+        <field name="state_id" ref="base.state_in_ka"/>
+        <field name="periodicity">monthly</field>
+        <field name="note">Verify current slab against the Karnataka
+            Professional Tax gazette before go-live. Threshold raised
+            15,000 to 25,000 effective 1 April 2025 - if the client has
+            been running payroll on the old 15,000 threshold, this will
+            change deductions for anyone between 15,000 and 24,999.
+        </field>
+    </record>
+    <record id="pt_slab_ka_1" model="bpro.pt.slab.line">
+        <field name="config_id" ref="pt_config_karnataka"/>
+        <field name="lower_bound">0</field>
+        <field name="upper_bound">24999</field>
+        <field name="amount">0</field>
+    </record>
+    <record id="pt_slab_ka_2" model="bpro.pt.slab.line">
+        <field name="config_id" ref="pt_config_karnataka"/>
+        <field name="lower_bound">25000</field>
+        <field name="upper_bound">0</field>
+        <field name="amount">200</field>
+        <field name="topup_month">2</field>
+        <field name="topup_amount">300</field>
+    </record>
+
+    <!-- ================= ANDHRA PRADESH (monthly) ================= -->
+    <!-- Nil to 15,000; 150/month for 15,001-20,000; 200/month above
+         20,000 with a 300 topup in March (totalling 2,500/year). -->
+    <record id="pt_config_andhra_pradesh" model="bpro.pt.config">
+        <field name="name">Andhra Pradesh</field>
+        <field name="state_id" ref="base.state_in_ap"/>
+        <field name="periodicity">monthly</field>
+        <field name="note">Verify current slab against the Andhra Pradesh
+            Professional Tax gazette before go-live.
+        </field>
+    </record>
+    <record id="pt_slab_ap_1" model="bpro.pt.slab.line">
+        <field name="config_id" ref="pt_config_andhra_pradesh"/>
+        <field name="lower_bound">0</field>
+        <field name="upper_bound">15000</field>
+        <field name="amount">0</field>
+    </record>
+    <record id="pt_slab_ap_2" model="bpro.pt.slab.line">
+        <field name="config_id" ref="pt_config_andhra_pradesh"/>
+        <field name="lower_bound">15001</field>
+        <field name="upper_bound">20000</field>
+        <field name="amount">150</field>
+    </record>
+    <record id="pt_slab_ap_3" model="bpro.pt.slab.line">
+        <field name="config_id" ref="pt_config_andhra_pradesh"/>
+        <field name="lower_bound">20001</field>
+        <field name="upper_bound">0</field>
+        <field name="amount">200</field>
+        <field name="topup_month">3</field>
+        <field name="topup_amount">300</field>
+    </record>
+
+    <!-- ================= TAMIL NADU (half-yearly) ================= -->
+    <!-- Greater Chennai Corporation slabs, revised for FY2024-25, still
+         applicable FY2026-27 per source. Other TN corporations/panchayats
+         may set different slabs - this is Chennai's, seeded as the
+         default. Charged in August (Apr-Sep period) and January
+         (Oct-Mar period). -->
+    <record id="pt_config_tamil_nadu" model="bpro.pt.config">
+        <field name="name">Tamil Nadu (Chennai Corporation)</field>
+        <field name="state_id" ref="base.state_in_tn"/>
+        <field name="periodicity">half_yearly</field>
+        <field name="charge_month_h1">8</field>
+        <field name="charge_month_h2">1</field>
+        <field name="note">These are Greater Chennai Corporation slabs.
+            Other Tamil Nadu municipalities/panchayats can set different
+            rates - confirm which local body the client's registered
+            office falls under before go-live.
+        </field>
+    </record>
+    <record id="pt_slab_tn_1" model="bpro.pt.slab.line">
+        <field name="config_id" ref="pt_config_tamil_nadu"/>
+        <field name="lower_bound">0</field>
+        <field name="upper_bound">21000</field>
+        <field name="amount">0</field>
+    </record>
+    <record id="pt_slab_tn_2" model="bpro.pt.slab.line">
+        <field name="config_id" ref="pt_config_tamil_nadu"/>
+        <field name="lower_bound">21001</field>
+        <field name="upper_bound">30000</field>
+        <field name="amount">180</field>
+    </record>
+    <record id="pt_slab_tn_3" model="bpro.pt.slab.line">
+        <field name="config_id" ref="pt_config_tamil_nadu"/>
+        <field name="lower_bound">30001</field>
+        <field name="upper_bound">45000</field>
+        <field name="amount">425</field>
+    </record>
+    <record id="pt_slab_tn_4" model="bpro.pt.slab.line">
+        <field name="config_id" ref="pt_config_tamil_nadu"/>
+        <field name="lower_bound">45001</field>
+        <field name="upper_bound">60000</field>
+        <field name="amount">930</field>
+    </record>
+    <record id="pt_slab_tn_5" model="bpro.pt.slab.line">
+        <field name="config_id" ref="pt_config_tamil_nadu"/>
+        <field name="lower_bound">60001</field>
+        <field name="upper_bound">75000</field>
+        <field name="amount">1025</field>
+    </record>
+    <record id="pt_slab_tn_6" model="bpro.pt.slab.line">
+        <field name="config_id" ref="pt_config_tamil_nadu"/>
+        <field name="lower_bound">75001</field>
+        <field name="upper_bound">0</field>
+        <field name="amount">1250</field>
+    </record>
+
+    <!-- ================= KERALA (half-yearly) ================= -->
+    <!-- Kerala Panchayat slabs (the most commonly cited default table).
+         Kerala PT is administered by Local Self Government Institutions
+         and genuinely varies by body - Municipalities and Corporations
+         (e.g. Cochin Corporation) use different, more granular tables.
+         This Panchayat table is a starting point, NOT necessarily what
+         applies to the client - confirm the actual LSGI before go-live.
+         Charged August (Apr-Sep, due by 31 Aug) and February (Oct-Mar,
+         due by end Feb) - charge month here is set to the due-date month
+         as the simplest assumption; real practice may deduct earlier. -->
+    <record id="pt_config_kerala" model="bpro.pt.config">
+        <field name="name">Kerala (Panchayat)</field>
+        <field name="state_id" ref="base.state_in_kl"/>
+        <field name="periodicity">half_yearly</field>
+        <field name="charge_month_h1">8</field>
+        <field name="charge_month_h2">2</field>
+        <field name="note">Panchayat slab used as the default - Kerala
+            Municipalities and Corporations (e.g. Cochin Corporation) use
+            different, more granular slab tables. Confirm the client's
+            actual local self-government institution before go-live; this
+            may be the wrong table entirely if they're under a
+            Municipality/Corporation rather than a Panchayat. The
+            45,000-49,999 band was ambiguous in the source table (gap
+            between the 30,000-44,999 and 50,000-59,999 rows) - assumed
+            continuous at the 450 rate; verify this specific band.
+        </field>
+    </record>
+    <record id="pt_slab_kl_1" model="bpro.pt.slab.line">
+        <field name="config_id" ref="pt_config_kerala"/>
+        <field name="lower_bound">0</field>
+        <field name="upper_bound">11999</field>
+        <field name="amount">0</field>
+    </record>
+    <record id="pt_slab_kl_2" model="bpro.pt.slab.line">
+        <field name="config_id" ref="pt_config_kerala"/>
+        <field name="lower_bound">12000</field>
+        <field name="upper_bound">17999</field>
+        <field name="amount">120</field>
+    </record>
+    <record id="pt_slab_kl_3" model="bpro.pt.slab.line">
+        <field name="config_id" ref="pt_config_kerala"/>
+        <field name="lower_bound">18000</field>
+        <field name="upper_bound">29999</field>
+        <field name="amount">180</field>
+    </record>
+    <record id="pt_slab_kl_4" model="bpro.pt.slab.line">
+        <field name="config_id" ref="pt_config_kerala"/>
+        <field name="lower_bound">30000</field>
+        <field name="upper_bound">44999</field>
+        <field name="amount">300</field>
+    </record>
+    <record id="pt_slab_kl_5" model="bpro.pt.slab.line">
+        <field name="config_id" ref="pt_config_kerala"/>
+        <field name="lower_bound">45000</field>
+        <field name="upper_bound">59999</field>
+        <field name="amount">450</field>
+    </record>
+    <record id="pt_slab_kl_6" model="bpro.pt.slab.line">
+        <field name="config_id" ref="pt_config_kerala"/>
+        <field name="lower_bound">60000</field>
+        <field name="upper_bound">74999</field>
+        <field name="amount">600</field>
+    </record>
+    <record id="pt_slab_kl_7" model="bpro.pt.slab.line">
+        <field name="config_id" ref="pt_config_kerala"/>
+        <field name="lower_bound">75000</field>
+        <field name="upper_bound">99999</field>
+        <field name="amount">750</field>
+    </record>
+    <record id="pt_slab_kl_8" model="bpro.pt.slab.line">
+        <field name="config_id" ref="pt_config_kerala"/>
+        <field name="lower_bound">100000</field>
+        <field name="upper_bound">124999</field>
+        <field name="amount">1000</field>
+    </record>
+    <record id="pt_slab_kl_9" model="bpro.pt.slab.line">
+        <field name="config_id" ref="pt_config_kerala"/>
+        <field name="lower_bound">125000</field>
+        <field name="upper_bound">0</field>
+        <field name="amount">1250</field>
+    </record>
+
+</odoo>

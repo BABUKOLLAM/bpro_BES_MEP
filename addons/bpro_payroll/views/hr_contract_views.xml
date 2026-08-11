@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+
+    <record id="hr_contract_view_form_bpro_payroll" model="ir.ui.view">
+        <field name="name">hr.contract.form.bpro.payroll</field>
+        <field name="model">hr.contract</field>
+        <field name="inherit_id" ref="hr_contract.hr_contract_view_form"/>
+        <field name="arch" type="xml">
+            <field name="wage" position="after">
+                <field name="ctc_annual"/>
+                <field name="basic_percent"/>
+                <field name="hra_percent"/>
+                <field name="pf_applicable"/>
+                <field name="pf_calculation_basis" invisible="not pf_applicable"/>
+                <field name="esi_applicable"/>
+                <field name="pt_state_id"/>
+                <field name="lwf_state_id"/>
+            </field>
+        </field>
+    </record>
+
+</odoo>

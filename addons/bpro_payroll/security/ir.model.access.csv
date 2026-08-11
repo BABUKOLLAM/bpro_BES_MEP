@@ -1,0 +1,9 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_bpro_pt_config_manager,bpro.pt.config manager,model_bpro_pt_config,hr.group_hr_manager,1,1,1,1
+access_bpro_pt_config_user,bpro.pt.config user,model_bpro_pt_config,hr.group_hr_user,1,0,0,0
+access_bpro_pt_slab_line_manager,bpro.pt.slab.line manager,model_bpro_pt_slab_line,hr.group_hr_manager,1,1,1,1
+access_bpro_pt_slab_line_user,bpro.pt.slab.line user,model_bpro_pt_slab_line,hr.group_hr_user,1,0,0,0
+access_bpro_lwf_config_manager,bpro.lwf.config manager,model_bpro_lwf_config,hr.group_hr_manager,1,1,1,1
+access_bpro_lwf_config_user,bpro.lwf.config user,model_bpro_lwf_config,hr.group_hr_user,1,0,0,0
+access_bpro_lwf_slab_line_manager,bpro.lwf.slab.line manager,model_bpro_lwf_slab_line,hr.group_hr_manager,1,1,1,1
+access_bpro_lwf_slab_line_user,bpro.lwf.slab.line user,model_bpro_lwf_slab_line,hr.group_hr_user,1,0,0,0

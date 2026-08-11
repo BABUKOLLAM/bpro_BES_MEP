@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo noupdate="1">
+    <!--
+        All six rules share the same condition: skip entirely if the
+        contract has pf_applicable=False. Sequenced 72-77, after GROSS (70)
+        so categories.BASIC/GROSS are settled, and before NET (80) so
+        PF_EE's contribution to categories.DED is picked up.
+
+        PF_WAGE (72) is a hidden helper (appears_on_payslip=False) that
+        resolves the capped-vs-full-basic policy once; PF_EE (73) and
+        PF_EPF_ER (76) reuse it via the bare `PF_WAGE` name that becomes
+        available after a rule with that code has run (see hr_payslip.py
+        _get_lines_dict: localdict[rule.code] = total). EPS/EDLI/Admin
+        (74, 75, 77) intentionally do NOT use PF_WAGE - by law they're
+        always computed on wages capped at the ceiling, even when the
+        contract's own PF calculation basis is 'full_basic'.
+    -->
+
+    <record id="rule_pf_wage" model="hr.salary.rule">
+        <field name="name">PF Wage Base (helper)</field>
+        <field name="code">PF_WAGE</field>
+        <field name="sequence" eval="72"/>
+        <field name="appears_on_payslip" eval="False"/>
+        <field name="condition_select">python</field>
+        <field name="condition_python">result = contract.pf_applicable</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">if contract.pf_calculation_basis == 'full_basic':
+    result = categories.BASIC
+else:
+    result = min(categories.BASIC, contract.company_id.pf_wage_ceiling)</field>
+    </record>
+
+    <record id="rule_pf_ee" model="hr.salary.rule">
+        <field name="name">Provident Fund (Employee)</field>
+        <field name="code">PF_EE</field>
+        <field name="sequence" eval="73"/>
+        <field name="category_id" ref="salary_rule_category_pf_ee"/>
+        <field name="condition_select">python</field>
+        <field name="condition_python">result = contract.pf_applicable</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">result = PF_WAGE * (contract.company_id.pf_employee_rate / 100.0)</field>
+    </record>
+
+    <record id="rule_pf_eps" model="hr.salary.rule">
+        <field name="name">Employer PF — EPS Share</field>
+        <field name="code">PF_EPS</field>
+        <field name="sequence" eval="74"/>
+        <field name="category_id" ref="salary_rule_category_pf_eps"/>
+        <field name="condition_select">python</field>
+        <field name="condition_python">result = contract.pf_applicable</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">eps_wage = min(categories.BASIC, contract.company_id.pf_wage_ceiling)
+result = eps_wage * (contract.company_id.pf_employer_eps_rate / 100.0)</field>
+    </record>
+
+    <record id="rule_pf_edli" model="hr.salary.rule">
+        <field name="name">EDLI</field>
+        <field name="code">PF_EDLI</field>
+        <field name="sequence" eval="75"/>
+        <field name="category_id" ref="salary_rule_category_pf_edli"/>
+        <field name="condition_select">python</field>
+        <field name="condition_python">result = contract.pf_applicable</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">edli_wage = min(categories.BASIC, contract.company_id.pf_wage_ceiling)
+result = edli_wage * (contract.company_id.pf_edli_rate / 100.0)</field>
+    </record>
+
+    <record id="rule_pf_epf_er" model="hr.salary.rule">
+        <field name="name">Employer PF — EPF Share</field>
+        <field name="code">PF_EPF_ER</field>
+        <field name="sequence" eval="76"/>
+        <field name="category_id" ref="salary_rule_category_pf_epf_er"/>
+        <field name="condition_select">python</field>
+        <field name="condition_python">result = contract.pf_applicable</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">employer_total = PF_WAGE * (contract.company_id.pf_employer_rate / 100.0)
+result = employer_total - PF_EPS</field>
+    </record>
+
+    <record id="rule_pf_admin" model="hr.salary.rule">
+        <field name="name">EPF Admin Charges</field>
+        <field name="code">PF_ADMIN</field>
+        <field name="sequence" eval="77"/>
+        <field name="category_id" ref="salary_rule_category_pf_admin"/>
+        <field name="condition_select">python</field>
+        <field name="condition_python">result = contract.pf_applicable</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">admin_wage = min(categories.BASIC, contract.company_id.pf_wage_ceiling)
+result = admin_wage * (contract.company_id.pf_admin_charge_rate / 100.0)</field>
+    </record>
+
+    <record id="structure_india_ctc" model="hr.payroll.structure">
+        <field name="rule_ids" eval="[(4, ref('rule_pf_wage')), (4, ref('rule_pf_ee')),
+            (4, ref('rule_pf_eps')), (4, ref('rule_pf_edli')),
+            (4, ref('rule_pf_epf_er')), (4, ref('rule_pf_admin'))]"/>
+    </record>
+
+</odoo>

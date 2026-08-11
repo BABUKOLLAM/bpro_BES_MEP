@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo noupdate="1">
+
+    <!--
+        GROSS, BASIC, HRA and FBP are deliberately flat (no parent_id
+        between them). category totals propagate to parent_id automatically
+        at compute time (see hr_payslip._sum_salary_rule_category) - if
+        BASIC/HRA/FBP parented to GROSS, the explicit "Gross Salary" rule
+        below (which lives in the GROSS category and sums the others by
+        hand) would double-count on top of that auto-propagation. FBP's own
+        children (LTA/MEAL/CONV/SALW) are safe to parent to FBP because no
+        rule targets the FBP category directly - only the auto-propagated
+        subtotal lands there.
+    -->
+    <record id="salary_rule_category_gross" model="hr.salary.rule.category">
+        <field name="name">Gross</field>
+        <field name="code">GROSS</field>
+    </record>
+
+    <record id="salary_rule_category_basic" model="hr.salary.rule.category">
+        <field name="name">Basic</field>
+        <field name="code">BASIC</field>
+    </record>
+
+    <record id="salary_rule_category_hra" model="hr.salary.rule.category">
+        <field name="name">House Rent Allowance</field>
+        <field name="code">HRA</field>
+    </record>
+
+    <record id="salary_rule_category_fbp" model="hr.salary.rule.category">
+        <field name="name">Flexible Benefit Plan</field>
+        <field name="code">FBP</field>
+    </record>
+
+    <record id="salary_rule_category_lta" model="hr.salary.rule.category">
+        <field name="name">Leave Travel Allowance</field>
+        <field name="code">LTA</field>
+        <field name="parent_id" ref="salary_rule_category_fbp"/>
+    </record>
+
+    <record id="salary_rule_category_meal" model="hr.salary.rule.category">
+        <field name="name">Meal Vouchers</field>
+        <field name="code">MEAL</field>
+        <field name="parent_id" ref="salary_rule_category_fbp"/>
+    </record>
+
+    <record id="salary_rule_category_conv" model="hr.salary.rule.category">
+        <field name="name">Conveyance Allowance</field>
+        <field name="code">CONV</field>
+        <field name="parent_id" ref="salary_rule_category_fbp"/>
+    </record>
+
+    <record id="salary_rule_category_salw" model="hr.salary.rule.category">
+        <field name="name">Special Allowance</field>
+        <field name="code">SALW</field>
+        <field name="parent_id" ref="salary_rule_category_fbp"/>
+    </record>
+
+    <record id="salary_rule_category_ded" model="hr.salary.rule.category">
+        <field name="name">Deductions</field>
+        <field name="code">DED</field>
+        <field name="note">Empty in R3.1 by design. PF/ESI/PT/LWF/TDS rules
+            (R3.2-R3.6) will each add their own child category and rule
+            here, without touching the Gross side of this structure.
+        </field>
+    </record>
+
+    <record id="salary_rule_category_net" model="hr.salary.rule.category">
+        <field name="name">Net</field>
+        <field name="code">NET</field>
+    </record>
+
+</odoo>

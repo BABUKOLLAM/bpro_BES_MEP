@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo noupdate="1">
+    <!--
+        Seed bounds/defaults only — these are NOT the client's actual FBP
+        policy figures, just sane starting points so the templates are
+        usable out of the box. Replace lower_bound/upper_bound/default_value
+        per the client's real policy before going live. All amounts are
+        monthly-equivalent: this generic advantage mechanism adds the same
+        `amount` to every payslip it runs, so an allowance that's meant to
+        be an annual lump sum (paid once a year, not every month) is NOT
+        something this foundation release handles - that's a gap, not an
+        oversight, and would need explicit handling if the client needs it.
+    -->
+
+    <record id="advantage_template_lta" model="hr.contract.advantage.template">
+        <field name="name">Leave Travel Allowance</field>
+        <field name="code">LTA</field>
+        <field name="lower_bound">0.0</field>
+        <field name="upper_bound">50000.0</field>
+        <field name="default_value">0.0</field>
+    </record>
+
+    <record id="advantage_template_meal" model="hr.contract.advantage.template">
+        <field name="name">Meal Vouchers</field>
+        <field name="code">MEAL</field>
+        <field name="lower_bound">0.0</field>
+        <!-- 2200/month reflects the old ₹50/meal × 2 × ~22 working-day
+             convention many India payrolls still use as a ceiling. -->
+        <field name="upper_bound">2200.0</field>
+        <field name="default_value">1100.0</field>
+    </record>
+
+    <record id="advantage_template_conv" model="hr.contract.advantage.template">
+        <field name="name">Conveyance Allowance</field>
+        <field name="code">CONV</field>
+        <field name="lower_bound">0.0</field>
+        <!-- 1600/month was the pre-2018 transport-allowance exemption
+             ceiling; kept as a familiar default, not a current statutory
+             limit (the exemption itself was folded into the standard
+             deduction in 2018). -->
+        <field name="upper_bound">1600.0</field>
+        <field name="default_value">1600.0</field>
+    </record>
+
+    <record id="advantage_template_salw" model="hr.contract.advantage.template">
+        <field name="name">Special Allowance</field>
+        <field name="code">SALW</field>
+        <field name="lower_bound">0.0</field>
+        <field name="upper_bound">999999.0</field>
+        <field name="default_value">0.0</field>
+    </record>
+
+</odoo>

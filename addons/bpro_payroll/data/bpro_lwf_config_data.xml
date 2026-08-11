@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo noupdate="1">
+    <!--
+        Seed data researched 2026-08-11 (ezhrm, source-cross-checked against
+        the general "LWF deduct in December, remit by 31 Jan" pattern that
+        applies across Karnataka/TN/AP/Telangana). All flat annual amounts,
+        no income slabs - one unbounded slab line per state. Verify against
+        the current state notification before go-live.
+
+        Kerala is deliberately NOT seeded here. Sources conflict: it has no
+        single straightforward general LWF Act the way KA/TN/AP do - there's
+        a 1975 Act plus a separate Shops & Commercial Establishments
+        Workers Welfare Fund Board (2007), plus sector-specific boards
+        (construction, headload workers). Which one (if any) covers the
+        client depends on their actual Kerala establishment type. Add a
+        bpro.lwf.config for Kerala via Settings > HR > Configuration >
+        "Labour Welfare Fund States" once that's confirmed - this data file
+        is the only place state coverage is defined, so adding it there is
+        the complete fix, no code change needed anywhere.
+    -->
+
+    <record id="lwf_config_karnataka" model="bpro.lwf.config">
+        <field name="name">Karnataka</field>
+        <field name="state_id" ref="base.state_in_ka"/>
+        <field name="periodicity">annual</field>
+        <field name="charge_month_h1">12</field>
+        <field name="note">Deduction 31 December, deposit deadline 15
+            January. Applicability threshold cut from 50 employees to 10,
+            effective 7 January 2026 - confirm the client's Karnataka
+            headcount meets this. Verify against the current Karnataka LWF
+            notification before go-live.
+        </field>
+    </record>
+    <record id="lwf_slab_ka_1" model="bpro.lwf.slab.line">
+        <field name="config_id" ref="lwf_config_karnataka"/>
+        <field name="lower_bound">0</field>
+        <field name="upper_bound">0</field>
+        <field name="employee_amount">50</field>
+        <field name="employer_amount">100</field>
+    </record>
+
+    <record id="lwf_config_tamil_nadu" model="bpro.lwf.config">
+        <field name="name">Tamil Nadu</field>
+        <field name="state_id" ref="base.state_in_tn"/>
+        <field name="periodicity">annual</field>
+        <field name="charge_month_h1">12</field>
+        <field name="note">Deposit deadline 31 January; deduction assumed
+            December in line with the general AP/KA/TN/Telangana pattern.
+            Verify against the current Tamil Nadu LWF notification before
+            go-live.
+        </field>
+    </record>
+    <record id="lwf_slab_tn_1" model="bpro.lwf.slab.line">
+        <field name="config_id" ref="lwf_config_tamil_nadu"/>
+        <field name="lower_bound">0</field>
+        <field name="upper_bound">0</field>
+        <field name="employee_amount">20</field>
+        <field name="employer_amount">40</field>
+    </record>
+
+    <record id="lwf_config_andhra_pradesh" model="bpro.lwf.config">
+        <field name="name">Andhra Pradesh</field>
+        <field name="state_id" ref="base.state_in_ap"/>
+        <field name="periodicity">annual</field>
+        <field name="charge_month_h1">12</field>
+        <field name="note">Deposit deadline 31 January; deduction assumed
+            December in line with the general AP/KA/TN/Telangana pattern.
+            Applicability is dual-threshold in AP: factories are covered
+            regardless of employee count, shops/commercial establishments
+            need 20+ employees - confirm the client's establishment type
+            meets this before assuming LWF applies. Verify against the
+            current Andhra Pradesh LWF notification before go-live.
+        </field>
+    </record>
+    <record id="lwf_slab_ap_1" model="bpro.lwf.slab.line">
+        <field name="config_id" ref="lwf_config_andhra_pradesh"/>
+        <field name="lower_bound">0</field>
+        <field name="upper_bound">0</field>
+        <field name="employee_amount">30</field>
+        <field name="employer_amount">70</field>
+    </record>
+
+</odoo>

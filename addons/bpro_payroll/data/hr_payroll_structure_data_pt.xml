@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo noupdate="1">
+    <!--
+        Single PT rule, sequence 71 - right after GROSS (70) and before the
+        PF block (72+). PT has no dependency on PF/ESI, so it doesn't need
+        to sit near them; it only needs to run after GROSS and before NET
+        (80) so it lands in categories.DED in time. All logic lives in
+        amount_python_compute itself (no condition_python) - a missing
+        pt_state_id or a half-yearly non-charge month both resolve to
+        result=0.0 in-code, so the line still appears on the payslip
+        (useful for visibility) but contributes nothing.
+
+        Half-yearly accumulation depends on prior months' payslips being
+        confirmed (state='done') - payslips.sum() only reads confirmed
+        payslips. A half-yearly state's charge-month figure will
+        understate the true half-year income if earlier months were left
+        in draft. This is a real operational dependency, not a bug - flag
+        it in client training/SOPs.
+
+        payslips.sum() runs a raw SQL query (self.env.cr.execute), which
+        does NOT see the ORM's own pending, not-yet-flushed writes. If
+        something ever confirms several months' payslips for one employee
+        inside a single transaction (a bulk payroll-run wizard, a data
+        migration script) without an HTTP-request boundary flushing
+        between them, this query would silently undercount - found this
+        exact way while testing (a rollback-per-test-scenario harness hit
+        it immediately; a normal one-payslip-confirmation-per-request UI
+        flow would not, since each request flushes+commits before the
+        next). env.flush_all() below is the defensive fix so the rule is
+        correct regardless of what confirmed the prior months or how.
+    -->
+
+    <record id="rule_pt" model="hr.salary.rule">
+        <field name="name">Professional Tax</field>
+        <field name="code">PT</field>
+        <field name="sequence" eval="71"/>
+        <field name="category_id" ref="salary_rule_category_pt"/>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute"><![CDATA[
+config = contract.pt_state_id
+if not config:
+    result = 0.0
+elif config.periodicity == 'monthly':
+    wage = categories.GROSS
+    slabs = config.slab_line_ids.filtered(lambda l: l.lower_bound <= wage and (not l.upper_bound or wage <= l.upper_bound))
+    if not slabs:
+        result = 0.0
+    else:
+        slab = slabs[0]
+        if slab.topup_month and int(slab.topup_month) == payslip.date_to.month:
+            result = slab.topup_amount
+        else:
+            result = slab.amount
+else:
+    month = payslip.date_to.month
+    year = payslip.date_to.year
+    if month in (4, 5, 6, 7, 8, 9):
+        period_start = payslip.date_to.replace(month=4, day=1)
+        charge_month = config.charge_month_h1
+    elif month in (10, 11, 12):
+        period_start = payslip.date_to.replace(month=10, day=1)
+        charge_month = config.charge_month_h2
+    else:
+        period_start = payslip.date_to.replace(year=year - 1, month=10, day=1)
+        charge_month = config.charge_month_h2
+    if charge_month and int(charge_month) == month:
+        payslip.env.flush_all()
+        hy_gross = payslips.sum('GROSS', period_start, payslip.date_to) + categories.GROSS
+        slabs = config.slab_line_ids.filtered(lambda l: l.lower_bound <= hy_gross and (not l.upper_bound or hy_gross <= l.upper_bound))
+        result = slabs[0].amount if slabs else 0.0
+    else:
+        result = 0.0
+]]></field>
+    </record>
+
+    <record id="structure_india_ctc" model="hr.payroll.structure">
+        <field name="rule_ids" eval="[(4, ref('rule_pt'))]"/>
+    </record>
+
+</odoo>

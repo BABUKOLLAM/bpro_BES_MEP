@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo noupdate="1">
+    <!-- PT is 100% employee-borne - no employer-side category needed,
+         unlike PF/ESI. -->
+
+    <record id="salary_rule_category_pt" model="hr.salary.rule.category">
+        <field name="name">Professional Tax</field>
+        <field name="code">PT</field>
+        <field name="parent_id" ref="salary_rule_category_ded"/>
+    </record>
+
+</odoo>

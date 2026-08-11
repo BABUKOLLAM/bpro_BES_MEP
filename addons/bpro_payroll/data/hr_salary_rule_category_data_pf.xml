@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo noupdate="1">
+    <!--
+        PF_EE is the only one of these that touches take-home pay - it's
+        parented to DED (from the R3.1 category file) so it flows into
+        NET = GROSS - DED automatically, no changes needed there.
+
+        PF_ER and its children (PF_EPS, PF_EPF_ER, PF_EDLI, PF_ADMIN) are
+        employer-borne costs, not employee deductions - deliberately NOT
+        parented to DED or GROSS. They exist for payslip visibility and
+        future CTC-reconciliation/compliance reporting only.
+    -->
+
+    <record id="salary_rule_category_pf_ee" model="hr.salary.rule.category">
+        <field name="name">Provident Fund (Employee)</field>
+        <field name="code">PF_EE</field>
+        <field name="parent_id" ref="salary_rule_category_ded"/>
+    </record>
+
+    <record id="salary_rule_category_pf_er" model="hr.salary.rule.category">
+        <field name="name">Employer Statutory Contributions</field>
+        <field name="code">PF_ER</field>
+        <field name="note">Employer-borne costs shown for visibility and
+            future CTC reconciliation - these never reduce Net Salary.
+        </field>
+    </record>
+
+    <record id="salary_rule_category_pf_eps" model="hr.salary.rule.category">
+        <field name="name">Employer PF — EPS Share</field>
+        <field name="code">PF_EPS</field>
+        <field name="parent_id" ref="salary_rule_category_pf_er"/>
+    </record>
+
+    <record id="salary_rule_category_pf_epf_er" model="hr.salary.rule.category">
+        <field name="name">Employer PF — EPF Share</field>
+        <field name="code">PF_EPF_ER</field>
+        <field name="parent_id" ref="salary_rule_category_pf_er"/>
+    </record>
+
+    <record id="salary_rule_category_pf_edli" model="hr.salary.rule.category">
+        <field name="name">EDLI</field>
+        <field name="code">PF_EDLI</field>
+        <field name="parent_id" ref="salary_rule_category_pf_er"/>
+    </record>
+
+    <record id="salary_rule_category_pf_admin" model="hr.salary.rule.category">
+        <field name="name">EPF Admin Charges</field>
+        <field name="code">PF_ADMIN</field>
+        <field name="parent_id" ref="salary_rule_category_pf_er"/>
+    </record>
+
+</odoo>
