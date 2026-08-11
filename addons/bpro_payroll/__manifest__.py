@@ -1,10 +1,10 @@
 {
     "name": "bpro Payroll — India Salary Structure Foundation",
-    "summary": "Flexible-benefit CTC salary structure + PF + ESI + Professional Tax + LWF + TDS (core) on top of the OCA payroll engine (BES HR & Payroll module, R3.1-3.6a)",
+    "summary": "Flexible-benefit CTC salary structure + PF + ESI + Professional Tax + LWF + TDS (with declarations) on top of the OCA payroll engine (BES HR & Payroll module, R3.1-3.6b)",
     "description": """
-India payroll build-out on the OCA payroll engine. R3.6b (investment
-declarations) and R3.6c (Form 16) are separate follow-up releases on top
-of R3.6a's core tax engine, not bundled here.
+India payroll build-out on the OCA payroll engine. R3.6c (Form 16) is a
+separate follow-up release on top of R3.6a/b's tax engine, not bundled
+here.
 
 R3.1 - salary structure foundation:
 
@@ -150,8 +150,29 @@ R3.6b; old regime here is annual Gross minus standard deduction only):
   the standard method real payroll systems use. Same env.flush_all()
   defensiveness as R3.4's PT rule, same reason (payslips.sum() needs
   prior months confirmed and doesn't see unflushed ORM writes).
+
+R3.6b - TDS investment declarations (Old Regime only - the New Regime
+disallows HRA exemption, 80C and 80D under current law):
+
+* New model bpro.tds.declaration (per contract per financial year):
+  declared_80c, declared_80d, monthly_rent, plus a draft -> submitted ->
+  approved/rejected workflow. Only an APPROVED declaration affects TDS -
+  submitted-but-unreviewed behaves exactly like no declaration at all,
+  deliberately, so an unverified claim never under-withholds tax.
+* The TDS rule now computes HRA exemption using the same projected-
+  annual accumulation pattern as Gross (actual BASIC/HRA so far this FY
+  + this month's rate x remaining months, not a flat x12) as
+  min(projected annual HRA, annual rent - 10% of projected annual Basic,
+  40%/50% of projected annual Basic) - the 40/50 split reuses the
+  contract's existing hra_percent as a metro/non-metro proxy (>=50 =
+  metro) rather than adding a separate flag. 80C is capped at Rs.1,50,000
+  and 80D at Rs.25,000 (a simplification - no senior-citizen category in
+  this build, so the higher senior-citizen 80D caps aren't modelled).
+  New Regime contracts and contracts with no approved declaration are
+  completely unaffected - taxable income still comes out exactly as
+  R3.6a computed it.
 """,
-    "version": "18.0.1.5.0",
+    "version": "18.0.1.6.0",
     "category": "Human Resources",
     "author": "Team bpro",
     "website": "https://bpropms.com",
@@ -186,6 +207,7 @@ R3.6b; old regime here is annual Gross minus standard deduction only):
         "views/bpro_pt_config_views.xml",
         "views/bpro_lwf_config_views.xml",
         "views/bpro_tds_config_views.xml",
+        "views/bpro_tds_declaration_views.xml",
     ],
     "installable": True,
     "application": False,

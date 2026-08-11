@@ -1,21 +1,35 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <odoo noupdate="1">
     <!--
-        R3.6a - core annual tax engine, no investment declarations yet
-        (that's R3.6b: old-regime taxable income here is just annual
-        Gross minus the regime's standard deduction, nothing else).
+        R3.6a gave the core engine with no declarations. R3.6b adds
+        HRA exemption + 80C + 80D, Old Regime only (the New Regime
+        disallows all three under current law) - and only once a
+        bpro.tds.declaration for this contract+FY is state='approved'.
+        Submitted-but-unapproved behaves exactly like no declaration at
+        all: this is deliberate (an unreviewed claim should never
+        under-withhold tax), not a state we forgot to handle.
 
         Sequence 82 (LWF used 80/81, NET is at 90 after R3.5's bump -
         see that file's comment). Method: project annual Gross as
         (actual confirmed-payslip GROSS so far this FY, via payslips.sum)
         + (this month's GROSS x remaining months including this one),
-        subtract standard deduction, run through the regime's progressive
-        slabs, apply the 87A rebate if under threshold, add cess, then
-        spread (annual TDS so far computed - TDS already withheld this FY)
-        over the remaining months. Recomputes fresh every payslip, so a
-        mid-year raise or bonus naturally reweights the remaining months'
-        deduction - this is the standard method real payroll systems use,
-        not a simplification.
+        subtract standard deduction (and, old regime with an approved
+        declaration, HRA exemption + capped 80C + capped 80D too), run
+        through the regime's progressive slabs, apply the 87A rebate if
+        under threshold, add cess, then spread (annual TDS so far
+        computed - TDS already withheld this FY) over the remaining
+        months. Recomputes fresh every payslip, so a mid-year raise or
+        bonus naturally reweights the remaining months' deduction - this
+        is the standard method real payroll systems use, not a
+        simplification.
+
+        HRA exemption reuses the SAME projected-annual accumulation
+        pattern as Gross (actual BASIC/HRA so far + this month's rate x
+        remaining months) rather than a flat x12, for consistency and so
+        a mid-year raise reweights it too. The metro/non-metro 50%/40%
+        split reuses contract.hra_percent (>=50 = metro) rather than a
+        separate flag - see bpro.tds.declaration's monthly_rent field
+        help for why.
 
         payslips.sum() needs prior months confirmed (state='done') and
         doesn't see unflushed ORM writes - same flush_all() defensiveness
@@ -55,7 +69,35 @@ else:
     tds_withheld_so_far = payslips.sum('TDS', fy_start, payslip.date_to)
 
     projected_annual_gross = actual_gross_so_far + categories.GROSS * remaining_months
-    taxable_income = max(0.0, projected_annual_gross - config.standard_deduction)
+
+    declaration = False
+    if contract.tds_regime == 'old':
+        declaration = payslip.env['bpro.tds.declaration'].search([
+            ('contract_id', '=', contract.id),
+            ('fy_start_year', '=', fy_start_year),
+            ('state', '=', 'approved'),
+        ], limit=1)
+
+    hra_exemption = 0.0
+    deduction_80c = 0.0
+    deduction_80d = 0.0
+    if declaration:
+        actual_basic_so_far = payslips.sum('BASIC', fy_start, payslip.date_to)
+        actual_hra_so_far = payslips.sum('HRA', fy_start, payslip.date_to)
+        projected_annual_basic = actual_basic_so_far + categories.BASIC * remaining_months
+        projected_annual_hra = actual_hra_so_far + categories.HRA * remaining_months
+
+        annual_rent = declaration.monthly_rent * 12.0
+        hra_ceiling_pct = 0.50 if contract.hra_percent >= 50 else 0.40
+        hra_exemption = max(0.0, min(
+            projected_annual_hra,
+            annual_rent - 0.10 * projected_annual_basic,
+            hra_ceiling_pct * projected_annual_basic,
+        ))
+        deduction_80c = min(declaration.declared_80c, 150000.0)
+        deduction_80d = min(declaration.declared_80d, 25000.0)
+
+    taxable_income = max(0.0, projected_annual_gross - hra_exemption - config.standard_deduction - deduction_80c - deduction_80d)
 
     tax = 0.0
     for slab in config.slab_line_ids.sorted('lower_bound'):

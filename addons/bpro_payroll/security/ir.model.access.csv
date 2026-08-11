@@ -11,3 +11,5 @@ access_bpro_tds_regime_config_manager,bpro.tds.regime.config manager,model_bpro_
 access_bpro_tds_regime_config_user,bpro.tds.regime.config user,model_bpro_tds_regime_config,hr.group_hr_user,1,0,0,0
 access_bpro_tds_slab_line_manager,bpro.tds.slab.line manager,model_bpro_tds_slab_line,hr.group_hr_manager,1,1,1,1
 access_bpro_tds_slab_line_user,bpro.tds.slab.line user,model_bpro_tds_slab_line,hr.group_hr_user,1,0,0,0
+access_bpro_tds_declaration_manager,bpro.tds.declaration manager,model_bpro_tds_declaration,hr.group_hr_manager,1,1,1,1
+access_bpro_tds_declaration_user,bpro.tds.declaration user,model_bpro_tds_declaration,hr.group_hr_user,1,1,1,0
