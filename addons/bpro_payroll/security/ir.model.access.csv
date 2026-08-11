@@ -7,3 +7,7 @@ access_bpro_lwf_config_manager,bpro.lwf.config manager,model_bpro_lwf_config,hr.
 access_bpro_lwf_config_user,bpro.lwf.config user,model_bpro_lwf_config,hr.group_hr_user,1,0,0,0
 access_bpro_lwf_slab_line_manager,bpro.lwf.slab.line manager,model_bpro_lwf_slab_line,hr.group_hr_manager,1,1,1,1
 access_bpro_lwf_slab_line_user,bpro.lwf.slab.line user,model_bpro_lwf_slab_line,hr.group_hr_user,1,0,0,0
+access_bpro_tds_regime_config_manager,bpro.tds.regime.config manager,model_bpro_tds_regime_config,hr.group_hr_manager,1,1,1,1
+access_bpro_tds_regime_config_user,bpro.tds.regime.config user,model_bpro_tds_regime_config,hr.group_hr_user,1,0,0,0
+access_bpro_tds_slab_line_manager,bpro.tds.slab.line manager,model_bpro_tds_slab_line,hr.group_hr_manager,1,1,1,1
+access_bpro_tds_slab_line_user,bpro.tds.slab.line user,model_bpro_tds_slab_line,hr.group_hr_user,1,0,0,0

@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo noupdate="1">
+    <!--
+        R3.6a - core annual tax engine, no investment declarations yet
+        (that's R3.6b: old-regime taxable income here is just annual
+        Gross minus the regime's standard deduction, nothing else).
+
+        Sequence 82 (LWF used 80/81, NET is at 90 after R3.5's bump -
+        see that file's comment). Method: project annual Gross as
+        (actual confirmed-payslip GROSS so far this FY, via payslips.sum)
+        + (this month's GROSS x remaining months including this one),
+        subtract standard deduction, run through the regime's progressive
+        slabs, apply the 87A rebate if under threshold, add cess, then
+        spread (annual TDS so far computed - TDS already withheld this FY)
+        over the remaining months. Recomputes fresh every payslip, so a
+        mid-year raise or bonus naturally reweights the remaining months'
+        deduction - this is the standard method real payroll systems use,
+        not a simplification.
+
+        payslips.sum() needs prior months confirmed (state='done') and
+        doesn't see unflushed ORM writes - same flush_all() defensiveness
+        as the PT half-yearly rule (R3.4), for the same reason.
+
+        Deliberately does NOT special-case April (FY's first month): if
+        there happen to be no confirmed prior payslips in the FY yet,
+        payslips.sum() naturally returns 0, which is correct.
+    -->
+
+    <record id="rule_tds" model="hr.salary.rule">
+        <field name="name">TDS (Income Tax)</field>
+        <field name="code">TDS</field>
+        <field name="sequence" eval="82"/>
+        <field name="category_id" ref="salary_rule_category_tds"/>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute"><![CDATA[
+config = False
+if contract.tds_regime:
+    fy_start_year = payslip.date_to.year if payslip.date_to.month >= 4 else payslip.date_to.year - 1
+    config = payslip.env['bpro.tds.regime.config'].search([
+        ('regime', '=', contract.tds_regime),
+        ('fy_start_year', '=', fy_start_year),
+    ], limit=1)
+
+if not config:
+    result = 0.0
+else:
+    month = payslip.date_to.month
+    fy_month_index = month - 3 if month >= 4 else month + 9
+    remaining_months = 13 - fy_month_index
+
+    fy_start = payslip.date_to.replace(year=fy_start_year, month=4, day=1)
+
+    payslip.env.flush_all()
+    actual_gross_so_far = payslips.sum('GROSS', fy_start, payslip.date_to)
+    tds_withheld_so_far = payslips.sum('TDS', fy_start, payslip.date_to)
+
+    projected_annual_gross = actual_gross_so_far + categories.GROSS * remaining_months
+    taxable_income = max(0.0, projected_annual_gross - config.standard_deduction)
+
+    tax = 0.0
+    for slab in config.slab_line_ids.sorted('lower_bound'):
+        if taxable_income <= slab.lower_bound:
+            continue
+        band_top = slab.upper_bound if slab.upper_bound else taxable_income
+        band_amount = min(taxable_income, band_top) - slab.lower_bound
+        if band_amount > 0:
+            tax += band_amount * (slab.rate / 100.0)
+
+    if taxable_income <= config.rebate_income_threshold:
+        tax = max(0.0, tax - config.rebate_max_amount)
+
+    annual_tds = tax * (1 + config.cess_rate / 100.0)
+
+    result = max(0.0, (annual_tds - tds_withheld_so_far) / remaining_months)
+]]></field>
+    </record>
+
+    <record id="structure_india_ctc" model="hr.payroll.structure">
+        <field name="rule_ids" eval="[(4, ref('rule_tds'))]"/>
+    </record>
+
+</odoo>

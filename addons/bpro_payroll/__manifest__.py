@@ -1,10 +1,10 @@
 {
     "name": "bpro Payroll — India Salary Structure Foundation",
-    "summary": "Flexible-benefit CTC salary structure + PF + ESI + Professional Tax + LWF on top of the OCA payroll engine (BES HR & Payroll module, R3.1-3.5)",
+    "summary": "Flexible-benefit CTC salary structure + PF + ESI + Professional Tax + LWF + TDS (core) on top of the OCA payroll engine (BES HR & Payroll module, R3.1-3.6a)",
     "description": """
-India payroll build-out on the OCA payroll engine. TDS is a separate
-follow-up release (R3.6) layered on top of this structure, not bundled
-here.
+India payroll build-out on the OCA payroll engine. R3.6b (investment
+declarations) and R3.6c (Form 16) are separate follow-up releases on top
+of R3.6a's core tax engine, not bundled here.
 
 R3.1 - salary structure foundation:
 
@@ -118,8 +118,40 @@ R3.5 - Labour Welfare Fund (multi-state):
 * NET's sequence bumped 80 -> 90 (a field-only override on the existing
   R3.1 rule, not a rewrite of that file) to make room for LWF_EE/LWF_ER
   at 80/81, since PT/PF/ESI already filled sequences 71-79 contiguously.
+
+R3.6a - TDS core tax engine (no investment declarations yet - that's
+R3.6b; old regime here is annual Gross minus standard deduction only):
+
+* New models bpro.tds.regime.config (regime new/old, fy_start_year,
+  standard_deduction, 87A rebate threshold/amount, cess_rate) and
+  bpro.tds.slab.line (bounds + rate) - tax slabs change nearly every
+  Union Budget, more volatile than PF/ESI/PT/LWF, so next year's Budget
+  is a data change here, not a code change. Seeded FY2026-27 (1 Apr 2026
+  - 31 Mar 2027) for both regimes, researched 2026-08-11: New Regime -
+  0-4L nil/4-8L 5%/8-12L 10%/12-16L 15%/16-20L 20%/20-24L 25%/24L+ 30%,
+  std deduction 75000, 87A rebate up to 60000 if income <= 12L. Old
+  Regime - 0-2.5L nil/2.5-5L 5%/5-10L 20%/10L+ 30%, std deduction 50000,
+  87A rebate up to 12500 if income <= 5L. Both: 4% cess. Neither
+  implements marginal relief near the rebate cliff or surcharge for very
+  high incomes (>50L/1Cr) - known gaps, flag if relevant to the client.
+  Old regime slabs shown are for individuals below 60; senior/super-
+  senior relaxed thresholds aren't modelled (no age category yet).
+* Adds tds_regime to hr.contract (new/old, default new) - optional per
+  employee, either is valid; doesn't enforce the once-per-FY change
+  restriction real tax law imposes.
+* Single TDS rule (category TDS, parented to DED, reduces Net). Method:
+  projected annual Gross = actual confirmed-payslip GROSS so far this FY
+  (payslips.sum) + this month's GROSS x remaining months (incl. this
+  one); subtract standard deduction for taxable income; run through the
+  regime's progressive slabs; apply the 87A rebate if under threshold;
+  add cess for annual TDS; subtract TDS already withheld this FY; spread
+  across remaining months. Recomputes fresh every payslip, so a mid-year
+  raise or bonus naturally reweights what's left to withhold - this is
+  the standard method real payroll systems use. Same env.flush_all()
+  defensiveness as R3.4's PT rule, same reason (payslips.sum() needs
+  prior months confirmed and doesn't see unflushed ORM writes).
 """,
-    "version": "18.0.1.4.0",
+    "version": "18.0.1.5.0",
     "category": "Human Resources",
     "author": "Team bpro",
     "website": "https://bpropms.com",
@@ -146,10 +178,14 @@ R3.5 - Labour Welfare Fund (multi-state):
         "data/bpro_lwf_config_data.xml",
         "data/hr_salary_rule_category_data_lwf.xml",
         "data/hr_payroll_structure_data_lwf.xml",
+        "data/bpro_tds_config_data.xml",
+        "data/hr_salary_rule_category_data_tds.xml",
+        "data/hr_payroll_structure_data_tds.xml",
         "views/hr_contract_views.xml",
         "views/res_company_views.xml",
         "views/bpro_pt_config_views.xml",
         "views/bpro_lwf_config_views.xml",
+        "views/bpro_tds_config_views.xml",
     ],
     "installable": True,
     "application": False,

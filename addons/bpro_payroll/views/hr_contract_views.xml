@@ -15,6 +15,7 @@
                 <field name="esi_applicable"/>
                 <field name="pt_state_id"/>
                 <field name="lwf_state_id"/>
+                <field name="tds_regime"/>
             </field>
         </field>
     </record>

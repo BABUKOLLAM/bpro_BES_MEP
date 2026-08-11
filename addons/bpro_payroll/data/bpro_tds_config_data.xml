@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo noupdate="1">
+    <!--
+        FY2026-27 (1 Apr 2026 - 31 Mar 2027) slabs, researched 2026-08-11.
+        Budget 2025 slabs carried forward unchanged into FY2026-27 per
+        multiple 2026 sources. Verify against the actual Union Budget/
+        Finance Act before go-live and again every year - this is the
+        single most volatile rate set in the whole payroll build, more
+        so than PF/ESI/PT/LWF, which change far less often.
+
+        Neither regime here implements: marginal relief for income just
+        above the 87A rebate threshold, or surcharge for very high
+        incomes (>50L/1Cr+). Both are known gaps, not oversights - flag
+        if the client has anyone near the rebate cliff or in a high
+        income bracket.
+    -->
+
+    <record id="tds_config_new_fy2026" model="bpro.tds.regime.config">
+        <field name="name">New Regime FY2026-27</field>
+        <field name="regime">new</field>
+        <field name="fy_start_year">2026</field>
+        <field name="standard_deduction">75000</field>
+        <field name="rebate_income_threshold">1200000</field>
+        <field name="rebate_max_amount">60000</field>
+        <field name="cess_rate">4.0</field>
+        <field name="note">Slabs unchanged from Budget 2025 into FY2026-27
+            per multiple 2026 sources. Default regime under current law
+            if the employee makes no declaration.
+        </field>
+    </record>
+    <record id="tds_slab_new_1" model="bpro.tds.slab.line">
+        <field name="config_id" ref="tds_config_new_fy2026"/>
+        <field name="lower_bound">0</field>
+        <field name="upper_bound">400000</field>
+        <field name="rate">0</field>
+    </record>
+    <record id="tds_slab_new_2" model="bpro.tds.slab.line">
+        <field name="config_id" ref="tds_config_new_fy2026"/>
+        <field name="lower_bound">400000</field>
+        <field name="upper_bound">800000</field>
+        <field name="rate">5</field>
+    </record>
+    <record id="tds_slab_new_3" model="bpro.tds.slab.line">
+        <field name="config_id" ref="tds_config_new_fy2026"/>
+        <field name="lower_bound">800000</field>
+        <field name="upper_bound">1200000</field>
+        <field name="rate">10</field>
+    </record>
+    <record id="tds_slab_new_4" model="bpro.tds.slab.line">
+        <field name="config_id" ref="tds_config_new_fy2026"/>
+        <field name="lower_bound">1200000</field>
+        <field name="upper_bound">1600000</field>
+        <field name="rate">15</field>
+    </record>
+    <record id="tds_slab_new_5" model="bpro.tds.slab.line">
+        <field name="config_id" ref="tds_config_new_fy2026"/>
+        <field name="lower_bound">1600000</field>
+        <field name="upper_bound">2000000</field>
+        <field name="rate">20</field>
+    </record>
+    <record id="tds_slab_new_6" model="bpro.tds.slab.line">
+        <field name="config_id" ref="tds_config_new_fy2026"/>
+        <field name="lower_bound">2000000</field>
+        <field name="upper_bound">2400000</field>
+        <field name="rate">25</field>
+    </record>
+    <record id="tds_slab_new_7" model="bpro.tds.slab.line">
+        <field name="config_id" ref="tds_config_new_fy2026"/>
+        <field name="lower_bound">2400000</field>
+        <field name="upper_bound">0</field>
+        <field name="rate">30</field>
+    </record>
+
+    <record id="tds_config_old_fy2026" model="bpro.tds.regime.config">
+        <field name="name">Old Regime FY2026-27</field>
+        <field name="regime">old</field>
+        <field name="fy_start_year">2026</field>
+        <field name="standard_deduction">50000</field>
+        <field name="rebate_income_threshold">500000</field>
+        <field name="rebate_max_amount">12500</field>
+        <field name="cess_rate">4.0</field>
+        <field name="note">Slabs shown are for individuals below 60.
+            Senior (60-79) and super-senior (80+) citizens get relaxed
+            thresholds (Rs.3L and Rs.5L Nil bands respectively) - not
+            modelled here since this build doesn't have a date-of-birth-
+            driven age category yet. HRA exemption, 80C, 80D and other
+            declared deductions are NOT applied here - that's R3.6b.
+            Taxable income in R3.6a is just annual Gross minus this
+            standard deduction.
+        </field>
+    </record>
+    <record id="tds_slab_old_1" model="bpro.tds.slab.line">
+        <field name="config_id" ref="tds_config_old_fy2026"/>
+        <field name="lower_bound">0</field>
+        <field name="upper_bound">250000</field>
+        <field name="rate">0</field>
+    </record>
+    <record id="tds_slab_old_2" model="bpro.tds.slab.line">
+        <field name="config_id" ref="tds_config_old_fy2026"/>
+        <field name="lower_bound">250000</field>
+        <field name="upper_bound">500000</field>
+        <field name="rate">5</field>
+    </record>
+    <record id="tds_slab_old_3" model="bpro.tds.slab.line">
+        <field name="config_id" ref="tds_config_old_fy2026"/>
+        <field name="lower_bound">500000</field>
+        <field name="upper_bound">1000000</field>
+        <field name="rate">20</field>
+    </record>
+    <record id="tds_slab_old_4" model="bpro.tds.slab.line">
+        <field name="config_id" ref="tds_config_old_fy2026"/>
+        <field name="lower_bound">1000000</field>
+        <field name="upper_bound">0</field>
+        <field name="rate">30</field>
+    </record>
+
+</odoo>

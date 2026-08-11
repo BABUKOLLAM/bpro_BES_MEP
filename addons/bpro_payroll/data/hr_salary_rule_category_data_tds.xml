@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo noupdate="1">
+    <record id="salary_rule_category_tds" model="hr.salary.rule.category">
+        <field name="name">TDS (Income Tax)</field>
+        <field name="code">TDS</field>
+        <field name="parent_id" ref="salary_rule_category_ded"/>
+    </record>
+</odoo>

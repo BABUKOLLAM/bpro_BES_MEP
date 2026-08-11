@@ -72,3 +72,11 @@ class HrContract(models.Model):
         "type/board, not a single flat state rate); add a bpro.lwf.config "
         "for it once that's confirmed, no code change needed.",
     )
+    tds_regime = fields.Selection(
+        [("new", "New Regime"), ("old", "Old Regime")],
+        default="new",
+        help="Employee's declared regime for TDS purposes - optional per "
+        "employee, either is valid. Under actual tax law this can only be "
+        "changed once at the start of each financial year; this field "
+        "doesn't enforce that, review it at each FY start.",
+    )
