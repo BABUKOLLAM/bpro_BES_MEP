@@ -1,5 +1,6 @@
 import base64
 from datetime import date
+from unittest import mock
 
 from odoo.exceptions import UserError
 
@@ -82,6 +83,30 @@ class TestXlsxExport(FinanceTestCommon):
         wizard.action_export_xlsx()
         raw = base64.b64decode(wizard.xlsx_file)
         self.assertEqual(raw[:4], b"PK\x03\x04")
+
+    def test_export_rejects_a_column_not_in_the_report_s_allowed_fields(self):
+        wizard = self._generated_trial_balance()
+        rogue = self.env["bpro.report.column"].create(
+            {
+                "report_model": "bpro.trial.balance.wizard",
+                "technical_name": "create_uid",  # real field, but not whitelisted
+                "name": "Not Allowed",
+            }
+        )
+        wizard.xlsx_column_ids = [(6, 0, rogue.ids)]
+        with self.assertRaises(UserError):
+            wizard.action_export_xlsx()
+
+    def test_export_rejects_a_field_that_does_not_exist_on_the_line_model(self):
+        wizard = self._generated_trial_balance()
+        column = self.env["bpro.report.column"].search(
+            [("report_model", "=", "bpro.trial.balance.wizard"), ("technical_name", "=", "account_id")]
+        )
+        wizard.xlsx_column_ids = [(6, 0, column.ids)]
+        Wizard = type(wizard)
+        with mock.patch.object(Wizard, "_xlsx_export_fields", ["account_id", "not_a_real_field"]):
+            with self.assertRaises(UserError):
+                wizard.action_export_xlsx()
 
     def test_balance_sheet_export(self):
         wizard = self.env["bpro.balance.sheet.wizard"].create({"date_to": date(2026, 4, 30)})

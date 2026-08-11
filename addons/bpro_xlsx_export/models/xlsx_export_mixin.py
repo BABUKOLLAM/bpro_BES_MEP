@@ -39,6 +39,36 @@ class BproXlsxExportMixin(models.AbstractModel):
         columns = self.xlsx_column_ids or self._default_xlsx_column_ids()
         if not columns:
             raise UserError(_("No columns available to export."))
+        unauthorized = columns.filtered(
+            lambda c: c.technical_name not in self._xlsx_export_fields
+        )
+        if unauthorized:
+            # bpro.report.column has no write access for any user group, so
+            # this can only happen from a data-file typo or a future addon
+            # loosening that ACL - fail loudly rather than silently reading
+            # (and exporting) a field nobody whitelisted for this report.
+            raise UserError(_(
+                "Column(s) %(bad)s are not in %(model)s's allowed export "
+                "fields (%(allowed)s)."
+            ) % {
+                "bad": ", ".join(unauthorized.mapped("technical_name")),
+                "model": self._name,
+                "allowed": ", ".join(self._xlsx_export_fields),
+            })
+        line_fields = self.env[self._xlsx_line_model]._fields
+        unknown = [f for f in self._xlsx_export_fields if f not in line_fields]
+        if unknown:
+            # _xlsx_export_fields itself is wrong (a typo on the wizard
+            # class, not the data file) - fail with a clear message
+            # instead of a bare KeyError once we reach the row loop.
+            raise UserError(_(
+                "%(model)s._xlsx_export_fields lists field(s) %(bad)s, which "
+                "don't exist on %(line_model)s."
+            ) % {
+                "model": self._name,
+                "bad": ", ".join(unknown),
+                "line_model": self._xlsx_line_model,
+            })
 
         output = io.BytesIO()
         workbook = xlsxwriter.Workbook(output, {"in_memory": True})
