@@ -130,12 +130,20 @@
     </record>
 
     <!-- ================= KERALA (half-yearly) ================= -->
-    <!-- Kerala Panchayat slabs (the most commonly cited default table).
-         Kerala PT is administered by Local Self Government Institutions
-         and genuinely varies by body - Municipalities and Corporations
-         (e.g. Cochin Corporation) use different, more granular tables.
-         This Panchayat table is a starting point, NOT necessarily what
-         applies to the client - confirm the actual LSGI before go-live.
+    <!-- Kerala Panchayat slabs, cross-checked 2026-08-12 against greythr
+         and indiafilings (both agree exactly, including the 45,000-59,999
+         band previously flagged as ambiguous - it's continuous at 450, no
+         gap, confirmed by indiafilings' full table). Confirmed as the
+         correct table for ME Polymers specifically: their registered
+         address (KAUZARIYYA Compound, Edathala, Aluva, PIN 683561) is
+         within Edathala Grama Panchayat, Ernakulam district - a rural
+         local body, not a Municipality/Corporation, so the Panchayat
+         table applies with certainty for this client. For any OTHER
+         client, Kerala PT is still administered by whichever Local Self
+         Government Institution that client's registered office falls
+         under - Municipalities and Corporations (e.g. Cochin Corporation)
+         use different, more granular tables - so confirm their specific
+         LSGI before assuming this Panchayat table applies to them too.
          Charged August (Apr-Sep, due by 31 Aug) and February (Oct-Mar,
          due by end Feb) - charge month here is set to the due-date month
          as the simplest assumption; real practice may deduct earlier. -->
@@ -145,7 +153,8 @@
         <field name="periodicity">half_yearly</field>
         <field name="charge_month_h1">8</field>
         <field name="charge_month_h2">2</field>
-        <field name="note">Panchayat slab used as the default - Kerala
+        <field name="note">Panchayat slab, verified correct for ME Polymers
+            (Edathala Grama Panchayat, Aluva). Kerala
             Municipalities and Corporations (e.g. Cochin Corporation) use
             different, more granular slab tables. Confirm the client's
             actual local self-government institution before go-live; this

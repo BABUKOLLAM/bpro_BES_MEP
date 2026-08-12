@@ -7,17 +7,52 @@
         no income slabs - one unbounded slab line per state. Verify against
         the current state notification before go-live.
 
-        Kerala is deliberately NOT seeded here. Sources conflict: it has no
-        single straightforward general LWF Act the way KA/TN/AP do - there's
-        a 1975 Act plus a separate Shops & Commercial Establishments
-        Workers Welfare Fund Board (2007), plus sector-specific boards
-        (construction, headload workers). Which one (if any) covers the
-        client depends on their actual Kerala establishment type. Add a
-        bpro.lwf.config for Kerala via Settings > HR > Configuration >
-        "Labour Welfare Fund States" once that's confirmed - this data file
-        is the only place state coverage is defined, so adding it there is
-        the complete fix, no code change needed anywhere.
+        Kerala seeded 2026-08-12, cross-checked against two independent
+        sources (greythr, factohr) that agree exactly: the Kerala Labour
+        Welfare Fund Act, 1975 (factories, plantations, and other
+        establishments not covered by the separate 2006 Shops Act) charges
+        Rs.45 employee + Rs.45 employer, half-yearly, contributed 30 June
+        and 31 December, returns filed 15 July and 15 January. This is the
+        1975 Act table, NOT the Kerala Shops and Commercial Establishments
+        Workers Welfare Fund Act 2006 (which is Rs.50/Rs.50 monthly and
+        covers shops/commercial establishments, not factories) - confirmed
+        against ME Polymers' own registration as a manufacturer at Edathala
+        Grama Panchayat, Aluva, so the 1975 Act is the correct table for
+        this client specifically. Still verify against the current LWF
+        Board notification before go-live for any other client, since the
+        rate can change and a different client's establishment type may
+        fall under the 2006 Act instead - add or edit a bpro.lwf.config via
+        Settings > HR > Configuration > "Labour Welfare Fund States" (no
+        code change needed) if so.
     -->
+
+    <record id="lwf_config_kerala" model="bpro.lwf.config">
+        <field name="name">Kerala</field>
+        <field name="state_id" ref="base.state_in_kl"/>
+        <field name="periodicity">half_yearly</field>
+        <field name="charge_month_h1">6</field>
+        <field name="charge_month_h2">12</field>
+        <field name="note">Kerala Labour Welfare Fund Act, 1975 (factories/
+            plantations/other establishments) - Rs.45 employee + Rs.45
+            employer, contributed 30 June and 31 December, filed 15 July
+            and 15 January. Applies to any establishment with 1+ employee.
+            NOT the same as the Kerala Shops and Commercial Establishments
+            Workers Welfare Fund Act 2006 (Rs.50/Rs.50 monthly) - if this
+            client is a shop/commercial establishment rather than a
+            factory, this config is the wrong one; add a separate
+            half_yearly-vs-monthly config for that Act instead. Sourced
+            2026-08-12 from greythr and factohr (cross-checked, both agree
+            exactly) - verify against the current LWF Board notification
+            before go-live.
+        </field>
+    </record>
+    <record id="lwf_slab_kl_1" model="bpro.lwf.slab.line">
+        <field name="config_id" ref="lwf_config_kerala"/>
+        <field name="lower_bound">0</field>
+        <field name="upper_bound">0</field>
+        <field name="employee_amount">45</field>
+        <field name="employer_amount">45</field>
+    </record>
 
     <record id="lwf_config_karnataka" model="bpro.lwf.config">
         <field name="name">Karnataka</field>
