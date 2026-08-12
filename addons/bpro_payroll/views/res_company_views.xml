@@ -32,6 +32,11 @@
                         </group>
                     </group>
                 </page>
+                <page string="Payroll — TDS" name="bpro_payroll_tds">
+                    <group>
+                        <field name="tan"/>
+                    </group>
+                </page>
             </notebook>
         </field>
     </record>

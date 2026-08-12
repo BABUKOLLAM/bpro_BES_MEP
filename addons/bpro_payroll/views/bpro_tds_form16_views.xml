@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+
+    <record id="bpro_tds_form16_view_form" model="ir.ui.view">
+        <field name="name">bpro.tds.form16.form</field>
+        <field name="model">bpro.tds.form16</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_generate" string="Generate / Refresh" type="object" class="oe_highlight"/>
+                    <button name="%(action_report_form16)d" string="Print" type="action"
+                            invisible="not generated_date"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="contract_id"/>
+                            <field name="employee_id"/>
+                            <field name="fy_start_year"/>
+                            <field name="regime" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="generated_date" readonly="1"/>
+                        </group>
+                    </group>
+                    <group string="Computed Breakdown" invisible="not generated_date">
+                        <group>
+                            <field name="gross_salary" readonly="1"/>
+                            <field name="hra_exemption" readonly="1"/>
+                            <field name="standard_deduction" readonly="1"/>
+                            <field name="deduction_80c" readonly="1"/>
+                            <field name="deduction_80d" readonly="1"/>
+                            <field name="taxable_income" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="tax_before_rebate" readonly="1"/>
+                            <field name="rebate_87a" readonly="1"/>
+                            <field name="cess" readonly="1"/>
+                            <field name="total_tax_payable" readonly="1"/>
+                            <field name="tds_deducted" readonly="1"/>
+                            <field name="balance_payable" readonly="1"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="bpro_tds_form16_view_list" model="ir.ui.view">
+        <field name="name">bpro.tds.form16.list</field>
+        <field name="model">bpro.tds.form16</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="employee_id"/>
+                <field name="fy_start_year"/>
+                <field name="regime"/>
+                <field name="total_tax_payable"/>
+                <field name="tds_deducted"/>
+                <field name="balance_payable"/>
+                <field name="generated_date"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_bpro_tds_form16" model="ir.actions.act_window">
+        <field name="name">Form 16</field>
+        <field name="res_model">bpro.tds.form16</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Generate a Form 16 for a contract's financial year
+            </p>
+            <p>
+                Pick the contract and financial year, then use
+                Generate/Refresh - it aggregates actual confirmed-payslip
+                figures for that FY, not a projection.
+            </p>
+        </field>
+    </record>
+
+    <menuitem id="menu_bpro_tds_form16" name="Form 16"
+              parent="hr.menu_human_resources_configuration"
+              action="action_bpro_tds_form16"/>
+
+</odoo>

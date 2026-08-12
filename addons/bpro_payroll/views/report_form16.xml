@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <template id="report_form16_document">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <h2>Form 16 — Part B (Computed Salary/Tax Breakdown)</h2>
+                        <p>
+                            <strong>This is not the government-filed TDS certificate.</strong>
+                            Form 16 Part A requires the employer's TAN and filing through
+                            the TRACES portal — that is a separate compliance step outside
+                            this document. This page shows the computation only.
+                        </p>
+
+                        <table class="table table-sm table-bordered">
+                            <tr>
+                                <td><strong>Employer</strong></td>
+                                <td><span t-field="o.company_id.name"/></td>
+                                <td><strong>TAN</strong></td>
+                                <td><span t-field="o.company_id.tan"/></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Employee</strong></td>
+                                <td><span t-field="o.employee_id.name"/></td>
+                                <td><strong>PAN</strong></td>
+                                <td><span t-field="o.employee_id.pan"/></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Financial Year</strong></td>
+                                <td>
+                                    <span t-esc="o.fy_start_year"/>-<span t-esc="o.fy_start_year + 1"/>
+                                </td>
+                                <td><strong>Regime</strong></td>
+                                <td><span t-field="o.regime"/></td>
+                            </tr>
+                        </table>
+
+                        <table class="table table-sm">
+                            <tbody>
+                                <tr>
+                                    <td>Gross Salary Paid</td>
+                                    <td class="text-right">
+                                        <span t-esc="o.gross_salary" t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Less: HRA Exemption (Sec 10)</td>
+                                    <td class="text-right">
+                                        <span t-esc="o.hra_exemption" t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Less: Standard Deduction</td>
+                                    <td class="text-right">
+                                        <span t-esc="o.standard_deduction" t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Less: Section 80C (capped Rs.1,50,000)</td>
+                                    <td class="text-right">
+                                        <span t-esc="o.deduction_80c" t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Less: Section 80D (capped Rs.25,000)</td>
+                                    <td class="text-right">
+                                        <span t-esc="o.deduction_80d" t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'/>
+                                    </td>
+                                </tr>
+                                <tr class="border-top">
+                                    <td><strong>Taxable Income</strong></td>
+                                    <td class="text-right">
+                                        <strong><span t-esc="o.taxable_income" t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'/></strong>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Tax on Taxable Income</td>
+                                    <td class="text-right">
+                                        <span t-esc="o.tax_before_rebate" t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Less: Rebate u/s 87A</td>
+                                    <td class="text-right">
+                                        <span t-esc="o.rebate_87a" t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Add: Health &amp; Education Cess</td>
+                                    <td class="text-right">
+                                        <span t-esc="o.cess" t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'/>
+                                    </td>
+                                </tr>
+                                <tr class="border-top">
+                                    <td><strong>Total Tax Payable (Annual)</strong></td>
+                                    <td class="text-right">
+                                        <strong><span t-esc="o.total_tax_payable" t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'/></strong>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Less: TDS Already Deducted</td>
+                                    <td class="text-right">
+                                        <span t-esc="o.tds_deducted" t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'/>
+                                    </td>
+                                </tr>
+                                <tr class="border-top">
+                                    <td>
+                                        <strong>
+                                            <span t-if="o.balance_payable &gt;= 0">Balance Payable</span>
+                                            <span t-if="o.balance_payable &lt; 0">Refund Due (via ITR)</span>
+                                        </strong>
+                                    </td>
+                                    <td class="text-right">
+                                        <strong><span t-esc="abs(o.balance_payable)" t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'/></strong>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <p class="text-muted">
+                            Generated <span t-field="o.generated_date"/>. Does not include
+                            Professional Tax deduction under Section 16(iii) — omitted here
+                            to stay consistent with the monthly TDS engine, which also does
+                            not apply it.
+                        </p>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <record id="action_report_form16" model="ir.actions.report">
+        <field name="name">Form 16 Part B</field>
+        <field name="model">bpro.tds.form16</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">bpro_payroll.report_form16_document</field>
+        <field name="report_file">bpro_payroll.report_form16_document</field>
+        <field name="binding_model_id" ref="model_bpro_tds_form16"/>
+        <field name="binding_type">report</field>
+    </record>
+</odoo>

@@ -2,6 +2,8 @@ from . import bpro_lwf_config
 from . import bpro_pt_config
 from . import bpro_tds_config
 from . import bpro_tds_declaration
+from . import bpro_tds_form16
 from . import hr_contract
+from . import hr_employee
 from . import hr_payslip
 from . import res_company

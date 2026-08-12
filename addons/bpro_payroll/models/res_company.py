@@ -65,3 +65,11 @@ class ResCompany(models.Model):
     )
     esi_employee_rate = fields.Float(string="Employee ESI Rate (%)", default=0.75)
     esi_employer_rate = fields.Float(string="Employer ESI Rate (%)", default=3.25)
+
+    tan = fields.Char(
+        string="TAN",
+        help="Tax Deduction and Collection Account Number - shown on Form "
+        "16. Required for actually filing TDS returns with the "
+        "government (TRACES portal), which is outside this build's "
+        "scope; this field only supports printing it on the document.",
+    )

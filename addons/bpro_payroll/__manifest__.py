@@ -1,10 +1,9 @@
 {
     "name": "bpro Payroll — India Salary Structure Foundation",
-    "summary": "Flexible-benefit CTC salary structure + PF + ESI + Professional Tax + LWF + TDS (with declarations) on top of the OCA payroll engine (BES HR & Payroll module, R3.1-3.6b)",
+    "summary": "Flexible-benefit CTC salary structure + PF + ESI + Professional Tax + LWF + TDS + Form 16 on top of the OCA payroll engine (BES HR & Payroll module, R3.1-3.6c — full payroll build)",
     "description": """
-India payroll build-out on the OCA payroll engine. R3.6c (Form 16) is a
-separate follow-up release on top of R3.6a/b's tax engine, not bundled
-here.
+India payroll build-out on the OCA payroll engine. This release (R3.6c)
+completes the payroll track scoped 2026-08-11.
 
 R3.1 - salary structure foundation:
 
@@ -171,8 +170,30 @@ disallows HRA exemption, 80C and 80D under current law):
   New Regime contracts and contracts with no approved declaration are
   completely unaffected - taxable income still comes out exactly as
   R3.6a computed it.
+
+R3.6c - Form 16 Part B:
+
+* Adds pan to hr.employee and tan to res.company - identifiers a real
+  Form 16 displays, even though this build doesn't file anything with
+  the government.
+* New model bpro.tds.form16 (per contract per FY): an "Generate/Refresh"
+  action aggregates ACTUAL confirmed-payslip figures for the full
+  financial year (not the monthly rule's projection - at year-end the
+  real numbers exist) - Gross paid, HRA exemption, standard deduction,
+  80C/80D from an approved declaration if one exists, taxable income,
+  progressive tax, 87A rebate, cess, total annual liability, actual TDS
+  withheld, and the balance payable or refund-due. Deliberately does NOT
+  deduct Professional Tax under Section 16(iii) - matches the R3.6a/b
+  monthly TDS engine's own omission, kept consistent on purpose rather
+  than introducing a document that disagrees with what was actually
+  withheld during the year.
+* QWeb PDF report (Print button once generated). Explicitly labelled on
+  the document itself: this is Part B, the computation, not Part A - the
+  actual government-filed TDS certificate, which needs the employer's
+  TAN and TRACES portal filing and is out of scope for any payroll
+  software, this one included.
 """,
-    "version": "18.0.1.6.0",
+    "version": "18.0.1.7.0",
     "category": "Human Resources",
     "author": "Team bpro",
     "website": "https://bpropms.com",
@@ -203,11 +224,14 @@ disallows HRA exemption, 80C and 80D under current law):
         "data/hr_salary_rule_category_data_tds.xml",
         "data/hr_payroll_structure_data_tds.xml",
         "views/hr_contract_views.xml",
+        "views/hr_employee_views.xml",
         "views/res_company_views.xml",
         "views/bpro_pt_config_views.xml",
         "views/bpro_lwf_config_views.xml",
         "views/bpro_tds_config_views.xml",
         "views/bpro_tds_declaration_views.xml",
+        "views/report_form16.xml",
+        "views/bpro_tds_form16_views.xml",
     ],
     "installable": True,
     "application": False,
