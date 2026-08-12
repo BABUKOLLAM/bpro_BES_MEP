@@ -26,4 +26,88 @@
         <field name="groups" eval="[(4, ref('bpro_base.group_super_admin'))]"/>
         <field name="domain_force">[(1, '=', 1)]</field>
     </record>
+
+    <!-- R4.6: read-only HOD visibility into their own department's
+         recruitment pipeline and onboarding - "shareable to HoD and
+         management for review" per the original requirement. Same
+         department_id.manager_id.user_id domain shape as the vacancy
+         request rule above, just reached via each model's own path to
+         a department.
+
+         IMPORTANT: bpro_base.group_client_hr implies group_hod, so any
+         HR user (or hr_recruitment group member who also happens to
+         hold group_hod) would otherwise get silently narrowed to their
+         own department by these rules too - ir.rule ORs together only
+         the rule rows that exist for groups a user belongs to, so a
+         group with zero rows on a model contributes no counterbalancing
+         "unrestricted" clause on its own. Every group that already has
+         full/company-wide access to these four models (per
+         ir.model.access.csv, none of which had any ir.rule before R4.6)
+         gets an explicit unrestricted rule below so the OR cancels the
+         HOD restriction out for them, exactly as
+         rule_vacancy_request_hr_own_company already does above for
+         bpro.vacancy.request. -->
+
+    <record id="rule_interview_evaluation_hod_own_department" model="ir.rule">
+        <field name="name">bpro Interview Evaluation: HOD Own Department</field>
+        <field name="model_id" ref="model_bpro_interview_evaluation"/>
+        <field name="groups" eval="[(4, ref('bpro_base.group_hod'))]"/>
+        <field name="domain_force">[('applicant_id.department_id.manager_id.user_id', '=', user.id)]</field>
+    </record>
+
+    <record id="rule_interview_evaluation_interviewer_all" model="ir.rule">
+        <field name="name">bpro Interview Evaluation: Interviewer Unrestricted</field>
+        <field name="model_id" ref="model_bpro_interview_evaluation"/>
+        <field name="groups" eval="[(4, ref('hr_recruitment.group_hr_recruitment_interviewer'))]"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+    </record>
+
+    <record id="rule_interview_evaluation_hr_recruitment_all" model="ir.rule">
+        <field name="name">bpro Interview Evaluation: Recruitment User/Manager Unrestricted</field>
+        <field name="model_id" ref="model_bpro_interview_evaluation"/>
+        <field name="groups" eval="[(4, ref('hr_recruitment.group_hr_recruitment_user')), (4, ref('hr_recruitment.group_hr_recruitment_manager'))]"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+    </record>
+
+    <record id="rule_job_offer_hod_own_department" model="ir.rule">
+        <field name="name">bpro Job Offer: HOD Own Department</field>
+        <field name="model_id" ref="model_bpro_job_offer"/>
+        <field name="groups" eval="[(4, ref('bpro_base.group_hod'))]"/>
+        <field name="domain_force">[('applicant_id.department_id.manager_id.user_id', '=', user.id)]</field>
+    </record>
+
+    <record id="rule_job_offer_hr_recruitment_all" model="ir.rule">
+        <field name="name">bpro Job Offer: Recruitment User/Manager Unrestricted</field>
+        <field name="model_id" ref="model_bpro_job_offer"/>
+        <field name="groups" eval="[(4, ref('hr_recruitment.group_hr_recruitment_user')), (4, ref('hr_recruitment.group_hr_recruitment_manager'))]"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+    </record>
+
+    <record id="rule_joining_report_hod_own_department" model="ir.rule">
+        <field name="name">bpro Joining Report: HOD Own Department</field>
+        <field name="model_id" ref="model_bpro_joining_report"/>
+        <field name="groups" eval="[(4, ref('bpro_base.group_hod'))]"/>
+        <field name="domain_force">[('employee_id.department_id.manager_id.user_id', '=', user.id)]</field>
+    </record>
+
+    <record id="rule_joining_report_hr_all" model="ir.rule">
+        <field name="name">bpro Joining Report: HR Unrestricted</field>
+        <field name="model_id" ref="model_bpro_joining_report"/>
+        <field name="groups" eval="[(4, ref('bpro_base.group_client_hr'))]"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+    </record>
+
+    <record id="rule_employee_asset_hod_own_department" model="ir.rule">
+        <field name="name">bpro Employee Asset: HOD Own Department</field>
+        <field name="model_id" ref="model_bpro_employee_asset"/>
+        <field name="groups" eval="[(4, ref('bpro_base.group_hod'))]"/>
+        <field name="domain_force">[('employee_id.department_id.manager_id.user_id', '=', user.id)]</field>
+    </record>
+
+    <record id="rule_employee_asset_hr_all" model="ir.rule">
+        <field name="name">bpro Employee Asset: HR Unrestricted</field>
+        <field name="model_id" ref="model_bpro_employee_asset"/>
+        <field name="groups" eval="[(4, ref('bpro_base.group_client_hr'))]"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+    </record>
 </odoo>
