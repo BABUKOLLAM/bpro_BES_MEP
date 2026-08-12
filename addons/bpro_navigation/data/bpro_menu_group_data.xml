@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo noupdate="1">
+    <record id="menu_group_sales" model="bpro.menu.group">
+        <field name="name">Sales</field>
+        <field name="sequence">10</field>
+    </record>
+    <record id="menu_group_production" model="bpro.menu.group">
+        <field name="name">Production</field>
+        <field name="sequence">20</field>
+    </record>
+    <record id="menu_group_accounts" model="bpro.menu.group">
+        <field name="name">Accounts</field>
+        <field name="sequence">30</field>
+    </record>
+    <record id="menu_group_hr" model="bpro.menu.group">
+        <field name="name">HR</field>
+        <field name="sequence">40</field>
+    </record>
+    <record id="menu_group_general" model="bpro.menu.group">
+        <field name="name">General</field>
+        <field name="sequence">50</field>
+        <field name="is_fallback">True</field>
+    </record>
+</odoo>

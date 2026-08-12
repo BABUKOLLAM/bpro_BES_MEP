@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_bpro_menu_group_all,bpro.menu.group.all,model_bpro_menu_group,base.group_user,1,0,0,0
+access_bpro_menu_group_settings,bpro.menu.group.settings,model_bpro_menu_group,base.group_system,1,1,1,1

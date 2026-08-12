@@ -1,0 +1,19 @@
+// The apps-menu dropdown content renders through Odoo's overlay/portal
+// system (o-overlay-container, appended near <body>), NOT as a descendant
+// of .o_navbar_apps_menu - so this selector can't be scoped to that
+// ancestor the way it naturally would be for in-place content.
+.bpro_app_group_header {
+    padding: 0.5rem 1rem 0.25rem;
+    margin-top: 0.25rem;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #6b7a72;
+    border-top: 1px solid rgba(0, 0, 0, 0.08);
+
+    &:first-child {
+        margin-top: 0;
+        border-top: none;
+    }
+}

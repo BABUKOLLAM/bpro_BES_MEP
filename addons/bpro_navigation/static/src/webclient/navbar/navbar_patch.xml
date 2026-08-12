@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-inherit="web.NavBar.AppsMenu" t-inherit-mode="extension" owl="1">
+        <xpath expr="//t[@t-set-slot='content']/DropdownItem" position="replace">
+            <t t-foreach="getGroupedApps(apps)" t-as="bproGroup" t-key="bproGroup.id">
+                <div class="bpro_app_group_header" t-if="bproGroup.name" t-esc="bproGroup.name"/>
+                <DropdownItem
+                    t-foreach="bproGroup.apps"
+                    t-as="app"
+                    t-key="app.id"
+                    class="{ 'o_app': true, focus: menuService.getCurrentApp() === app }"
+                    onSelected="() => this.onNavBarDropdownItemSelection(app)"
+                    t-esc="app.name"
+                    attrs="{ href: getMenuItemHref(app), 'data-menu-xmlid': app.xmlid, 'data-section': app.id }"
+                />
+            </t>
+        </xpath>
+    </t>
+</templates>

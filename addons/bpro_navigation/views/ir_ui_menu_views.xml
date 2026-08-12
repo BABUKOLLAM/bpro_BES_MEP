@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="view_menu_form_bpro_group" model="ir.ui.view">
+        <field name="name">ir.ui.menu.form.bpro.group</field>
+        <field name="model">ir.ui.menu</field>
+        <field name="inherit_id" ref="base.edit_menu_access"/>
+        <field name="arch" type="xml">
+            <field name="sequence" position="after">
+                <field name="bpro_group_id"/>
+            </field>
+        </field>
+    </record>
+</odoo>
