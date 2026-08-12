@@ -2,3 +2,6 @@ id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_bpro_vacancy_request_hod,bpro.vacancy.request hod,model_bpro_vacancy_request,bpro_base.group_hod,1,1,1,0
 access_bpro_vacancy_request_hr,bpro.vacancy.request hr,model_bpro_vacancy_request,bpro_base.group_client_hr,1,1,1,1
 access_bpro_vacancy_request_reject_wizard,bpro.vacancy.request.reject.wizard,model_bpro_vacancy_request_reject_wizard,bpro_base.group_client_hr,1,1,1,1
+access_bpro_interview_evaluation_interviewer,bpro.interview.evaluation interviewer,model_bpro_interview_evaluation,hr_recruitment.group_hr_recruitment_interviewer,1,1,1,0
+access_bpro_interview_evaluation_user,bpro.interview.evaluation user,model_bpro_interview_evaluation,hr_recruitment.group_hr_recruitment_user,1,1,1,0
+access_bpro_interview_evaluation_manager,bpro.interview.evaluation manager,model_bpro_interview_evaluation,hr_recruitment.group_hr_recruitment_manager,1,1,1,1
