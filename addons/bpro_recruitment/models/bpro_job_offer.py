@@ -46,6 +46,16 @@ class BproJobOffer(models.Model):
     declined_date = fields.Datetime(readonly=True, copy=False)
     declined_reason = fields.Text(readonly=True, copy=False)
 
+    employee_id = fields.Many2one(
+        "hr.employee", readonly=True, copy=False,
+        help="Set by Finalize Hiring - the 'final approval of the HR "
+        "Dept' the requirement describes. Presence of this field is the "
+        "finalization marker; there's no separate state value for it "
+        "since accept/decline is the candidate's decision and this is a "
+        "distinct, later HR-side action.",
+    )
+    finalized_date = fields.Datetime(readonly=True, copy=False)
+
     def _compute_access_url(self):
         super()._compute_access_url()
         for rec in self:
@@ -105,3 +115,35 @@ class BproJobOffer(models.Model):
             "declined_date": fields.Datetime.now(),
             "declined_reason": reason,
         })
+
+    def action_finalize_hiring(self):
+        """The 'unique employee code + Appointment Order on final HR
+        approval' requirement. Reuses native hr_recruitment's own
+        applicant-to-employee conversion rather than duplicating it -
+        this only adds the employee_code assignment and the link back
+        from the offer.
+        """
+        for rec in self:
+            if rec.state != "accepted":
+                raise UserError(
+                    "Only an accepted offer can be finalized into hiring."
+                )
+            if rec.employee_id:
+                raise UserError(
+                    f"This offer was already finalized on "
+                    f"{rec.finalized_date} - {rec.employee_id.name} "
+                    f"({rec.employee_id.employee_code})."
+                )
+            # sudo(): create_employee_from_applicant() is native
+            # hr_recruitment logic gated by its own manager group; the
+            # real permission gate for THIS action is
+            # group_hr_recruitment_manager on the button/ir.model.access,
+            # same scoped-sudo() pattern as R4.1/R4.2.
+            action = rec.applicant_id.sudo().create_employee_from_applicant()
+            employee = rec.env["hr.employee"].browse(action["res_id"])
+            code = rec.env["ir.sequence"].sudo().next_by_code("bpro.employee.code")
+            employee.sudo().write({"employee_code": code})
+            rec.write({
+                "employee_id": employee.id,
+                "finalized_date": fields.Datetime.now(),
+            })

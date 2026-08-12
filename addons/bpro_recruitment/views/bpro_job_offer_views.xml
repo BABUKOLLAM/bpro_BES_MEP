@@ -9,7 +9,13 @@
                 <header>
                     <button name="action_send" string="Send Offer" type="object"
                             invisible="state != 'draft'" class="oe_highlight"/>
+                    <button name="action_finalize_hiring" string="Finalize Hiring" type="object"
+                            invisible="state != 'accepted' or employee_id" class="oe_highlight"
+                            groups="hr_recruitment.group_hr_recruitment_manager"
+                            confirm="This creates the employee record and assigns a permanent employee code - it cannot be undone. Continue?"/>
                     <button name="%(action_report_job_offer)d" string="Print Offer Letter" type="action"/>
+                    <button name="%(action_report_appointment_order)d" string="Print Appointment Order" type="action"
+                            invisible="not employee_id"/>
                     <field name="state" widget="statusbar"
                            statusbar_visible="draft,sent,accepted"/>
                 </header>
@@ -26,6 +32,12 @@
                             <field name="accepted_date" readonly="1" invisible="not accepted_date"/>
                             <field name="declined_date" readonly="1" invisible="not declined_date"/>
                             <field name="declined_reason" readonly="1" invisible="not declined_reason"/>
+                        </group>
+                    </group>
+                    <group string="Hiring Finalization" invisible="not employee_id">
+                        <group>
+                            <field name="employee_id" readonly="1"/>
+                            <field name="finalized_date" readonly="1"/>
                         </group>
                     </group>
                     <group string="Candidate-Submitted Details" invisible="state in ('draft', 'sent')">
@@ -57,6 +69,7 @@
                 <field name="proposed_ctc"/>
                 <field name="joining_date"/>
                 <field name="state"/>
+                <field name="employee_id"/>
             </list>
         </field>
     </record>

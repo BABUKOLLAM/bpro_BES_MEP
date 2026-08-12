@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <!-- Not company-scoped: this platform gives each client its own
+         separate Odoo database (see bpro-lms-pms's own README, "Each
+         client organisation gets its own Odoo database"), so a single
+         global sequence per database is correct - no cross-client
+         collision risk to guard against here. -->
+    <record id="seq_bpro_employee_code" model="ir.sequence">
+        <field name="name">Employee Code</field>
+        <field name="code">bpro.employee.code</field>
+        <field name="prefix">EMP</field>
+        <field name="padding">5</field>
+        <field name="number_next">1</field>
+        <field name="number_increment">1</field>
+    </record>
+</odoo>

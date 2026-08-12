@@ -1,6 +1,6 @@
 {
     "name": "bpro Recruitment — Vacancy Requests & Hiring Workflow",
-    "summary": "HOD vacancy requisition + interview evaluation + offer/acceptance portal on top of native Recruitment (BES HR module, R4.1-4.3)",
+    "summary": "HOD vacancy requisition + interview evaluation + offer/acceptance portal + hiring finalization on top of native Recruitment (BES HR module, R4.1-4.4)",
     "description": """
 Recruitment build-out for the India client, layered on top of native
 Odoo Recruitment rather than replacing it: job posting, the public
@@ -58,11 +58,30 @@ R4.3 - offer letter + candidate acceptance portal:
 * Offer letter PDF report, following the bpro.tds.form16 QWeb pattern
   from the payroll build.
 
-Later releases (not in this one): employee code + Appointment Order
-generation (R4.4), joining/onboarding SLA (R4.5), HOD/management
-reporting (R4.6).
+R4.4 - hiring finalization:
+
+* Adds employee_code to hr.employee (unique, auto-assigned, never
+  reused) via a new ir.sequence 'bpro.employee.code' (EMP00001 style).
+  Not company-scoped - each bpro-lms-pms client gets its own database
+  (per that repo's own README), so there's no cross-client collision to
+  guard against with company scoping.
+* bpro.job.offer's "Finalize Hiring" action (accepted state only, once
+  per offer - re-finalizing raises with the existing employee's name and
+  code) reuses native hr_recruitment's own
+  applicant_id.create_employee_from_applicant() to create the hr.employee
+  rather than duplicating that logic, then assigns the employee_code and
+  links employee_id back onto the offer. Gated to
+  hr_recruitment.group_hr_recruitment_manager - the "final approval of
+  the HR Dept" the requirement describes - with a confirmation prompt
+  since it's irreversible.
+* Appointment Order PDF report (employee code, name, designation,
+  department, joining date, CTC), same QWeb pattern as the offer letter
+  and bpro.tds.form16 from payroll.
+
+Later releases (not in this one): joining/onboarding SLA (R4.5),
+HOD/management reporting (R4.6).
 """,
-    "version": "18.0.1.2.0",
+    "version": "18.0.1.3.0",
     "category": "Human Resources",
     "author": "Team bpro",
     "website": "https://bpropms.com",
@@ -77,9 +96,11 @@ reporting (R4.6).
     "data": [
         "security/ir.model.access.csv",
         "security/bpro_recruitment_security.xml",
+        "data/bpro_employee_code_sequence.xml",
         "views/bpro_vacancy_request_views.xml",
         "views/bpro_interview_evaluation_views.xml",
         "views/report_job_offer.xml",
+        "views/report_appointment_order.xml",
         "views/bpro_job_offer_views.xml",
         "views/portal_offer_templates.xml",
     ],

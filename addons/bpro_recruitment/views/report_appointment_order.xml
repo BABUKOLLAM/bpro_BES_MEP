@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <template id="report_appointment_order_document">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <h2>Appointment Order</h2>
+                        <p>
+                            Date: <span t-field="o.finalized_date"/>
+                        </p>
+                        <table class="table table-sm table-bordered">
+                            <tr>
+                                <td><strong>Employee Code</strong></td>
+                                <td><span t-field="o.employee_id.employee_code"/></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Name</strong></td>
+                                <td><span t-field="o.employee_id.name"/></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Designation</strong></td>
+                                <td><span t-field="o.proposed_designation"/></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Department</strong></td>
+                                <td><span t-field="o.employee_id.department_id.name"/></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Date of Joining</strong></td>
+                                <td><span t-field="o.joining_date"/></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Annual CTC</strong></td>
+                                <td>
+                                    <span t-esc="o.proposed_ctc" t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'/>
+                                </td>
+                            </tr>
+                        </table>
+                        <p>
+                            This is to confirm your appointment with
+                            <span t-field="o.company_id.name"/> as per the
+                            details above and the terms of the offer letter
+                            issued to you, effective from your date of
+                            joining.
+                        </p>
+                        <p class="mt-5">
+                            <strong>For <span t-field="o.company_id.name"/></strong>
+                        </p>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <record id="action_report_appointment_order" model="ir.actions.report">
+        <field name="name">Appointment Order</field>
+        <field name="model">bpro.job.offer</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">bpro_recruitment.report_appointment_order_document</field>
+        <field name="report_file">bpro_recruitment.report_appointment_order_document</field>
+        <field name="binding_model_id" ref="model_bpro_job_offer"/>
+        <field name="binding_type">report</field>
+    </record>
+</odoo>

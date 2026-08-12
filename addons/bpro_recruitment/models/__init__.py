@@ -1,4 +1,5 @@
 from . import hr_applicant
+from . import hr_employee
 from . import bpro_interview_evaluation
 from . import bpro_job_offer
 from . import bpro_vacancy_request
