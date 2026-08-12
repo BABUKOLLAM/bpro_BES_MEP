@@ -1,11 +1,11 @@
 {
     "name": "bpro Executive Dashboard",
-    "summary": "One-glance cross-module KPI dashboard tying together all 10 BES modules",
+    "summary": "One-glance cross-module KPI dashboard tying together all 11 BES modules",
     "description": """
 A capstone reporting layer, not a new operational module - pulls one
-primary KPI from each of the 10 BES modules already built into a single
-screen, reusing each module's own existing computation rather than
-duplicating logic (the Finance section calls straight into
+primary KPI from each BES module already built into a single screen,
+reusing each module's own existing computation rather than duplicating
+logic (the Finance section calls straight into
 bpro.finance.dashboard's own _get_kpi_data).
 
 Blends two kinds of signal deliberately:
@@ -15,8 +15,9 @@ Blends two kinds of signal deliberately:
 * "Stock" metrics read as of right now, for modules where a live backlog
   count or balance is the more meaningful signal (Inventory pending
   adjustments, HR pending expense approvals, Project pending budget
-  approvals, Plant asset book value) or where cumulative-to-date avoids
-  fragile date-boundary handling (Quality pass rate, Fleet trip cost).
+  approvals, Plant asset book value, Recruitment open vacancies/overdue
+  joining reports) or where cumulative-to-date avoids fragile date-
+  boundary handling (Quality pass rate, Fleet trip cost).
 
 Weekly MIS section: reproduces the client's own hand-maintained weekly
 production/sales meeting report from live data instead of a spreadsheet
@@ -25,8 +26,17 @@ production qty and sales value, item-wise production achieved/target/
 balance (against bpro.item.target), item-wise weekly sales achieved/
 target, and area-wise sales load counts (against bpro.sales.area, from
 bpro_sales).
+
+Recruitment (R4.6): pulls two management-facing signals from
+bpro_recruitment - open vacancies still short of their target headcount
+(approved bpro.vacancy.request whose linked hr.job isn't fully hired)
+and overdue joining reports (pending bpro.joining.report past their SLA
+deadline) - the "shareable to management for review" half of the
+original requirement; the HOD-facing half is department-scoped
+read-only access on bpro_recruitment's own models, not a dashboard
+concern.
 """,
-    "version": "18.0.1.0.0",
+    "version": "18.0.1.1.0",
     "category": "Reporting",
     "author": "Team bpro",
     "website": "https://bpropms.com",
@@ -43,6 +53,7 @@ bpro_sales).
         "bpro_plant",
         "bpro_project",
         "bpro_fleet",
+        "bpro_recruitment",
     ],
     "data": [
         "security/ir.model.access.csv",

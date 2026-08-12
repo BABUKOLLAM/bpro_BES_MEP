@@ -27,6 +27,8 @@ class TestExecutiveDashboard(TransactionCase):
         self.assertEqual(data["plant_total_asset_book_value"], 0.0)
         self.assertEqual(data["project_pending_budget_approvals"], 0)
         self.assertEqual(data["fleet_trip_cost"], 0.0)
+        self.assertEqual(data["recruitment_open_vacancies"], 0)
+        self.assertEqual(data["recruitment_overdue_joining_reports"], 0)
 
     def test_sales_mtd_revenue(self):
         partner = self.env["res.partner"].create({"name": "Dashboard Test Customer"})
@@ -386,3 +388,69 @@ class TestExecutiveDashboard(TransactionCase):
         picking.button_validate()
         self.assertEqual(batch.state, "done")
         self.assertEqual(self._kpi()["fleet_trip_cost"], 750.0)
+
+    def test_recruitment_open_vacancies(self):
+        department = self.env["hr.department"].create(
+            {"name": "Dashboard Test Department", "company_id": self.company.id}
+        )
+        request = self.env["bpro.vacancy.request"].create(
+            {
+                "company_id": self.company.id,
+                "department_id": department.id,
+                "job_title": "Dashboard Test Role",
+                "positions_count": 2,
+                "justification": "backfill",
+            }
+        )
+        request.action_submit()
+        request.action_approve()
+        self.assertEqual(self._kpi()["recruitment_open_vacancies"], 1)
+
+        # Fill one of the two requested positions - still short of
+        # headcount, so the vacancy stays open.
+        candidate = self.env["hr.candidate"].create({"partner_name": "Dashboard Hire 1"})
+        applicant = self.env["hr.applicant"].create(
+            {"candidate_id": candidate.id, "job_id": request.job_id.id}
+        )
+        applicant.date_closed = fields.Datetime.now()
+        request.job_id.invalidate_recordset(["no_of_hired_employee"])
+        self.assertEqual(self._kpi()["recruitment_open_vacancies"], 1)
+
+        # Fill the second position - headcount now met, vacancy closes.
+        candidate_2 = self.env["hr.candidate"].create({"partner_name": "Dashboard Hire 2"})
+        applicant_2 = self.env["hr.applicant"].create(
+            {"candidate_id": candidate_2.id, "job_id": request.job_id.id}
+        )
+        applicant_2.date_closed = fields.Datetime.now()
+        request.job_id.invalidate_recordset(["no_of_hired_employee"])
+        self.assertEqual(self._kpi()["recruitment_open_vacancies"], 0)
+
+    def test_recruitment_overdue_joining_reports(self):
+        employee = self.env["hr.employee"].create(
+            {"name": "Dashboard Joining Employee", "company_id": self.company.id}
+        )
+        today = fields.Date.context_today(self.env.user)
+
+        overdue = self.env["bpro.joining.report"].create(
+            {
+                "employee_id": employee.id,
+                "expected_joining_date": today - timedelta(days=30),
+            }
+        )
+        self.assertLess(overdue.sla_deadline, today)
+        self.assertEqual(self._kpi()["recruitment_overdue_joining_reports"], 1)
+
+        # A future-dated joiner isn't overdue yet.
+        self.env["bpro.joining.report"].create(
+            {
+                "employee_id": employee.id,
+                "expected_joining_date": today + timedelta(days=5),
+            }
+        )
+        self.assertEqual(self._kpi()["recruitment_overdue_joining_reports"], 1)
+
+        # Submitting the overdue one clears it from the backlog even
+        # though its deadline has already passed.
+        overdue.write({"actual_joining_date": today})
+        overdue.action_submit()
+        self.assertEqual(self._kpi()["recruitment_overdue_joining_reports"], 0)

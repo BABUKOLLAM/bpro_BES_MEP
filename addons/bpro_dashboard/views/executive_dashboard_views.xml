@@ -118,6 +118,22 @@
                         </span>
                         <span class="bpro_kpi_sublabel">Total Trip Cost</span>
                     </div>
+
+                    <div class="bpro_kpi_card bpro_kpi_green">
+                        <span class="bpro_kpi_label">Recruitment</span>
+                        <span class="bpro_kpi_value">
+                            <field name="recruitment_open_vacancies" nolabel="1"/>
+                        </span>
+                        <span class="bpro_kpi_sublabel">Open Vacancies</span>
+                    </div>
+
+                    <div class="bpro_kpi_card bpro_kpi_blue">
+                        <span class="bpro_kpi_label">Recruitment</span>
+                        <span class="bpro_kpi_value">
+                            <field name="recruitment_overdue_joining_reports" nolabel="1"/>
+                        </span>
+                        <span class="bpro_kpi_sublabel">Overdue Joining Reports</span>
+                    </div>
                 </div>
 
                 <h2 class="mt-4">Weekly MIS</h2>

@@ -25,6 +25,8 @@ class BproExecutiveDashboard(models.TransientModel):
     plant_total_asset_book_value = fields.Monetary(compute="_compute_kpis")
     project_pending_budget_approvals = fields.Integer(compute="_compute_kpis")
     fleet_trip_cost = fields.Monetary(compute="_compute_kpis")
+    recruitment_open_vacancies = fields.Integer(compute="_compute_kpis")
+    recruitment_overdue_joining_reports = fields.Integer(compute="_compute_kpis")
 
     # Weekly MIS: reproduces the "2026 ME Weekly Meet Report" ritual
     # (production/sales trend, item-wise achievement, area-wise sales)
@@ -187,6 +189,28 @@ class BproExecutiveDashboard(models.TransientModel):
             ]
         )
         data["fleet_trip_cost"] = sum(batches.mapped("bpro_trip_cost"))
+
+        approved_requests = self.env["bpro.vacancy.request"].search(
+            [("company_id", "=", company.id), ("state", "=", "approved")]
+        )
+        # "Open" = the linked hr.job still hasn't hired up to the
+        # requested headcount - a request stays open until the vacancy
+        # it created is actually filled, not merely approved.
+        data["recruitment_open_vacancies"] = len(
+            approved_requests.filtered(
+                lambda r: r.job_id.no_of_hired_employee < r.job_id.no_of_recruitment
+            )
+        )
+
+        data["recruitment_overdue_joining_reports"] = self.env[
+            "bpro.joining.report"
+        ].search_count(
+            [
+                ("employee_id.company_id", "=", company.id),
+                ("state", "=", "pending"),
+                ("sla_deadline", "<", as_of_date),
+            ]
+        )
 
         return data
 
