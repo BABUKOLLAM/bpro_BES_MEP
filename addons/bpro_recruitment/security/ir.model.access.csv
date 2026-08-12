@@ -5,3 +5,5 @@ access_bpro_vacancy_request_reject_wizard,bpro.vacancy.request.reject.wizard,mod
 access_bpro_interview_evaluation_interviewer,bpro.interview.evaluation interviewer,model_bpro_interview_evaluation,hr_recruitment.group_hr_recruitment_interviewer,1,1,1,0
 access_bpro_interview_evaluation_user,bpro.interview.evaluation user,model_bpro_interview_evaluation,hr_recruitment.group_hr_recruitment_user,1,1,1,0
 access_bpro_interview_evaluation_manager,bpro.interview.evaluation manager,model_bpro_interview_evaluation,hr_recruitment.group_hr_recruitment_manager,1,1,1,1
+access_bpro_job_offer_user,bpro.job.offer user,model_bpro_job_offer,hr_recruitment.group_hr_recruitment_user,1,1,1,0
+access_bpro_job_offer_manager,bpro.job.offer manager,model_bpro_job_offer,hr_recruitment.group_hr_recruitment_manager,1,1,1,1

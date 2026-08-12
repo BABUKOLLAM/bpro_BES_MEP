@@ -1,6 +1,6 @@
 {
     "name": "bpro Recruitment — Vacancy Requests & Hiring Workflow",
-    "summary": "HOD vacancy requisition + interview evaluation on top of native Recruitment (BES HR module, R4.1-4.2)",
+    "summary": "HOD vacancy requisition + interview evaluation + offer/acceptance portal on top of native Recruitment (BES HR module, R4.1-4.3)",
     "description": """
 Recruitment build-out for the India client, layered on top of native
 Odoo Recruitment rather than replacing it: job posting, the public
@@ -39,11 +39,30 @@ R4.2 - interview evaluation:
   interviewer themselves, not a HOD who may not be on the panel. Closes
   the "intimated to interview panel/HOD or concerned" requirement.
 
-Later releases (not in this one): offer letter + candidate acceptance
-portal (R4.3), employee code + Appointment Order generation (R4.4),
-joining/onboarding SLA (R4.5), HOD/management reporting (R4.6).
+R4.3 - offer letter + candidate acceptance portal:
+
+* New model bpro.job.offer (inherits portal.mixin for the standard
+  access_token pattern Odoo itself uses for share links - not a custom
+  auth scheme): proposed designation/CTC/joining date, plus fields the
+  CANDIDATE fills in themselves (address, DOB, PAN, Aadhar, emergency
+  contact, bank details) - draft -> sent -> accepted/declined workflow.
+* "Send Offer" emails the candidate a tokenised link
+  (/bpro/offer/<id>?access_token=...). WhatsApp was explicitly deferred
+  in the 2026-08-12 scoping decision pending the client's WhatsApp
+  Business API credentials - this is the one place a WhatsApp send would
+  plug in alongside the email, not a rebuild, once that account exists.
+* Public portal page (auth="public", the token IS the authentication):
+  shows the offer summary, an editable form for the candidate's details,
+  and Accept/Decline buttons - no login required, matching how the
+  public job-application page itself works.
+* Offer letter PDF report, following the bpro.tds.form16 QWeb pattern
+  from the payroll build.
+
+Later releases (not in this one): employee code + Appointment Order
+generation (R4.4), joining/onboarding SLA (R4.5), HOD/management
+reporting (R4.6).
 """,
-    "version": "18.0.1.1.0",
+    "version": "18.0.1.2.0",
     "category": "Human Resources",
     "author": "Team bpro",
     "website": "https://bpropms.com",
@@ -53,12 +72,16 @@ joining/onboarding SLA (R4.5), HOD/management reporting (R4.6).
         "bpro_hr",
         "hr_recruitment",
         "website_hr_recruitment",
+        "portal",
     ],
     "data": [
         "security/ir.model.access.csv",
         "security/bpro_recruitment_security.xml",
         "views/bpro_vacancy_request_views.xml",
         "views/bpro_interview_evaluation_views.xml",
+        "views/report_job_offer.xml",
+        "views/bpro_job_offer_views.xml",
+        "views/portal_offer_templates.xml",
     ],
     "installable": True,
     "application": False,

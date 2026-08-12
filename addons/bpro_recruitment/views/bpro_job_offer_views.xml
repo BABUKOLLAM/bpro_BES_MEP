@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+
+    <record id="bpro_job_offer_view_form" model="ir.ui.view">
+        <field name="name">bpro.job.offer.form</field>
+        <field name="model">bpro.job.offer</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_send" string="Send Offer" type="object"
+                            invisible="state != 'draft'" class="oe_highlight"/>
+                    <button name="%(action_report_job_offer)d" string="Print Offer Letter" type="action"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,sent,accepted"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="applicant_id"/>
+                            <field name="proposed_designation"/>
+                            <field name="proposed_ctc"/>
+                            <field name="joining_date"/>
+                            <field name="offer_date"/>
+                        </group>
+                        <group>
+                            <field name="accepted_date" readonly="1" invisible="not accepted_date"/>
+                            <field name="declined_date" readonly="1" invisible="not declined_date"/>
+                            <field name="declined_reason" readonly="1" invisible="not declined_reason"/>
+                        </group>
+                    </group>
+                    <group string="Candidate-Submitted Details" invisible="state in ('draft', 'sent')">
+                        <group>
+                            <field name="candidate_address" readonly="1"/>
+                            <field name="candidate_dob" readonly="1"/>
+                            <field name="candidate_pan" readonly="1"/>
+                            <field name="candidate_aadhar" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="candidate_emergency_contact_name" readonly="1"/>
+                            <field name="candidate_emergency_contact_phone" readonly="1"/>
+                            <field name="candidate_bank_account_number" readonly="1"/>
+                            <field name="candidate_bank_ifsc" readonly="1"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="bpro_job_offer_view_list" model="ir.ui.view">
+        <field name="name">bpro.job.offer.list</field>
+        <field name="model">bpro.job.offer</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="applicant_id"/>
+                <field name="proposed_designation"/>
+                <field name="proposed_ctc"/>
+                <field name="joining_date"/>
+                <field name="state"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_bpro_job_offer" model="ir.actions.act_window">
+        <field name="name">Job Offers</field>
+        <field name="res_model">bpro.job.offer</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <menuitem id="menu_bpro_job_offer" name="Job Offers"
+              parent="hr_recruitment.menu_hr_recruitment_root"
+              action="action_bpro_job_offer" sequence="2"/>
+
+</odoo>

@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <template id="portal_offer_page" name="Job Offer Portal">
+        <t t-call="website.layout">
+            <div id="wrap" class="container my-5">
+                <div class="row justify-content-center">
+                    <div class="col-lg-7">
+
+                        <t t-if="offer.state == 'accepted'">
+                            <div class="alert alert-success">
+                                <h3>Offer Accepted</h3>
+                                <p>Thank you - your acceptance was recorded on
+                                   <span t-field="offer.accepted_date"/>. Our HR team
+                                   will be in touch with next steps.</p>
+                            </div>
+                        </t>
+
+                        <t t-elif="offer.state == 'declined'">
+                            <div class="alert alert-secondary">
+                                <h3>Offer Declined</h3>
+                                <p>You declined this offer on
+                                   <span t-field="offer.declined_date"/>. If this was a
+                                   mistake, please contact HR directly.</p>
+                            </div>
+                        </t>
+
+                        <t t-else="">
+                            <h2>Offer of Employment</h2>
+                            <table class="table table-borderless mb-4">
+                                <tr>
+                                    <td><strong>Position</strong></td>
+                                    <td><span t-field="offer.proposed_designation"/></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Proposed CTC (Annual)</strong></td>
+                                    <td><span t-esc="offer.proposed_ctc" t-options='{"widget": "monetary", "display_currency": offer.company_id.currency_id}'/></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Joining Date</strong></td>
+                                    <td><span t-field="offer.joining_date"/></td>
+                                </tr>
+                            </table>
+
+                            <p>Please complete your details below, then Accept or
+                               Decline this offer.</p>
+
+                            <form t-attf-action="/bpro/offer/#{offer.id}/submit" method="post" class="mt-3">
+                                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                <input type="hidden" name="access_token" t-att-value="access_token"/>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Address</label>
+                                    <textarea name="candidate_address" class="form-control" rows="2"><t t-esc="offer.candidate_address"/></textarea>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Date of Birth</label>
+                                        <input type="date" name="candidate_dob" class="form-control" t-att-value="offer.candidate_dob"/>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">PAN</label>
+                                        <input type="text" name="candidate_pan" class="form-control" t-att-value="offer.candidate_pan"/>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Aadhar Number</label>
+                                    <input type="text" name="candidate_aadhar" class="form-control" t-att-value="offer.candidate_aadhar"/>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Emergency Contact Name</label>
+                                        <input type="text" name="candidate_emergency_contact_name" class="form-control" t-att-value="offer.candidate_emergency_contact_name"/>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Emergency Contact Phone</label>
+                                        <input type="text" name="candidate_emergency_contact_phone" class="form-control" t-att-value="offer.candidate_emergency_contact_phone"/>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Bank Account Number</label>
+                                        <input type="text" name="candidate_bank_account_number" class="form-control" t-att-value="offer.candidate_bank_account_number"/>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Bank IFSC</label>
+                                        <input type="text" name="candidate_bank_ifsc" class="form-control" t-att-value="offer.candidate_bank_ifsc"/>
+                                    </div>
+                                </div>
+                                <div class="mb-4">
+                                    <label class="form-label">Reason (only needed if declining)</label>
+                                    <textarea name="declined_reason" class="form-control" rows="2"/>
+                                </div>
+
+                                <button type="submit" name="decision" value="accept" class="btn btn-success me-2">Accept Offer</button>
+                                <button type="submit" name="decision" value="decline" class="btn btn-outline-danger me-2">Decline Offer</button>
+                                <button type="submit" name="decision" value="save" class="btn btn-outline-secondary">Save Details Only</button>
+                            </form>
+                        </t>
+
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+</odoo>
