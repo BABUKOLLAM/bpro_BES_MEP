@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+
+    <!-- Reject wizard - defined first, since the main form's Reject
+         button references its action via %(xmlid)d, which must already
+         exist in the DB by the time that record is parsed. -->
+    <record id="bpro_vacancy_request_reject_wizard_view_form" model="ir.ui.view">
+        <field name="name">bpro.vacancy.request.reject.wizard.form</field>
+        <field name="model">bpro.vacancy.request.reject.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="request_id" invisible="1"/>
+                    <field name="reason" nolabel="1" placeholder="Reason for rejection..."/>
+                </group>
+                <footer>
+                    <button name="action_confirm_reject" string="Confirm Reject" type="object" class="btn-primary"/>
+                    <button string="Cancel" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_bpro_vacancy_request_reject_wizard" model="ir.actions.act_window">
+        <field name="name">Reject Vacancy Request</field>
+        <field name="res_model">bpro.vacancy.request.reject.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="context">{'default_request_id': active_id}</field>
+    </record>
+
+    <record id="bpro_vacancy_request_view_form" model="ir.ui.view">
+        <field name="name">bpro.vacancy.request.form</field>
+        <field name="model">bpro.vacancy.request</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_submit" string="Submit" type="object"
+                            invisible="state != 'draft'" class="oe_highlight"/>
+                    <button name="action_approve" string="Approve" type="object"
+                            invisible="state != 'submitted'" class="oe_highlight"
+                            groups="bpro_base.group_client_hr"/>
+                    <button name="%(action_bpro_vacancy_request_reject_wizard)d" string="Reject" type="action"
+                            invisible="state != 'submitted'"
+                            groups="bpro_base.group_client_hr"/>
+                    <button name="action_reset_draft" string="Reset to Draft" type="object"
+                            invisible="state != 'rejected'"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,submitted,approved"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="job_title"/>
+                            <field name="department_id"/>
+                            <field name="positions_count"/>
+                            <field name="employment_type"/>
+                            <field name="target_joining_date"/>
+                        </group>
+                        <group>
+                            <field name="requested_by"/>
+                            <field name="job_id" readonly="1" invisible="not job_id"/>
+                            <field name="approved_by" readonly="1" invisible="not approved_by"/>
+                            <field name="approved_date" readonly="1" invisible="not approved_date"/>
+                        </group>
+                    </group>
+                    <group string="Justification">
+                        <field name="justification" nolabel="1"/>
+                    </group>
+                    <group string="Rejection Reason" invisible="not rejection_reason">
+                        <field name="rejection_reason" nolabel="1" readonly="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="bpro_vacancy_request_view_list" model="ir.ui.view">
+        <field name="name">bpro.vacancy.request.list</field>
+        <field name="model">bpro.vacancy.request</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="job_title"/>
+                <field name="department_id"/>
+                <field name="positions_count"/>
+                <field name="requested_by"/>
+                <field name="target_joining_date"/>
+                <field name="state"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_bpro_vacancy_request" model="ir.actions.act_window">
+        <field name="name">Vacancy Requests</field>
+        <field name="res_model">bpro.vacancy.request</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Request a new position for your department
+            </p>
+        </field>
+    </record>
+
+    <menuitem id="menu_bpro_vacancy_request_root" name="Vacancy Requests"
+              parent="hr_recruitment.menu_hr_recruitment_root"
+              action="action_bpro_vacancy_request" sequence="1"/>
+
+</odoo>
