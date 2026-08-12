@@ -78,10 +78,27 @@ R4.4 - hiring finalization:
   department, joining date, CTC), same QWeb pattern as the offer letter
   and bpro.tds.form16 from payroll.
 
-Later releases (not in this one): joining/onboarding SLA (R4.5),
-HOD/management reporting (R4.6).
+R4.5 - joining & onboarding:
+
+* Adds joining_report_sla to res.company (2/7/15/30 days, management's
+  choice per the requirement's "stipulated time say 2 days, a week, 15
+  days or One month as per the discretion of the management/HR depts").
+* New model bpro.joining.report, auto-created by Finalize Hiring: tracks
+  the expected joining date, the SLA deadline computed from it (fixed at
+  creation - a later policy change doesn't retroactively make existing
+  joiners overdue), and the candidate's actual joining-report submission.
+  is_overdue flags anything past deadline still pending.
+* New model bpro.employee.asset for IT-equipment issue/return tracking
+  (laptop, mobile, accessory) - deliberately separate from bpro_plant's
+  company fixed-asset register, a different accounting concern entirely.
+* Depends on bpro_lms: create_employee_from_applicant() already triggers
+  bpro_lms's own hr.employee.create() override, which auto-enrolls the
+  new hire into every course tagged for Induction - no separate
+  induction step needed here, just the dependency to guarantee ordering.
+
+Later releases (not in this one): HOD/management reporting (R4.6).
 """,
-    "version": "18.0.1.3.0",
+    "version": "18.0.1.4.0",
     "category": "Human Resources",
     "author": "Team bpro",
     "website": "https://bpropms.com",
@@ -89,6 +106,7 @@ HOD/management reporting (R4.6).
     "depends": [
         "bpro_base",
         "bpro_hr",
+        "bpro_lms",
         "hr_recruitment",
         "website_hr_recruitment",
         "portal",
@@ -103,6 +121,9 @@ HOD/management reporting (R4.6).
         "views/report_appointment_order.xml",
         "views/bpro_job_offer_views.xml",
         "views/portal_offer_templates.xml",
+        "views/bpro_joining_report_views.xml",
+        "views/bpro_employee_asset_views.xml",
+        "views/res_company_views.xml",
     ],
     "installable": True,
     "application": False,

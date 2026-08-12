@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+
+    <record id="bpro_joining_report_view_form" model="ir.ui.view">
+        <field name="name">bpro.joining.report.form</field>
+        <field name="model">bpro.joining.report</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_submit" string="Submit Joining Report" type="object"
+                            invisible="state != 'pending'" class="oe_highlight"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="pending,submitted"/>
+                </header>
+                <sheet>
+                    <widget name="web_ribbon" title="Overdue" bg_color="text-bg-danger"
+                            invisible="not is_overdue"/>
+                    <group>
+                        <group>
+                            <field name="employee_id"/>
+                            <field name="offer_id"/>
+                            <field name="expected_joining_date"/>
+                            <field name="sla_deadline" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="is_overdue" readonly="1"/>
+                            <field name="actual_joining_date"/>
+                            <field name="submitted_date" readonly="1" invisible="not submitted_date"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="note"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="bpro_joining_report_view_list" model="ir.ui.view">
+        <field name="name">bpro.joining.report.list</field>
+        <field name="model">bpro.joining.report</field>
+        <field name="arch" type="xml">
+            <list decoration-danger="is_overdue">
+                <field name="employee_id"/>
+                <field name="expected_joining_date"/>
+                <field name="sla_deadline"/>
+                <field name="state"/>
+                <field name="is_overdue"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="bpro_joining_report_view_search" model="ir.ui.view">
+        <field name="name">bpro.joining.report.search</field>
+        <field name="model">bpro.joining.report</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="employee_id"/>
+                <filter name="pending" string="Pending" domain="[('state', '=', 'pending')]"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_by_state" string="Status" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_bpro_joining_report" model="ir.actions.act_window">
+        <field name="name">Joining Reports</field>
+        <field name="res_model">bpro.joining.report</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'search_default_pending': 1}</field>
+    </record>
+
+    <menuitem id="menu_bpro_joining_report" name="Joining Reports"
+              parent="hr_recruitment.menu_hr_recruitment_root"
+              action="action_bpro_joining_report" sequence="3"/>
+
+</odoo>

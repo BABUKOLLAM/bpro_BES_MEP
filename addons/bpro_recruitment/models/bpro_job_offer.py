@@ -147,3 +147,13 @@ class BproJobOffer(models.Model):
                 "employee_id": employee.id,
                 "finalized_date": fields.Datetime.now(),
             })
+            # Auto-create the joining-report tracker (R4.5) - HR
+            # shouldn't have to remember to do this as a separate step.
+            # bpro_lms's own hr.employee.create() override (already
+            # fired above, via create_employee_from_applicant) handles
+            # induction auto-enrollment - nothing to do for that here.
+            rec.env["bpro.joining.report"].sudo().create({
+                "employee_id": employee.id,
+                "offer_id": rec.id,
+                "expected_joining_date": rec.joining_date or fields.Date.context_today(rec),
+            })

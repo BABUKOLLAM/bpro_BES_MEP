@@ -7,3 +7,6 @@ access_bpro_interview_evaluation_user,bpro.interview.evaluation user,model_bpro_
 access_bpro_interview_evaluation_manager,bpro.interview.evaluation manager,model_bpro_interview_evaluation,hr_recruitment.group_hr_recruitment_manager,1,1,1,1
 access_bpro_job_offer_user,bpro.job.offer user,model_bpro_job_offer,hr_recruitment.group_hr_recruitment_user,1,1,1,0
 access_bpro_job_offer_manager,bpro.job.offer manager,model_bpro_job_offer,hr_recruitment.group_hr_recruitment_manager,1,1,1,1
+access_bpro_joining_report_hr,bpro.joining.report hr,model_bpro_joining_report,bpro_base.group_client_hr,1,1,1,0
+access_bpro_joining_report_hod,bpro.joining.report hod,model_bpro_joining_report,bpro_base.group_hod,1,0,0,0
+access_bpro_employee_asset_hr,bpro.employee.asset hr,model_bpro_employee_asset,bpro_base.group_client_hr,1,1,1,1
