@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <template id="report_confirmation_letter_document">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <h2>Letter of Confirmation</h2>
+                        <p>Date: <span t-esc="o.confirmation_date or ''"/></p>
+                        <p>
+                            Dear <span t-field="o.name"/>
+                            (<span t-field="o.employee_code"/>),
+                        </p>
+                        <p>
+                            We are pleased to confirm your services with
+                            <span t-field="o.company_id.name"/> as
+                            <span t-field="o.job_id.name"/> in the
+                            <span t-field="o.department_id.name"/> department,
+                            effective <span t-esc="o.confirmation_date or ''"/>,
+                            upon successful completion of your probation period.
+                        </p>
+                        <p>
+                            All other terms of your appointment remain unchanged.
+                            We look forward to your continued contribution.
+                        </p>
+                        <p class="mt-5">
+                            <strong>For <span t-field="o.company_id.name"/></strong>
+                        </p>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <record id="action_report_confirmation_letter" model="ir.actions.report">
+        <field name="name">Confirmation Letter</field>
+        <field name="model">hr.employee</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">bpro_probation.report_confirmation_letter_document</field>
+        <field name="report_file">bpro_probation.report_confirmation_letter_document</field>
+        <field name="binding_model_id" ref="hr.model_hr_employee"/>
+        <field name="binding_type">report</field>
+    </record>
+</odoo>

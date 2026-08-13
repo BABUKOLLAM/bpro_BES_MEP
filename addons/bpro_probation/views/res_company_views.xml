@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+
+    <record id="res_company_view_form_bpro_probation" model="ir.ui.view">
+        <field name="name">res.company.form.bpro.probation</field>
+        <field name="model">res.company</field>
+        <field name="inherit_id" ref="base.view_company_form"/>
+        <field name="arch" type="xml">
+            <notebook position="inside">
+                <page string="HR — Probation Policy" name="bpro_probation_policy">
+                    <group>
+                        <field name="probation_months"/>
+                    </group>
+                </page>
+            </notebook>
+        </field>
+    </record>
+
+</odoo>

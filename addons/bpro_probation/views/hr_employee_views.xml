@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+
+    <record id="hr_employee_view_form_bpro_probation" model="ir.ui.view">
+        <field name="name">hr.employee.form.bpro.probation</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_form"/>
+        <field name="arch" type="xml">
+            <header position="inside">
+                <button name="action_confirm_probation" string="Confirm Employment" type="object"
+                        invisible="probation_state != 'probation'" class="oe_highlight"
+                        groups="bpro_base.group_client_hr"
+                        confirm="Confirm this employee's services (ends probation)?"/>
+                <button name="action_extend_probation" string="Extend Probation (3 months)" type="object"
+                        invisible="probation_state != 'probation'"
+                        groups="bpro_base.group_client_hr"/>
+            </header>
+            <field name="identification_id" position="after">
+                <field name="probation_state"/>
+                <field name="probation_end_date" invisible="probation_state != 'probation'"/>
+                <field name="confirmation_date" invisible="not confirmation_date"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="hr_employee_filter_bpro_probation" model="ir.ui.view">
+        <field name="name">hr.employee.search.bpro.probation</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_filter"/>
+        <field name="arch" type="xml">
+            <filter name="group_manager" position="before">
+                <filter name="on_probation" string="On Probation"
+                        domain="[('probation_state', '=', 'probation')]"/>
+            </filter>
+        </field>
+    </record>
+
+</odoo>
