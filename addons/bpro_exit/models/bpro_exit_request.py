@@ -1,7 +1,7 @@
 from datetime import timedelta
 
 from odoo import api, fields, models
-from odoo.exceptions import UserError
+from odoo.exceptions import AccessError, UserError
 
 STANDARD_CLEARANCE_LINES = [
     ("asset", "Asset Return"),
@@ -17,7 +17,13 @@ class BproExitRequest(models.Model):
     _order = "create_date desc"
     _rec_name = "employee_id"
 
-    employee_id = fields.Many2one("hr.employee", required=True, ondelete="restrict")
+    employee_id = fields.Many2one(
+        "hr.employee", required=True, ondelete="restrict",
+        default=lambda self: self.env.user.employee_id,
+        help="Defaults to the logged-in user's own employee record - "
+        "the self-service resignation case. HR picks a different "
+        "employee when filing on someone's behalf.",
+    )
     department_id = fields.Many2one(related="employee_id.department_id", store=True)
     company_id = fields.Many2one(related="employee_id.company_id", store=True)
     resignation_date = fields.Date(
@@ -106,6 +112,15 @@ class BproExitRequest(models.Model):
                 line.state == "done" for line in rec.clearance_line_ids
             )
 
+    def _check_hr(self):
+        """The UI already gates the HR-only buttons via groups=, but
+        button visibility is not authorization - once employees can
+        write their own resignation records (bpro_ess), nothing would
+        stop a crafted RPC call from, say, accepting their own
+        resignation. Method-level check, not just view-level."""
+        if not (self.env.su or self.env.user.has_group("bpro_base.group_client_hr")):
+            raise AccessError("Only HR can perform this step.")
+
     def action_submit(self):
         for rec in self:
             if rec.state != "draft":
@@ -113,6 +128,7 @@ class BproExitRequest(models.Model):
         self.write({"state": "submitted"})
 
     def action_accept(self):
+        self._check_hr()
         for rec in self:
             if rec.state != "submitted":
                 raise UserError("Only a submitted request can be accepted.")
@@ -170,6 +186,7 @@ class BproExitRequest(models.Model):
         return sum(allocations.mapped("number_of_days")) - sum(taken.mapped("number_of_days"))
 
     def action_compute_settlement(self):
+        self._check_hr()
         for rec in self:
             if rec.state not in ("accepted", "settled"):
                 raise UserError("Accept the resignation before computing the settlement.")
@@ -228,6 +245,7 @@ class BproExitRequest(models.Model):
             )
 
     def action_settle(self):
+        self._check_hr()
         for rec in self:
             if rec.state != "accepted":
                 raise UserError("Only a request in clearance can be settled.")
@@ -246,6 +264,7 @@ class BproExitRequest(models.Model):
         """Registers the departure through the native wizard path so
         bpro_hr's login-deactivation override fires - reused, not
         duplicated here."""
+        self._check_hr()
         for rec in self:
             if rec.state != "settled":
                 raise UserError("Only a settled request can be closed.")

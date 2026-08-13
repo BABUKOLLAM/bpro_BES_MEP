@@ -29,6 +29,10 @@ class TestExecutiveDashboard(TransactionCase):
         self.assertEqual(data["fleet_trip_cost"], 0.0)
         self.assertEqual(data["recruitment_open_vacancies"], 0)
         self.assertEqual(data["recruitment_overdue_joining_reports"], 0)
+        self.assertEqual(data["hr_pending_attendance_exceptions"], 0)
+        self.assertEqual(data["hr_open_exit_requests"], 0)
+        self.assertEqual(data["hr_attrition_rate_pct"], 0.0)
+        self.assertEqual(data["hr_el_liability"], 0.0)
 
     def test_sales_mtd_revenue(self):
         partner = self.env["res.partner"].create({"name": "Dashboard Test Customer"})
@@ -454,3 +458,70 @@ class TestExecutiveDashboard(TransactionCase):
         overdue.write({"actual_joining_date": today})
         overdue.action_submit()
         self.assertEqual(self._kpi()["recruitment_overdue_joining_reports"], 0)
+
+    def test_hr_pending_attendance_exceptions(self):
+        employee = self.env["hr.employee"].create(
+            {"name": "Dashboard Absence Employee", "company_id": self.company.id}
+        )
+        today = fields.Date.context_today(self.env.user)
+        exception = self.env["bpro.attendance.exception"].create(
+            {"employee_id": employee.id, "date": today - timedelta(days=1)}
+        )
+        self.assertEqual(self._kpi()["hr_pending_attendance_exceptions"], 1)
+        exception.action_excuse()
+        self.assertEqual(self._kpi()["hr_pending_attendance_exceptions"], 0)
+
+    def test_hr_exit_and_attrition(self):
+        user = self.env["res.users"].create({
+            "name": "Dashboard Exit User", "login": "dashboard-exit@test.example",
+            "email": "dashboard-exit@test.example",
+        })
+        employee = self.env["hr.employee"].create({
+            "name": "Dashboard Exit Employee", "company_id": self.company.id,
+            "user_id": user.id,
+        })
+        self.env["hr.contract"].create({
+            "name": "Dashboard Exit Contract", "employee_id": employee.id,
+            "wage": 20000, "ctc_annual": 240000.0,
+            "basic_percent": 50.0, "hra_percent": 40.0,
+            "date_start": fields.Date.context_today(self.env.user) - timedelta(days=6 * 365),
+            "state": "open",
+        })
+        exit_request = self.env["bpro.exit.request"].create(
+            {"employee_id": employee.id}
+        )
+        exit_request.action_submit()
+        self.assertEqual(self._kpi()["hr_open_exit_requests"], 1)
+        exit_request.action_accept()
+        exit_request.last_working_day = fields.Date.context_today(self.env.user)
+        for line in exit_request.clearance_line_ids:
+            line.action_mark_done()
+        exit_request.action_settle()
+        exit_request.action_close()
+        headcount = self.env["hr.employee"].search_count(
+            [("company_id", "=", self.company.id)]
+        )
+        kpi = self._kpi()
+        self.assertEqual(kpi["hr_open_exit_requests"], 0)
+        self.assertAlmostEqual(kpi["hr_attrition_rate_pct"], 100.0 / headcount, places=2)
+
+    def test_hr_el_liability(self):
+        employee = self.env["hr.employee"].create(
+            {"name": "Dashboard EL Employee", "company_id": self.company.id}
+        )
+        self.env["hr.contract"].create({
+            "name": "Dashboard EL Contract", "employee_id": employee.id,
+            "wage": 20000, "ctc_annual": 240000.0,
+            "basic_percent": 50.0, "hra_percent": 40.0,
+            "date_start": fields.Date.context_today(self.env.user), "state": "open",
+        })
+        el_type = self.env.ref("bpro_leave.leave_type_earned")
+        allocation = self.env["hr.leave.allocation"].create({
+            "name": "Dashboard EL alloc", "employee_id": employee.id,
+            "holiday_status_id": el_type.id, "number_of_days": 13,
+            "state": "confirm",
+        })
+        allocation.action_approve()
+        # 13 days x 10000/26 = 5000 - the same s79(11) formula the F&F
+        # settlement uses, so the two figures can never disagree.
+        self.assertAlmostEqual(self._kpi()["hr_el_liability"], 5000.0, places=2)

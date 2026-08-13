@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <!-- A dedicated top-level "My HR" menu for group_employee rather
+         than hanging off the HR app root (which plain employees don't
+         see). Leave requests stay in native "Time Off" - no duplicate
+         menu for what already works. The ir.rules do the scoping;
+         these actions are plain list views over the same models. -->
+
+    <menuitem id="menu_bpro_ess_root" name="My HR"
+              groups="bpro_base.group_employee" sequence="30"/>
+
+    <record id="action_ess_my_payslips" model="ir.actions.act_window">
+        <field name="name">My Payslips</field>
+        <field name="res_model">hr.payslip</field>
+        <field name="view_mode">list,form</field>
+    </record>
+    <menuitem id="menu_ess_my_payslips" name="My Payslips"
+              parent="menu_bpro_ess_root" action="action_ess_my_payslips"
+              sequence="1"/>
+
+    <record id="action_ess_my_attendance_exceptions" model="ir.actions.act_window">
+        <field name="name">My Absence Flags</field>
+        <field name="res_model">bpro.attendance.exception</field>
+        <field name="view_mode">list,form</field>
+    </record>
+    <menuitem id="menu_ess_my_attendance_exceptions" name="My Absence Flags"
+              parent="menu_bpro_ess_root" action="action_ess_my_attendance_exceptions"
+              sequence="2"/>
+
+    <record id="action_ess_my_assets" model="ir.actions.act_window">
+        <field name="name">My Assets</field>
+        <field name="res_model">bpro.employee.asset</field>
+        <field name="view_mode">list,form</field>
+    </record>
+    <menuitem id="menu_ess_my_assets" name="My Assets"
+              parent="menu_bpro_ess_root" action="action_ess_my_assets"
+              sequence="3"/>
+
+    <record id="action_ess_my_exit_request" model="ir.actions.act_window">
+        <field name="name">My Resignation</field>
+        <field name="res_model">bpro.exit.request</field>
+        <field name="view_mode">list,form</field>
+    </record>
+    <menuitem id="menu_ess_my_exit_request" name="My Resignation"
+              parent="menu_bpro_ess_root" action="action_ess_my_exit_request"
+              sequence="4"/>
+</odoo>

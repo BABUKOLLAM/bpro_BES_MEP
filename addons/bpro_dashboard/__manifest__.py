@@ -35,8 +35,16 @@ deadline) - the "shareable to management for review" half of the
 original requirement; the HOD-facing half is department-scoped
 read-only access on bpro_recruitment's own models, not a dashboard
 concern.
+
+HR analytics (post-R5.3): pending attendance exceptions (unexplained
+absences awaiting HR review, from bpro_attendance), open exit requests
+(in-flight separations, from bpro_exit), trailing-12-month attrition
+rate (closed exits over current active headcount), and Earned Leave
+encashment liability (every active employee's EL balance x Basic/26 -
+the same s79(11) formula bpro_exit's F&F uses, so the dashboard
+liability figure and an actual settlement always agree).
 """,
-    "version": "18.0.1.1.0",
+    "version": "18.0.1.2.0",
     "category": "Reporting",
     "author": "Team bpro",
     "website": "https://bpropms.com",
@@ -54,6 +62,8 @@ concern.
         "bpro_project",
         "bpro_fleet",
         "bpro_recruitment",
+        "bpro_attendance",
+        "bpro_exit",
     ],
     "data": [
         "security/ir.model.access.csv",

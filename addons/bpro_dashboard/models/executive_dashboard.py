@@ -27,6 +27,10 @@ class BproExecutiveDashboard(models.TransientModel):
     fleet_trip_cost = fields.Monetary(compute="_compute_kpis")
     recruitment_open_vacancies = fields.Integer(compute="_compute_kpis")
     recruitment_overdue_joining_reports = fields.Integer(compute="_compute_kpis")
+    hr_pending_attendance_exceptions = fields.Integer(compute="_compute_kpis")
+    hr_open_exit_requests = fields.Integer(compute="_compute_kpis")
+    hr_attrition_rate_pct = fields.Float(compute="_compute_kpis", digits=(16, 2))
+    hr_el_liability = fields.Monetary(compute="_compute_kpis")
 
     # Weekly MIS: reproduces the "2026 ME Weekly Meet Report" ritual
     # (production/sales trend, item-wise achievement, area-wise sales)
@@ -211,6 +215,83 @@ class BproExecutiveDashboard(models.TransientModel):
                 ("sla_deadline", "<", as_of_date),
             ]
         )
+
+        data["hr_pending_attendance_exceptions"] = self.env[
+            "bpro.attendance.exception"
+        ].search_count(
+            [
+                ("employee_id.company_id", "=", company.id),
+                ("state", "=", "pending"),
+            ]
+        )
+
+        data["hr_open_exit_requests"] = self.env["bpro.exit.request"].search_count(
+            [
+                ("company_id", "=", company.id),
+                ("state", "in", ("submitted", "accepted", "settled")),
+            ]
+        )
+
+        # Trailing-12-month attrition: closed exits with a last working
+        # day in the window, over the CURRENT active headcount - a
+        # deliberate simplification of the textbook average-headcount
+        # denominator, which would need historical headcount snapshots
+        # this system doesn't keep.
+        headcount = self.env["hr.employee"].search_count(
+            [("company_id", "=", company.id)]
+        )
+        exits_12m = self.env["bpro.exit.request"].search_count(
+            [
+                ("company_id", "=", company.id),
+                ("state", "=", "closed"),
+                ("last_working_day", ">", as_of_date - timedelta(days=365)),
+                ("last_working_day", "<=", as_of_date),
+            ]
+        )
+        data["hr_attrition_rate_pct"] = (
+            exits_12m / headcount * 100.0 if headcount else 0.0
+        )
+
+        # EL encashment liability: the same s79(11) formula bpro_exit's
+        # F&F uses (balance x Basic/26), summed over active employees -
+        # so this figure and an actual settlement always agree.
+        el_liability = 0.0
+        el_type = self.env.ref("bpro_leave.leave_type_earned", raise_if_not_found=False)
+        if el_type:
+            allocations = self.env["hr.leave.allocation"].search([
+                ("employee_id.company_id", "=", company.id),
+                ("holiday_status_id", "=", el_type.id),
+                ("state", "=", "validate"),
+            ])
+            taken = self.env["hr.leave"].search([
+                ("employee_id.company_id", "=", company.id),
+                ("holiday_status_id", "=", el_type.id),
+                ("state", "=", "validate"),
+            ])
+            balance_by_employee = {}
+            for allocation in allocations:
+                balance_by_employee[allocation.employee_id] = (
+                    balance_by_employee.get(allocation.employee_id, 0.0)
+                    + allocation.number_of_days
+                )
+            for leave in taken:
+                balance_by_employee[leave.employee_id] = (
+                    balance_by_employee.get(leave.employee_id, 0.0)
+                    - leave.number_of_days
+                )
+            for employee, balance in balance_by_employee.items():
+                if balance <= 0:
+                    continue
+                contract = self.env["hr.contract"].search(
+                    [("employee_id", "=", employee.id), ("state", "=", "open")],
+                    limit=1,
+                )
+                if contract:
+                    monthly_basic = (
+                        contract.ctc_annual / 12.0 * (contract.basic_percent / 100.0)
+                    )
+                    el_liability += balance * monthly_basic / 26.0
+        data["hr_el_liability"] = el_liability
 
         return data
 

@@ -1,0 +1,8 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_hr_payslip_employee,hr.payslip employee own,payroll.model_hr_payslip,bpro_base.group_employee,1,0,0,0
+access_hr_payslip_line_employee,hr.payslip.line employee own,payroll.model_hr_payslip_line,bpro_base.group_employee,1,0,0,0
+access_hr_payslip_worked_days_employee,hr.payslip.worked_days employee own,payroll.model_hr_payslip_worked_days,bpro_base.group_employee,1,0,0,0
+access_bpro_attendance_exception_employee,bpro.attendance.exception employee own,bpro_attendance.model_bpro_attendance_exception,bpro_base.group_employee,1,0,0,0
+access_bpro_employee_asset_employee,bpro.employee.asset employee own,bpro_recruitment.model_bpro_employee_asset,bpro_base.group_employee,1,0,0,0
+access_bpro_exit_request_employee,bpro.exit.request employee own,bpro_exit.model_bpro_exit_request,bpro_base.group_employee,1,1,1,0
+access_bpro_exit_clearance_line_employee,bpro.exit.clearance.line employee own,bpro_exit.model_bpro_exit_clearance_line,bpro_base.group_employee,1,0,0,0

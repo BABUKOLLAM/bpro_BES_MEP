@@ -134,6 +134,38 @@
                         </span>
                         <span class="bpro_kpi_sublabel">Overdue Joining Reports</span>
                     </div>
+
+                    <div class="bpro_kpi_card bpro_kpi_green">
+                        <span class="bpro_kpi_label">HR — Attendance</span>
+                        <span class="bpro_kpi_value">
+                            <field name="hr_pending_attendance_exceptions" nolabel="1"/>
+                        </span>
+                        <span class="bpro_kpi_sublabel">Pending Absence Reviews</span>
+                    </div>
+
+                    <div class="bpro_kpi_card bpro_kpi_blue">
+                        <span class="bpro_kpi_label">HR — Separation</span>
+                        <span class="bpro_kpi_value">
+                            <field name="hr_open_exit_requests" nolabel="1"/>
+                        </span>
+                        <span class="bpro_kpi_sublabel">Open Exit Requests</span>
+                    </div>
+
+                    <div class="bpro_kpi_card bpro_kpi_green">
+                        <span class="bpro_kpi_label">HR — Attrition</span>
+                        <span class="bpro_kpi_value">
+                            <field name="hr_attrition_rate_pct" nolabel="1"/><span class="bpro_kpi_unit"> %</span>
+                        </span>
+                        <span class="bpro_kpi_sublabel">Attrition (Trailing 12M)</span>
+                    </div>
+
+                    <div class="bpro_kpi_card bpro_kpi_blue">
+                        <span class="bpro_kpi_label">HR — Leave Liability</span>
+                        <span class="bpro_kpi_value">
+                            <field name="hr_el_liability" widget="monetary" nolabel="1"/>
+                        </span>
+                        <span class="bpro_kpi_sublabel">EL Encashment Exposure</span>
+                    </div>
                 </div>
 
                 <h2 class="mt-4">Weekly MIS</h2>

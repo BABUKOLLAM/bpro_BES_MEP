@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <!-- Own-records scoping for group_employee. The R4.6 lesson applies
+         throughout: group_client_hr implies group_hod implies
+         group_employee, so each employee rule needs the counterpart
+         unrestricted rule for the staff group that already had full
+         access, or staff would silently be narrowed to their own
+         records. -->
+
+    <!-- Payslips: own + done only. Draft slips are HR work-in-progress;
+         showing them would leak provisional figures. -->
+    <record id="rule_payslip_employee_own_done" model="ir.rule">
+        <field name="name">ESS Payslip: Employee Own (Done)</field>
+        <field name="model_id" ref="payroll.model_hr_payslip"/>
+        <field name="groups" eval="[(4, ref('bpro_base.group_employee'))]"/>
+        <field name="domain_force">[('employee_id.user_id', '=', user.id), ('state', '=', 'done')]</field>
+    </record>
+
+    <record id="rule_payslip_payroll_user_all" model="ir.rule">
+        <field name="name">ESS Payslip: Payroll User Unrestricted</field>
+        <field name="model_id" ref="payroll.model_hr_payslip"/>
+        <field name="groups" eval="[(4, ref('payroll.group_payroll_user'))]"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+    </record>
+
+    <record id="rule_payslip_line_employee_own_done" model="ir.rule">
+        <field name="name">ESS Payslip Line: Employee Own (Done)</field>
+        <field name="model_id" ref="payroll.model_hr_payslip_line"/>
+        <field name="groups" eval="[(4, ref('bpro_base.group_employee'))]"/>
+        <field name="domain_force">[('slip_id.employee_id.user_id', '=', user.id), ('slip_id.state', '=', 'done')]</field>
+    </record>
+
+    <record id="rule_payslip_line_payroll_user_all" model="ir.rule">
+        <field name="name">ESS Payslip Line: Payroll User Unrestricted</field>
+        <field name="model_id" ref="payroll.model_hr_payslip_line"/>
+        <field name="groups" eval="[(4, ref('payroll.group_payroll_user'))]"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+    </record>
+
+    <record id="rule_payslip_worked_days_employee_own" model="ir.rule">
+        <field name="name">ESS Payslip Worked Days: Employee Own (Done)</field>
+        <field name="model_id" ref="payroll.model_hr_payslip_worked_days"/>
+        <field name="groups" eval="[(4, ref('bpro_base.group_employee'))]"/>
+        <field name="domain_force">[('payslip_id.employee_id.user_id', '=', user.id), ('payslip_id.state', '=', 'done')]</field>
+    </record>
+
+    <record id="rule_payslip_worked_days_payroll_user_all" model="ir.rule">
+        <field name="name">ESS Payslip Worked Days: Payroll User Unrestricted</field>
+        <field name="model_id" ref="payroll.model_hr_payslip_worked_days"/>
+        <field name="groups" eval="[(4, ref('payroll.group_payroll_user'))]"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+    </record>
+
+    <!-- Attendance exceptions: own, read-only (the ACL grants no write -
+         resolving stays an HR action). HR unrestricted counterpart
+         already exists in bpro_attendance (rule_attendance_exception_
+         hr_own_company). -->
+    <record id="rule_attendance_exception_employee_own" model="ir.rule">
+        <field name="name">ESS Attendance Exception: Employee Own</field>
+        <field name="model_id" ref="bpro_attendance.model_bpro_attendance_exception"/>
+        <field name="groups" eval="[(4, ref('bpro_base.group_employee'))]"/>
+        <field name="domain_force">[('employee_id.user_id', '=', user.id)]</field>
+    </record>
+
+    <!-- Assets: own, read-only. HR unrestricted counterpart exists in
+         bpro_recruitment (rule_employee_asset_hr_all, R4.6); the HOD
+         department rule exists there too. -->
+    <record id="rule_employee_asset_employee_own" model="ir.rule">
+        <field name="name">ESS Employee Asset: Employee Own</field>
+        <field name="model_id" ref="bpro_recruitment.model_bpro_employee_asset"/>
+        <field name="groups" eval="[(4, ref('bpro_base.group_employee'))]"/>
+        <field name="domain_force">[('employee_id.user_id', '=', user.id)]</field>
+    </record>
+
+    <!-- Exit requests: employees read their own in any state, but may
+         only WRITE/CREATE while it's still draft/submitted - once HR
+         accepts, clearance and F&F figures are out of their hands.
+         Separate read vs write rules express exactly that. HR
+         unrestricted counterparts exist in bpro_exit. -->
+    <record id="rule_exit_request_employee_own_read" model="ir.rule">
+        <field name="name">ESS Exit Request: Employee Own (Read)</field>
+        <field name="model_id" ref="bpro_exit.model_bpro_exit_request"/>
+        <field name="groups" eval="[(4, ref('bpro_base.group_employee'))]"/>
+        <field name="domain_force">[('employee_id.user_id', '=', user.id)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <record id="rule_exit_request_employee_own_write_draft" model="ir.rule">
+        <field name="name">ESS Exit Request: Employee Own (Write, Pre-Acceptance)</field>
+        <field name="model_id" ref="bpro_exit.model_bpro_exit_request"/>
+        <field name="groups" eval="[(4, ref('bpro_base.group_employee'))]"/>
+        <field name="domain_force">[('employee_id.user_id', '=', user.id), ('state', 'in', ('draft', 'submitted'))]</field>
+        <field name="perm_read" eval="False"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <record id="rule_exit_clearance_line_employee_own" model="ir.rule">
+        <field name="name">ESS Exit Clearance Line: Employee Own</field>
+        <field name="model_id" ref="bpro_exit.model_bpro_exit_clearance_line"/>
+        <field name="groups" eval="[(4, ref('bpro_base.group_employee'))]"/>
+        <field name="domain_force">[('exit_id.employee_id.user_id', '=', user.id)]</field>
+    </record>
+</odoo>
