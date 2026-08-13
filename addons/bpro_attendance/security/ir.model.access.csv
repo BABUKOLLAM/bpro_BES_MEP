@@ -1,0 +1,4 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_bpro_attendance_import_hr,bpro.attendance.import hr,model_bpro_attendance_import,bpro_base.group_client_hr,1,1,1,1
+access_bpro_attendance_exception_hr,bpro.attendance.exception hr,model_bpro_attendance_exception,bpro_base.group_client_hr,1,1,1,1
+access_bpro_attendance_exception_wizard_hr,bpro.attendance.exception.wizard hr,model_bpro_attendance_exception_wizard,bpro_base.group_client_hr,1,1,1,1

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+
+    <record id="bpro_attendance_import_view_form" model="ir.ui.view">
+        <field name="name">bpro.attendance.import.form</field>
+        <field name="model">bpro.attendance.import</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <p>
+                        Upload a .csv or .xlsx export from your attendance device's
+                        management software. Expected columns (header row required):
+                        <b>badge_id</b>, <b>date</b> (YYYY-MM-DD), <b>check_in</b> (HH:MM),
+                        <b>check_out</b> (HH:MM, optional). badge_id is matched against
+                        each employee's Badge ID field.
+                    </p>
+                    <group>
+                        <field name="attachment" filename="filename"/>
+                        <field name="filename" invisible="1"/>
+                    </group>
+                    <field name="result_summary" invisible="not result_summary" readonly="1"/>
+                </sheet>
+                <footer>
+                    <button name="action_import" string="Import" type="object" class="oe_highlight"/>
+                    <button string="Close" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_bpro_attendance_import" model="ir.actions.act_window">
+        <field name="name">Import Attendance Log</field>
+        <field name="res_model">bpro.attendance.import</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <menuitem id="menu_bpro_attendance_import" name="Import Attendance Log"
+              parent="hr_attendance.menu_hr_attendance_root"
+              action="action_bpro_attendance_import" sequence="20"/>
+
+</odoo>

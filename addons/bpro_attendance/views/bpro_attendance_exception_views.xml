@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+
+    <record id="bpro_attendance_exception_view_form" model="ir.ui.view">
+        <field name="name">bpro.attendance.exception.form</field>
+        <field name="model">bpro.attendance.exception</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_excuse" string="Excuse" type="object"
+                            invisible="state != 'pending'"/>
+                    <button name="action_confirm_absent" string="Confirm Absent" type="object"
+                            invisible="state != 'pending'" class="oe_highlight"/>
+                    <button name="action_reset_pending" string="Reset to Pending" type="object"
+                            invisible="state == 'pending'"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="pending,excused,confirmed_absent"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="employee_id"/>
+                            <field name="department_id" readonly="1"/>
+                            <field name="date"/>
+                        </group>
+                        <group>
+                            <field name="resolved_by" readonly="1" invisible="not resolved_by"/>
+                            <field name="resolved_date" readonly="1" invisible="not resolved_date"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="note"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="bpro_attendance_exception_view_list" model="ir.ui.view">
+        <field name="name">bpro.attendance.exception.list</field>
+        <field name="model">bpro.attendance.exception</field>
+        <field name="arch" type="xml">
+            <list decoration-warning="state == 'pending'">
+                <field name="employee_id"/>
+                <field name="department_id"/>
+                <field name="date"/>
+                <field name="state"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="bpro_attendance_exception_view_search" model="ir.ui.view">
+        <field name="name">bpro.attendance.exception.search</field>
+        <field name="model">bpro.attendance.exception</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="employee_id"/>
+                <field name="department_id"/>
+                <filter name="pending" string="Pending Review" domain="[('state', '=', 'pending')]"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_by_department" string="Department" context="{'group_by': 'department_id'}"/>
+                    <filter name="group_by_state" string="Status" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_bpro_attendance_exception" model="ir.actions.act_window">
+        <field name="name">Attendance Exceptions</field>
+        <field name="res_model">bpro.attendance.exception</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'search_default_pending': 1}</field>
+    </record>
+
+    <menuitem id="menu_bpro_attendance_exception" name="Attendance Exceptions"
+              parent="hr_attendance.menu_hr_attendance_root"
+              action="action_bpro_attendance_exception" sequence="21"/>
+
+    <record id="bpro_attendance_exception_wizard_view_form" model="ir.ui.view">
+        <field name="name">bpro.attendance.exception.wizard.form</field>
+        <field name="model">bpro.attendance.exception.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <p>
+                        Scan for working days with no attendance record and no approved
+                        leave in the selected range, and raise a pending exception for
+                        HR to review.
+                    </p>
+                    <group>
+                        <field name="date_from"/>
+                        <field name="date_to"/>
+                    </group>
+                </sheet>
+                <footer>
+                    <button name="action_detect" string="Detect Exceptions" type="object" class="oe_highlight"/>
+                    <button string="Close" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_bpro_attendance_exception_wizard" model="ir.actions.act_window">
+        <field name="name">Detect Attendance Exceptions</field>
+        <field name="res_model">bpro.attendance.exception.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <menuitem id="menu_bpro_attendance_exception_wizard" name="Detect Exceptions"
+              parent="hr_attendance.menu_hr_attendance_root"
+              action="action_bpro_attendance_exception_wizard" sequence="22"/>
+
+</odoo>
