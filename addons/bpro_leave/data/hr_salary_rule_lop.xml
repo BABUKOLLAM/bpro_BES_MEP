@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo noupdate="1">
+    <!--
+        LOP (Loss of Pay) proration - the piece that finally closes the
+        gap found in R5.1: the vendored payroll engine pays full expected
+        calendar days regardless of actual attendance.
+
+        Design (confirmed with the client 2026-08-13): PF and ESI must
+        prorate along with pay - statutorily, contributions follow actual
+        earned wages, not contracted CTC. That's why proration happens AT
+        THE EARNINGS SOURCE (each earning rule multiplies by LOP_FACTOR)
+        rather than as one deduction line after GROSS: BASIC shrinks, so
+        PF_WAGE = min(BASIC, ceiling) shrinks; GROSS shrinks, so ESI on
+        GROSS shrinks - the existing PF/ESI rules in bpro_payroll need no
+        changes at all and can't drift out of sync with a parallel
+        proration.
+
+        LOP_FACTOR runs at sequence 5 - before BASIC (10) - and follows
+        bpro_payroll's own PF_WAGE hidden-helper pattern: after a rule
+        runs, its total is available to later rules under its bare code
+        name. HRA needs no override (it's a % of the already-prorated
+        categories.BASIC); GROSS/NET are category sums and prorate
+        automatically.
+
+        The <record> tags below targeting bpro_payroll.rule_* xmlids
+        override those rules' amount_python_compute at THIS module's
+        install time - the supported cross-module way to extend noupdate
+        seed data without editing bpro_payroll's own files.
+
+        Known accepted quirk (documented, not a bug): an employee whose
+        normal GROSS is just above the ESI threshold can dip under it in
+        a heavy-LOP month and attract ESI that month. Real ESIC
+        eligibility is fixed per contribution period (Apr-Sep/Oct-Mar) -
+        that continuity logic has been a known unimplemented gap since
+        R3.3 and this change neither fixes nor worsens it.
+    -->
+
+    <record id="rule_lop_factor" model="hr.salary.rule">
+        <field name="name">LOP Factor (helper)</field>
+        <field name="code">LOP_FACTOR</field>
+        <field name="sequence" eval="5"/>
+        <field name="appears_on_payslip" eval="False"/>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">result = payslip.bpro_lop_factor(employee, contract)</field>
+    </record>
+
+    <record id="bpro_payroll.rule_basic" model="hr.salary.rule">
+        <field name="amount_python_compute">result = contract.ctc_annual / 12.0 * (contract.basic_percent / 100.0) * LOP_FACTOR</field>
+    </record>
+
+    <record id="bpro_payroll.rule_lta" model="hr.salary.rule">
+        <field name="amount_python_compute">result = current_contract.advantages.LTA * LOP_FACTOR</field>
+    </record>
+
+    <record id="bpro_payroll.rule_meal" model="hr.salary.rule">
+        <field name="amount_python_compute">result = current_contract.advantages.MEAL * LOP_FACTOR</field>
+    </record>
+
+    <record id="bpro_payroll.rule_conv" model="hr.salary.rule">
+        <field name="amount_python_compute">result = current_contract.advantages.CONV * LOP_FACTOR</field>
+    </record>
+
+    <record id="bpro_payroll.rule_salw" model="hr.salary.rule">
+        <field name="amount_python_compute">result = current_contract.advantages.SALW * LOP_FACTOR</field>
+    </record>
+
+    <record id="bpro_payroll.structure_india_ctc" model="hr.payroll.structure">
+        <field name="rule_ids" eval="[(4, ref('rule_lop_factor'))]"/>
+    </record>
+
+</odoo>

@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo noupdate="1">
+    <!--
+        Leave-type seed for the India client (factory context - ME
+        Polymers is a manufacturer, so the Factories Act 1948 is the
+        governing law for statutory leave, NOT the state Shops &
+        Establishments Acts, which apply to shops/commercial
+        establishments only).
+
+        Researched 2026-08-13 (per-state verification for Kerala, Tamil
+        Nadu, Karnataka, Andhra Pradesh - same four states as the PT/LWF
+        configs in bpro_payroll):
+
+        * Earned Leave: STATUTORY, central, uniform - Factories Act 1948
+          s79: 1 day per 20 days worked, for workers with 240+ days in
+          the prior calendar year; carry-forward capped at 30 days
+          (s79(3)); encashment on separation (s79(11)). No amendment to
+          the rate/threshold found in any of the four states' Factories
+          Rules. (One secondary source claimed TN disallows
+          carry-forward; unverifiable against the TN Rules text, so the
+          central 30-day cap is seeded - adjust in the accrual plan if
+          the client's TN counsel says otherwise, no code change needed.)
+        * Casual/Sick Leave: NO statutory floor for factories in any of
+          the four states - the 12+12 figures often quoted come from
+          S&E Acts that don't apply here. Seeded as company policy
+          (12 CL + 12 SL per year) - freely adjustable, nothing
+          statutory about the numbers.
+        * Maternity: STATUTORY, central, uniform - Maternity Benefit Act
+          1961 (2017 amendment): 26 weeks (first two children), 12 weeks
+          thereafter. No state variation in the four states. Seeded at
+          26 weeks (182 days); the 12-week third-child case is an
+          allocation-level decision per employee, not a separate type.
+        * Paternity: NO private-sector statutory mandate anywhere in
+          India. Seeded at 15 days matching the CCS (central government)
+          Rule 43-A benchmark most private employers copy - pure company
+          policy, adjust freely.
+        * Loss of Pay: the unpaid type - flagged bpro_is_lop_type so
+          approved leaves under it prorate the payslip via bpro_payroll's
+          LOP_FACTOR chain, alongside confirmed attendance exceptions.
+
+        National/festival paid holidays are deliberately NOT leave types:
+        they're statutory paid holidays under each state's own N&FH Act
+        (Kerala 13, TN 9, Karnataka 10, AP 8) and belong in
+        resource.calendar global leaves per work location, configured at
+        go-live with the client's actual holiday list.
+    -->
+
+    <record id="leave_type_earned" model="hr.leave.type">
+        <field name="name">Earned Leave</field>
+        <field name="requires_allocation">yes</field>
+        <field name="leave_validation_type">hr</field>
+        <field name="request_unit">day</field>
+        <field name="color">2</field>
+    </record>
+
+    <record id="leave_type_casual" model="hr.leave.type">
+        <field name="name">Casual Leave</field>
+        <field name="requires_allocation">yes</field>
+        <field name="leave_validation_type">manager</field>
+        <field name="request_unit">day</field>
+        <field name="color">4</field>
+    </record>
+
+    <record id="leave_type_sick" model="hr.leave.type">
+        <field name="name">Sick Leave</field>
+        <field name="requires_allocation">yes</field>
+        <field name="leave_validation_type">manager</field>
+        <field name="request_unit">day</field>
+        <field name="color">6</field>
+    </record>
+
+    <record id="leave_type_maternity" model="hr.leave.type">
+        <field name="name">Maternity Leave</field>
+        <field name="requires_allocation">yes</field>
+        <field name="leave_validation_type">hr</field>
+        <field name="request_unit">day</field>
+        <field name="color">9</field>
+    </record>
+
+    <record id="leave_type_paternity" model="hr.leave.type">
+        <field name="name">Paternity Leave</field>
+        <field name="requires_allocation">yes</field>
+        <field name="leave_validation_type">hr</field>
+        <field name="request_unit">day</field>
+        <field name="color">10</field>
+    </record>
+
+    <record id="leave_type_lop" model="hr.leave.type">
+        <field name="name">Loss of Pay</field>
+        <field name="requires_allocation">no</field>
+        <field name="leave_validation_type">hr</field>
+        <field name="request_unit">day</field>
+        <field name="color">1</field>
+        <field name="bpro_is_lop_type" eval="True"/>
+    </record>
+
+    <!--
+        EL accrual: Factories Act s79's "1 day per 20 days worked" -
+        modelled as a worked-time-based daily accrual of 0.05 day per
+        worked day, capped at 30 (the s79(3) carry-forward ceiling).
+        The 240-days-in-prior-year eligibility gate is a milestone start
+        condition (12 months seniority approximates it - Odoo's accrual
+        engine can't count calendar-year worked days directly; flagged
+        for go-live review rather than silently pretending it's exact).
+    -->
+    <record id="accrual_plan_earned_leave" model="hr.leave.accrual.plan">
+        <field name="name">Earned Leave (Factories Act s79)</field>
+        <field name="time_off_type_id" ref="leave_type_earned"/>
+        <field name="is_based_on_worked_time" eval="True"/>
+        <field name="accrued_gain_time">end</field>
+        <field name="carryover_date">year_start</field>
+        <field name="transition_mode">immediately</field>
+    </record>
+
+    <record id="accrual_plan_level_earned_leave" model="hr.leave.accrual.level">
+        <field name="accrual_plan_id" ref="accrual_plan_earned_leave"/>
+        <field name="start_count">12</field>
+        <field name="start_type">month</field>
+        <field name="added_value">0.05</field>
+        <field name="added_value_type">day</field>
+        <field name="frequency">daily</field>
+        <field name="cap_accrued_time" eval="True"/>
+        <field name="maximum_leave">30</field>
+        <field name="action_with_unused_accruals">all</field>
+    </record>
+
+</odoo>
