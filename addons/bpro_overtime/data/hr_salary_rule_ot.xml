@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo noupdate="1">
+    <!--
+        OT pay rule at sequence 71 - after GROSS (70) so it never feeds
+        the ESI threshold test (OT is statutorily excluded from ESI
+        ELIGIBILITY), before the deduction block. Its own category, not
+        under GROSS.
+
+        NET is extended (cross-module noupdate override, same technique
+        as bpro_leave's LOP chain) to GROSS + OT - DED - without this
+        the OT line would print on the slip but never reach take-home.
+    -->
+
+    <record id="salary_rule_category_ot" model="hr.salary.rule.category">
+        <field name="name">Overtime</field>
+        <field name="code">OT</field>
+    </record>
+
+    <record id="rule_ot" model="hr.salary.rule">
+        <field name="name">Overtime</field>
+        <field name="code">OT</field>
+        <field name="sequence" eval="71"/>
+        <field name="category_id" ref="salary_rule_category_ot"/>
+        <field name="condition_select">python</field>
+        <field name="condition_python">result = contract.company_id.ot_compensation == 'pay'</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">result = payslip.bpro_ot_amount(employee, contract)</field>
+    </record>
+
+    <record id="bpro_payroll.rule_net" model="hr.salary.rule">
+        <field name="amount_python_compute">result = categories.GROSS + categories.OT - categories.DED</field>
+    </record>
+
+    <record id="bpro_payroll.structure_india_ctc" model="hr.payroll.structure">
+        <field name="rule_ids" eval="[(4, ref('rule_ot'))]"/>
+    </record>
+</odoo>

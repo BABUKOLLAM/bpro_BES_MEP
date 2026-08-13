@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+
+    <record id="bpro_compoff_wizard_view_form" model="ir.ui.view">
+        <field name="name">bpro.compoff.wizard.form</field>
+        <field name="model">bpro.compoff.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <p>
+                        Converts approved, not-yet-converted overtime hours in the
+                        range into validated Compensatory Off allocations
+                        (8 hours = 1 day, floored to half-days). Safe to re-run -
+                        converted attendances are flagged and never credited twice.
+                    </p>
+                    <group>
+                        <field name="date_from"/>
+                        <field name="date_to"/>
+                    </group>
+                    <field name="summary" readonly="1" invisible="not summary"/>
+                </sheet>
+                <footer>
+                    <button name="action_convert" string="Convert to Comp-Off" type="object" class="oe_highlight"/>
+                    <button string="Close" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_bpro_compoff_wizard" model="ir.actions.act_window">
+        <field name="name">Convert OT to Comp-Off</field>
+        <field name="res_model">bpro.compoff.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <menuitem id="menu_bpro_compoff_wizard" name="Convert OT to Comp-Off"
+              parent="hr_attendance.menu_hr_attendance_root"
+              action="action_bpro_compoff_wizard" sequence="23"/>
+
+</odoo>

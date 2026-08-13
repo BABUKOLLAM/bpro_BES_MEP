@@ -1,0 +1,2 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_bpro_compoff_wizard_hr,bpro.compoff.wizard hr,model_bpro_compoff_wizard,bpro_base.group_client_hr,1,1,1,1

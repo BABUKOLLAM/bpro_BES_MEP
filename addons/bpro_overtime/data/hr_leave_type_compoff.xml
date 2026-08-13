@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo noupdate="1">
+    <record id="leave_type_compoff" model="hr.leave.type">
+        <field name="name">Compensatory Off</field>
+        <field name="requires_allocation">yes</field>
+        <field name="leave_validation_type">manager</field>
+        <field name="request_unit">half_day</field>
+        <field name="color">7</field>
+    </record>
+</odoo>
