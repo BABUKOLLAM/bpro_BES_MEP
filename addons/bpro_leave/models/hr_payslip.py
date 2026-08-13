@@ -26,10 +26,22 @@ class HrPayslip(models.Model):
         rule code runs under safe_eval with no datetime access - and so
         the date logic is unit-testable outside a payslip run.
         """
+        lop_days, working_days = self.bpro_lop_days(employee, contract)
+        if not working_days:
+            return 1.0
+        return max(working_days - lop_days, 0) / working_days
+
+    def bpro_lop_days(self, employee, contract):
+        """(lop_day_count, working_day_count) for this payslip's period -
+        split out of bpro_lop_factor so statutory filings can report the
+        day counts themselves (EPFO's ECR wants NCP days, ESIC wants
+        days worked) from the SAME definition the pay proration uses -
+        a filing that disagreed with the payslip would be worse than
+        no filing."""
         self.ensure_one()
         calendar = contract.resource_calendar_id
         if not calendar:
-            return 1.0
+            return 0, 0
 
         working_days = []
         current = self.date_from
@@ -38,7 +50,7 @@ class HrPayslip(models.Model):
                 working_days.append(current)
             current += timedelta(days=1)
         if not working_days:
-            return 1.0
+            return 0, 0
         working_set = set(working_days)
 
         lop_dates = set()
@@ -66,5 +78,4 @@ class HrPayslip(models.Model):
                     lop_dates.add(day)
                 day += timedelta(days=1)
 
-        payable = len(working_set) - len(lop_dates)
-        return max(payable, 0) / len(working_set)
+        return len(lop_dates), len(working_set)

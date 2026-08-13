@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+
+    <record id="hr_employee_view_form_bpro_statutory_filing" model="ir.ui.view">
+        <field name="name">hr.employee.form.bpro.statutory.filing</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="bpro_payroll.hr_employee_view_form_bpro_payroll"/>
+        <field name="arch" type="xml">
+            <field name="pan" position="after">
+                <field name="uan"/>
+                <field name="esi_number"/>
+            </field>
+        </field>
+    </record>
+
+</odoo>
