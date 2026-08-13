@@ -193,7 +193,7 @@ R3.6c - Form 16 Part B:
   TAN and TRACES portal filing and is out of scope for any payroll
   software, this one included.
 """,
-    "version": "18.0.1.7.0",
+    "version": "18.0.1.8.0",
     "category": "Human Resources",
     "author": "Team bpro",
     "website": "https://bpropms.com",
@@ -231,6 +231,7 @@ R3.6c - Form 16 Part B:
         "views/bpro_tds_config_views.xml",
         "views/bpro_tds_declaration_views.xml",
         "views/report_form16.xml",
+        "views/report_payslip.xml",
         "views/bpro_tds_form16_views.xml",
     ],
     "installable": True,

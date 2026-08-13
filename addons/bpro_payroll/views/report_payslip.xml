@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <template id="report_payslip_document">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <h2>Payslip — <span t-esc="o.date_from.strftime('%B %Y')"/></h2>
+                        <table class="table table-sm table-bordered">
+                            <tr>
+                                <td><strong>Employee</strong></td>
+                                <td><span t-field="o.employee_id.name"/></td>
+                                <td><strong>Department</strong></td>
+                                <td><span t-field="o.employee_id.department_id.name"/></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Period</strong></td>
+                                <td><span t-field="o.date_from"/> — <span t-field="o.date_to"/></td>
+                                <td><strong>PAN</strong></td>
+                                <td><span t-field="o.employee_id.pan"/></td>
+                            </tr>
+                        </table>
+                        <table class="table table-sm table-bordered">
+                            <thead>
+                                <tr><th>Component</th><th class="text-end">Amount</th></tr>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="o.line_ids.filtered(lambda l: l.appears_on_payslip and l.code != 'NET')" t-as="line">
+                                    <tr>
+                                        <td><span t-field="line.name"/></td>
+                                        <td class="text-end"><span t-esc="line.total" t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'/></td>
+                                    </tr>
+                                </t>
+                                <tr>
+                                    <td><strong>Net Pay</strong></td>
+                                    <td class="text-end"><strong>
+                                        <span t-esc="sum(o.line_ids.filtered(lambda l: l.code == 'NET').mapped('total'))" t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'/>
+                                    </strong></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <p class="text-muted">
+                            This is a system-generated payslip and does not require a signature.
+                        </p>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <record id="action_report_bpro_payslip" model="ir.actions.report">
+        <field name="name">Payslip</field>
+        <field name="model">hr.payslip</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">bpro_payroll.report_payslip_document</field>
+        <field name="report_file">bpro_payroll.report_payslip_document</field>
+        <field name="binding_model_id" ref="payroll.model_hr_payslip"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <record id="hr_payslip_view_form_bpro_email" model="ir.ui.view">
+        <field name="name">hr.payslip.form.bpro.email</field>
+        <field name="model">hr.payslip</field>
+        <field name="inherit_id" ref="payroll.hr_payslip_view_form"/>
+        <field name="arch" type="xml">
+            <header position="inside">
+                <button name="action_email_payslip" string="Email Payslip" type="object"
+                        invisible="state != 'done'"
+                        groups="payroll.group_payroll_user"/>
+            </header>
+        </field>
+    </record>
+
+</odoo>
