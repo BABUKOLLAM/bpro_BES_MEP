@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+
+    <record id="bpro_hr_letter_view_form" model="ir.ui.view">
+        <field name="name">bpro.hr.letter.form</field>
+        <field name="model">bpro.hr.letter</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_print" string="Print Letter" type="object" class="oe_highlight"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="reference" readonly="1"/>
+                            <field name="employee_id"/>
+                            <field name="letter_type"/>
+                            <field name="letter_date"/>
+                        </group>
+                        <group>
+                            <field name="designation"/>
+                            <field name="ctc_annual" invisible="letter_type not in ('salary_certificate',)"/>
+                            <field name="monthly_gross" invisible="letter_type != 'salary_certificate'"/>
+                            <field name="service_from"/>
+                            <field name="service_to" invisible="letter_type != 'experience'"/>
+                            <field name="revised_ctc" invisible="letter_type != 'increment'"
+                                   required="letter_type == 'increment'"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="note"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="bpro_hr_letter_view_list" model="ir.ui.view">
+        <field name="name">bpro.hr.letter.list</field>
+        <field name="model">bpro.hr.letter</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="reference"/>
+                <field name="employee_id"/>
+                <field name="letter_type"/>
+                <field name="letter_date"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_bpro_hr_letter" model="ir.actions.act_window">
+        <field name="name">HR Letters</field>
+        <field name="res_model">bpro.hr.letter</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <menuitem id="menu_bpro_hr_letter" name="HR Letters"
+              parent="hr.menu_hr_root"
+              action="action_bpro_hr_letter" sequence="26"
+              groups="bpro_base.group_client_hr"/>
+
+</odoo>

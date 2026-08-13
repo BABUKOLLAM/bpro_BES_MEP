@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <template id="report_hr_letter_document">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <p class="text-end">
+                            Ref: <span t-field="o.reference"/><br/>
+                            Date: <span t-field="o.letter_date"/>
+                        </p>
+
+                        <t t-if="o.letter_type == 'salary_certificate'">
+                            <h2>Salary Certificate</h2>
+                            <p>
+                                This is to certify that <strong t-field="o.employee_id.name"/>
+                                (<span t-field="o.employee_id.employee_code"/>) is employed with
+                                <span t-field="o.company_id.name"/> as
+                                <strong t-field="o.designation"/> since
+                                <span t-field="o.service_from"/>.
+                            </p>
+                            <p>
+                                Their current annual CTC is
+                                <strong t-esc="o.ctc_annual" t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'/>
+                                (monthly gross
+                                <span t-esc="o.monthly_gross" t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'/>).
+                            </p>
+                            <p>
+                                This certificate is issued at the employee's request
+                                for whatever legitimate purpose it may serve.
+                            </p>
+                        </t>
+
+                        <t t-if="o.letter_type == 'address_proof'">
+                            <h2>Employment &amp; Address Confirmation</h2>
+                            <p>
+                                This is to confirm that <strong t-field="o.employee_id.name"/>
+                                (<span t-field="o.employee_id.employee_code"/>) is employed with
+                                <span t-field="o.company_id.name"/>, having its registered
+                                office at <span t-esc="', '.join(filter(None, [o.company_id.street, o.company_id.street2, o.company_id.city, o.company_id.state_id.name, o.company_id.zip]))"/>,
+                                as <strong t-field="o.designation"/> since
+                                <span t-field="o.service_from"/>.
+                            </p>
+                        </t>
+
+                        <t t-if="o.letter_type == 'experience'">
+                            <h2>Experience &amp; Relieving Letter</h2>
+                            <p>
+                                This is to certify that <strong t-field="o.employee_id.name"/>
+                                (<span t-field="o.employee_id.employee_code"/>) was employed with
+                                <span t-field="o.company_id.name"/> as
+                                <strong t-field="o.designation"/> from
+                                <span t-field="o.service_from"/>
+                                <t t-if="o.service_to">to <span t-field="o.service_to"/></t>.
+                            </p>
+                            <p>
+                                During their tenure, their services were found
+                                satisfactory. They have been relieved of their duties
+                                <t t-if="o.service_to">effective <span t-field="o.service_to"/></t>
+                                and hold no outstanding obligations to the company.
+                                We wish them success in their future endeavours.
+                            </p>
+                        </t>
+
+                        <t t-if="o.letter_type == 'increment'">
+                            <h2>Increment Letter</h2>
+                            <p>Dear <span t-field="o.employee_id.name"/>,</p>
+                            <p>
+                                In recognition of your performance and contribution,
+                                we are pleased to revise your annual CTC to
+                                <strong t-esc="o.revised_ctc" t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'/>
+                                effective <span t-field="o.letter_date"/>. All other
+                                terms of your employment remain unchanged.
+                            </p>
+                        </t>
+
+                        <p t-if="o.note" t-field="o.note"/>
+
+                        <p class="mt-5">
+                            <strong>For <span t-field="o.company_id.name"/></strong>
+                        </p>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <record id="action_report_hr_letter" model="ir.actions.report">
+        <field name="name">HR Letter</field>
+        <field name="model">bpro.hr.letter</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">bpro_hr_letters.report_hr_letter_document</field>
+        <field name="report_file">bpro_hr_letters.report_hr_letter_document</field>
+        <field name="binding_model_id" ref="model_bpro_hr_letter"/>
+        <field name="binding_type">report</field>
+    </record>
+</odoo>
