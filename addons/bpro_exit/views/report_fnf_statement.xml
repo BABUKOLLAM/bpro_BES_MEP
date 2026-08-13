@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <template id="report_fnf_statement_document">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <h2>Full &amp; Final Settlement Statement</h2>
+                        <table class="table table-sm table-bordered">
+                            <tr>
+                                <td><strong>Employee</strong></td>
+                                <td><span t-field="o.employee_id.name"/> (<span t-field="o.employee_id.employee_code"/>)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Department</strong></td>
+                                <td><span t-field="o.department_id.name"/></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Service From</strong></td>
+                                <td><span t-field="o.service_start_date"/></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Last Working Day</strong></td>
+                                <td><span t-field="o.last_working_day"/></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Monthly Basic (last drawn)</strong></td>
+                                <td><span t-esc="o.monthly_basic" t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'/></td>
+                            </tr>
+                        </table>
+
+                        <h4>Payables</h4>
+                        <table class="table table-sm table-bordered">
+                            <tr>
+                                <td>Gratuity (<span t-esc="o.gratuity_years"/> completed years)</td>
+                                <td class="text-end"><span t-esc="o.gratuity_amount" t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'/></td>
+                            </tr>
+                            <tr>
+                                <td>Earned Leave Encashment (<span t-esc="o.el_balance_days"/> days)</td>
+                                <td class="text-end"><span t-esc="o.el_encashment_amount" t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'/></td>
+                            </tr>
+                            <tr>
+                                <td>Other Additions</td>
+                                <td class="text-end"><span t-esc="o.other_addition" t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'/></td>
+                            </tr>
+                        </table>
+
+                        <h4>Recoveries</h4>
+                        <table class="table table-sm table-bordered">
+                            <tr>
+                                <td>Notice Shortfall Recovery (<span t-esc="o.notice_shortfall_days"/> days)</td>
+                                <td class="text-end"><span t-esc="o.notice_recovery_amount" t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'/></td>
+                            </tr>
+                            <tr>
+                                <td>Other Deductions</td>
+                                <td class="text-end"><span t-esc="o.other_deduction" t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'/></td>
+                            </tr>
+                        </table>
+
+                        <h4>
+                            Net Settlement:
+                            <span t-esc="o.settlement_total" t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'/>
+                        </h4>
+
+                        <p class="mt-4">
+                            Final monthly salary dues (including any Loss-of-Pay
+                            proration) are settled through the regular payslip for
+                            the final month and are not repeated here.
+                        </p>
+                        <p class="mt-5">
+                            <strong>For <span t-field="o.company_id.name"/></strong>
+                        </p>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <record id="action_report_fnf_statement" model="ir.actions.report">
+        <field name="name">F&amp;F Settlement Statement</field>
+        <field name="model">bpro.exit.request</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">bpro_exit.report_fnf_statement_document</field>
+        <field name="report_file">bpro_exit.report_fnf_statement_document</field>
+        <field name="binding_model_id" ref="model_bpro_exit_request"/>
+        <field name="binding_type">report</field>
+    </record>
+</odoo>

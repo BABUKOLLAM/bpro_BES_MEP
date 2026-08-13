@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <!-- Same pattern as bpro_recruitment's R4.6 rules, including the
+         lesson learned there: bpro_base.group_client_hr implies
+         group_hod, and ir.rule only ORs rule rows that exist for a
+         user's groups - so every HOD-scoped rule below needs the
+         explicit unrestricted HR counterpart, or HR staff would be
+         silently narrowed to their own department. -->
+
+    <record id="rule_exit_request_hod_own_department" model="ir.rule">
+        <field name="name">bpro Exit Request: HOD Own Department</field>
+        <field name="model_id" ref="model_bpro_exit_request"/>
+        <field name="groups" eval="[(4, ref('bpro_base.group_hod'))]"/>
+        <field name="domain_force">[('department_id.manager_id.user_id', '=', user.id)]</field>
+    </record>
+
+    <record id="rule_exit_request_hr_own_company" model="ir.rule">
+        <field name="name">bpro Exit Request: HR Own Company</field>
+        <field name="model_id" ref="model_bpro_exit_request"/>
+        <field name="groups" eval="[(4, ref('bpro_base.group_client_hr'))]"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+
+    <record id="rule_exit_clearance_line_hod_own_department" model="ir.rule">
+        <field name="name">bpro Exit Clearance Line: HOD Own Department</field>
+        <field name="model_id" ref="model_bpro_exit_clearance_line"/>
+        <field name="groups" eval="[(4, ref('bpro_base.group_hod'))]"/>
+        <field name="domain_force">[('department_id.manager_id.user_id', '=', user.id)]</field>
+    </record>
+
+    <record id="rule_exit_clearance_line_hr_all" model="ir.rule">
+        <field name="name">bpro Exit Clearance Line: HR Unrestricted</field>
+        <field name="model_id" ref="model_bpro_exit_clearance_line"/>
+        <field name="groups" eval="[(4, ref('bpro_base.group_client_hr'))]"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+    </record>
+</odoo>

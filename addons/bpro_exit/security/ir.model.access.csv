@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_bpro_exit_request_hr,bpro.exit.request hr,model_bpro_exit_request,bpro_base.group_client_hr,1,1,1,1
+access_bpro_exit_request_hod,bpro.exit.request hod,model_bpro_exit_request,bpro_base.group_hod,1,0,0,0
+access_bpro_exit_clearance_line_hr,bpro.exit.clearance.line hr,model_bpro_exit_clearance_line,bpro_base.group_client_hr,1,1,1,1
+access_bpro_exit_clearance_line_hod,bpro.exit.clearance.line hod,model_bpro_exit_clearance_line,bpro_base.group_hod,1,1,0,0
