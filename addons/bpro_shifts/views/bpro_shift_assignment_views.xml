@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+
+    <record id="bpro_shift_assignment_view_form" model="ir.ui.view">
+        <field name="name">bpro.shift.assignment.form</field>
+        <field name="model">bpro.shift.assignment</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="employee_id"/>
+                            <field name="calendar_id"/>
+                        </group>
+                        <group>
+                            <field name="date_from"/>
+                            <field name="date_to"/>
+                            <field name="note"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="bpro_shift_assignment_view_list" model="ir.ui.view">
+        <field name="name">bpro.shift.assignment.list</field>
+        <field name="model">bpro.shift.assignment</field>
+        <field name="arch" type="xml">
+            <list editable="bottom">
+                <field name="employee_id"/>
+                <field name="calendar_id"/>
+                <field name="date_from"/>
+                <field name="date_to"/>
+                <field name="note"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="bpro_shift_assignment_view_search" model="ir.ui.view">
+        <field name="name">bpro.shift.assignment.search</field>
+        <field name="model">bpro.shift.assignment</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="employee_id"/>
+                <field name="calendar_id"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_by_shift" string="Shift" context="{'group_by': 'calendar_id'}"/>
+                    <filter name="group_by_employee" string="Employee" context="{'group_by': 'employee_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_bpro_shift_assignment" model="ir.actions.act_window">
+        <field name="name">Shift Assignments</field>
+        <field name="res_model">bpro.shift.assignment</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <menuitem id="menu_bpro_shift_assignment" name="Shift Assignments"
+              parent="hr_attendance.menu_hr_attendance_root"
+              action="action_bpro_shift_assignment" sequence="24"/>
+
+</odoo>

@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_bpro_shift_assignment_hr,bpro.shift.assignment hr,model_bpro_shift_assignment,bpro_base.group_client_hr,1,1,1,1
+access_bpro_shift_assignment_hod,bpro.shift.assignment hod,model_bpro_shift_assignment,bpro_base.group_hod,1,0,0,0

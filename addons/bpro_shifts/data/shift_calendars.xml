@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo noupdate="1">
+    <!-- The common 6-day manufacturing pattern (Mon-Sat). A night
+         shift crossing midnight needs two attendance lines per day and
+         should be configured deliberately at go-live, not seeded
+         blind. -->
+
+    <record id="calendar_shift_a" model="resource.calendar">
+        <field name="name">Shift A (06:00-14:00)</field>
+        <field name="tz">Asia/Kolkata</field>
+        <field name="attendance_ids" eval="[(5, 0, 0)] + [
+            (0, 0, {'name': 'Day %s' % day, 'dayofweek': str(day),
+                    'hour_from': 6.0, 'hour_to': 14.0})
+            for day in range(6)
+        ]"/>
+    </record>
+
+    <record id="calendar_shift_b" model="resource.calendar">
+        <field name="name">Shift B (14:00-22:00)</field>
+        <field name="tz">Asia/Kolkata</field>
+        <field name="attendance_ids" eval="[(5, 0, 0)] + [
+            (0, 0, {'name': 'Day %s' % day, 'dayofweek': str(day),
+                    'hour_from': 14.0, 'hour_to': 22.0})
+            for day in range(6)
+        ]"/>
+    </record>
+</odoo>
