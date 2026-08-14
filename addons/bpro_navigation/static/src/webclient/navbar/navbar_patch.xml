@@ -2,17 +2,32 @@
 <templates xml:space="preserve">
     <t t-inherit="web.NavBar.AppsMenu" t-inherit-mode="extension" owl="1">
         <xpath expr="//t[@t-set-slot='content']/DropdownItem" position="replace">
-            <t t-foreach="getGroupedApps(apps)" t-as="bproGroup" t-key="bproGroup.id">
-                <div class="bpro_app_group_header" t-if="bproGroup.name" t-esc="bproGroup.name"/>
-                <DropdownItem
-                    t-foreach="bproGroup.apps"
-                    t-as="app"
-                    t-key="app.id"
-                    class="{ 'o_app': true, focus: menuService.getCurrentApp() === app }"
-                    onSelected="() => this.onNavBarDropdownItemSelection(app)"
-                    t-esc="app.name"
-                    attrs="{ href: getMenuItemHref(app), 'data-menu-xmlid': app.xmlid, 'data-section': app.id }"
-                />
+            <t t-set="bproGroupedApps" t-value="getGroupedApps(apps)"/>
+            <t t-foreach="bproGroupedApps" t-as="bproGroup" t-key="bproGroup.id">
+                <t t-set="bproExpanded" t-value="isBproGroupExpanded(bproGroup, bproGroupedApps)"/>
+                <button
+                    t-if="bproGroup.name"
+                    type="button"
+                    class="bpro_app_group_toggle"
+                    t-att-class="bproExpanded ? 'bpro_expanded' : ''"
+                    t-att-aria-expanded="bproExpanded ? 'true' : 'false'"
+                    t-on-click="(ev) => this.toggleBproGroup(bproGroup, bproGroupedApps, ev)"
+                >
+                    <span class="bpro_app_group_name" t-esc="bproGroup.name"/>
+                    <span class="bpro_app_group_count" t-esc="bproGroup.apps.length"/>
+                    <i class="fa fa-chevron-down bpro_app_group_chevron" role="img" aria-hidden="true"/>
+                </button>
+                <div t-if="!bproGroup.name or bproExpanded" class="bpro_app_group_items">
+                    <DropdownItem
+                        t-foreach="bproGroup.apps"
+                        t-as="app"
+                        t-key="app.id"
+                        class="{ 'o_app': true, 'bpro_app_item': true, focus: menuService.getCurrentApp() === app }"
+                        onSelected="() => this.onNavBarDropdownItemSelection(app)"
+                        t-esc="app.name"
+                        attrs="{ href: getMenuItemHref(app), 'data-menu-xmlid': app.xmlid, 'data-section': app.id }"
+                    />
+                </div>
             </t>
         </xpath>
     </t>
