@@ -6,7 +6,7 @@
             <t t-foreach="bproGroupedApps" t-as="bproGroup" t-key="bproGroup.id">
                 <t t-set="bproExpanded" t-value="isBproGroupExpanded(bproGroup, bproGroupedApps)"/>
                 <button
-                    t-if="bproGroup.name"
+                    t-if="bproGroup.name and !bproGroup.isFallback"
                     type="button"
                     class="bpro_app_group_toggle"
                     t-att-class="bproExpanded ? 'bpro_expanded' : ''"
@@ -17,12 +17,13 @@
                     <span class="bpro_app_group_count" t-esc="bproGroup.apps.length"/>
                     <i class="fa fa-chevron-down bpro_app_group_chevron" role="img" aria-hidden="true"/>
                 </button>
-                <div t-if="!bproGroup.name or bproExpanded" class="bpro_app_group_items">
+                <div t-if="bproGroup.isFallback and bproGroup_index > 0" class="bpro_app_group_divider"/>
+                <div t-if="bproExpanded" t-att-class="bproGroup.isFallback ? 'bpro_app_root_items' : 'bpro_app_group_items'">
                     <DropdownItem
                         t-foreach="bproGroup.apps"
                         t-as="app"
                         t-key="app.id"
-                        class="{ 'o_app': true, 'bpro_app_item': true, focus: menuService.getCurrentApp() === app }"
+                        class="{ 'o_app': true, 'bpro_app_item': !bproGroup.isFallback, 'bpro_app_root_item': bproGroup.isFallback, focus: menuService.getCurrentApp() === app }"
                         onSelected="() => this.onNavBarDropdownItemSelection(app)"
                         t-esc="app.name"
                         attrs="{ href: getMenuItemHref(app), 'data-menu-xmlid': app.xmlid, 'data-section': app.id }"

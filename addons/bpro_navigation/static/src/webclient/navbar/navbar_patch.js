@@ -42,7 +42,14 @@ patch(NavBar.prototype, {
             this.bproMenuGroups.find((g) => g.is_fallback) ||
             this.bproMenuGroups[this.bproMenuGroups.length - 1];
         const buckets = new Map(
-            this.bproMenuGroups.map((g) => [g.id, { id: g.id, name: g.name, apps: [] }])
+            this.bproMenuGroups.map((g) => [
+                g.id,
+                // The fallback group ("General") renders as top-level
+                // items rather than a collapsible submenu - its contents
+                // (dashboard, settings, discuss...) are cross-functional
+                // and deserve one-click access, not a second click.
+                { id: g.id, name: g.name, isFallback: g.id === fallback.id, apps: [] },
+            ])
         );
         for (const app of apps) {
             const groupId = menuIdToGroupId[app.id] ?? fallback.id;
@@ -58,6 +65,9 @@ patch(NavBar.prototype, {
      * the switcher always starts from "where am I".
      */
     isBproGroupExpanded(group, groupedApps) {
+        if (group.isFallback) {
+            return true; // top-level items, never collapsed
+        }
         if (this.bproNavState.expandedGroupId !== null) {
             return this.bproNavState.expandedGroupId === group.id;
         }
@@ -65,7 +75,11 @@ patch(NavBar.prototype, {
         const currentGroup = currentApp
             ? groupedApps.find((g) => g.apps.some((a) => a.id === currentApp.id))
             : null;
-        return (currentGroup || groupedApps[0])?.id === group.id;
+        const defaultGroup =
+            currentGroup && !currentGroup.isFallback
+                ? currentGroup
+                : groupedApps.find((g) => !g.isFallback);
+        return defaultGroup?.id === group.id;
     },
 
     toggleBproGroup(group, groupedApps, ev) {

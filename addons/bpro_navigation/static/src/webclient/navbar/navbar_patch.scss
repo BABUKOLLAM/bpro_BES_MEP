@@ -60,6 +60,17 @@
     }
 }
 
+.bpro_app_group_divider {
+    margin: 0.35rem 0;
+    border-top: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+// Fallback ("General") apps: plain top-level entries, styled like the
+// group headers' weight but behaving as ordinary one-click items.
+.bpro_app_root_items .bpro_app_root_item {
+    font-weight: 500;
+}
+
 .bpro_app_group_items {
     padding-bottom: 0.25rem;
 
