@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Split-screen login. Priority 30 so it wins over bpro_branding's
+         minimal-card layout (priority 20) when both are installed; the
+         inner web.login form (with branding's show-password toggle, if
+         present) renders unchanged inside the right-hand card. -->
+    <template id="split_login_layout" inherit_id="website.login_layout"
+              name="HRMS Suite Pro split login" priority="30">
+        <xpath expr="//t[@t-call='website.layout' or @t-call='web.frontend_layout']" position="replace">
+            <t t-call="web.frontend_layout">
+                <t t-set="html_data" t-value="{'style': 'height: 100%;'}"/>
+                <t t-set="no_header" t-value="True"/>
+                <t t-set="no_footer" t-value="True"/>
+                <div class="bpro-login">
+                    <!-- Brand panel -->
+                    <div class="bpro-login-brand d-none d-lg-flex">
+                        <div class="bpro-login-brand-bg">
+                            <div class="bpro-orb bpro-orb-1"/>
+                            <div class="bpro-orb bpro-orb-2"/>
+                            <div class="bpro-grid-overlay"/>
+                        </div>
+                        <div class="bpro-login-brand-content">
+                            <a href="/" class="bpro-nav-brand">
+                                <span class="bpro-logo-mark">b</span>
+                                <span class="bpro-logo-text bpro-logo-text-light">bpro <strong>HCM</strong> <span class="bpro-logo-divider">|</span> HRMS</span>
+                            </a>
+                            <div class="bpro-login-headline">
+                                <h1>People work<br/>happens <span class="bpro-gradient-text">here.</span></h1>
+                                <p>Payroll, recruitment, attendance, leave, exits and
+                                   learning — the whole employee lifecycle in one signed-in
+                                   workspace.</p>
+                            </div>
+                            <div class="bpro-login-chips">
+                                <span class="bpro-chip"><i class="fa fa-inr me-2"/>India payroll compliance</span>
+                                <span class="bpro-chip"><i class="fa fa-shield me-2"/>Role-scoped security</span>
+                                <span class="bpro-chip"><i class="fa fa-mobile me-2"/>Employee self-service</span>
+                            </div>
+                            <div class="bpro-login-foot">
+                                Developed by <a href="https://www.drbabu.in" target="_blank" rel="noopener">Dr. Babu</a>
+                                &amp; <a href="https://www.bpropms.com" target="_blank" rel="noopener">bpro Technologies</a>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Form panel -->
+                    <div class="bpro-login-form">
+                        <div class="bpro-login-card">
+                            <div class="bpro-login-logo">
+                                <img t-attf-src="/web/binary/company_logo{{ '?dbname='+db if db else '' }}"
+                                     alt="Company logo"/>
+                            </div>
+                            <h2 class="bpro-login-title">Welcome back</h2>
+                            <p class="bpro-login-sub">Sign in to your HRMS workspace</p>
+                            <t t-out="0"/>
+                        </div>
+                        <div class="bpro-login-form-foot">
+                            <a href="/">&#8592; Back to home</a>
+                        </div>
+                    </div>
+                </div>
+            </t>
+        </xpath>
+    </template>
+</odoo>
