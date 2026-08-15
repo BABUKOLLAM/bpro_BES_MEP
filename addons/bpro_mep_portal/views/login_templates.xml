@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Centered card over an industrial dark backdrop - deliberately a
+         different layout family from bpro_hrms_portal's split-screen, so
+         the two products can never be mistaken for each other. Priority
+         30 beats bpro_branding's minimal card (20); the inner web.login
+         form (incl. branding's show-password toggle) renders unchanged. -->
+    <template id="mep_login_layout" inherit_id="website.login_layout"
+              name="ME Polymers login" priority="30">
+        <xpath expr="//t[@t-call='website.layout' or @t-call='web.frontend_layout']" position="replace">
+            <t t-call="web.frontend_layout">
+                <t t-set="html_data" t-value="{'style': 'height: 100%;'}"/>
+                <t t-set="no_header" t-value="True"/>
+                <t t-set="no_footer" t-value="True"/>
+                <div class="mep-login">
+                    <div class="mep-login-bg">
+                        <div class="mep-molecules"/>
+                        <div class="mep-hero-glow"/>
+                    </div>
+                    <div class="mep-login-card">
+                        <div class="mep-login-logo">
+                            <img t-attf-src="/web/binary/company_logo{{ '?dbname='+db if db else '' }}"
+                                 alt="Company logo"/>
+                        </div>
+                        <h2 class="mep-login-title">Internal Business System</h2>
+                        <p class="mep-login-sub">Sign in with your company credentials</p>
+                        <t t-out="0"/>
+                    </div>
+                    <div class="mep-login-foot">
+                        <span>Authorized personnel only</span>
+                        <a href="/">&#8592; Back to home</a>
+                    </div>
+                </div>
+            </t>
+        </xpath>
+    </template>
+</odoo>

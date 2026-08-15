@@ -1,0 +1,417 @@
+// ============================================================
+// ME Polymers portal — industrial slate + cyan identity.
+// Deliberately distinct from bpro_hrms_portal (navy/green split
+// layout): different palette, different layout family, no shared
+// class names.
+// ============================================================
+
+$mep-slate: #131f28;
+$mep-slate-2: #1d2f3c;
+$mep-steel: #2b4356;
+$mep-cyan: #00b4d8;
+$mep-cyan-deep: #0e7c9c;
+$mep-ink: #182530;
+$mep-muted: #5f7280;
+$mep-paper: #f4f7f9;
+$mep-white: #ffffff;
+
+.mep-landing, .mep-login {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+        "Helvetica Neue", Arial, sans-serif;
+    color: $mep-ink;
+    -webkit-font-smoothing: antialiased;
+    h1, h2, h3 { font-weight: 800; letter-spacing: -0.02em; }
+}
+
+.mep-accent-dot { color: $mep-cyan; }
+
+// ---------- shared backdrop primitives ----------
+
+.mep-molecules {
+    position: absolute;
+    inset: 0;
+    background-image:
+        radial-gradient(circle at 15% 25%, rgba($mep-cyan, 0.18) 0 2px, transparent 3px),
+        radial-gradient(circle at 40% 70%, rgba($mep-cyan, 0.12) 0 2px, transparent 3px),
+        radial-gradient(circle at 70% 30%, rgba($mep-cyan, 0.15) 0 2px, transparent 3px),
+        radial-gradient(circle at 85% 65%, rgba($mep-cyan, 0.1) 0 2px, transparent 3px),
+        radial-gradient(circle at 55% 15%, rgba($mep-white, 0.08) 0 1.5px, transparent 2.5px),
+        radial-gradient(circle at 25% 85%, rgba($mep-white, 0.06) 0 1.5px, transparent 2.5px);
+    background-size: 340px 340px;
+    animation: mep-drift 40s linear infinite;
+    pointer-events: none;
+}
+
+@keyframes mep-drift {
+    from { background-position: 0 0; }
+    to { background-position: 340px 340px; }
+}
+
+.mep-hero-glow {
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(60% 55% at 78% 20%, rgba($mep-cyan, 0.16), transparent 65%),
+        radial-gradient(45% 45% at 12% 85%, rgba($mep-cyan-deep, 0.22), transparent 70%);
+    pointer-events: none;
+}
+
+.mep-reveal {
+    opacity: 0;
+    transform: translateY(22px);
+    transition: opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1),
+                transform 0.65s cubic-bezier(0.16, 1, 0.3, 1);
+    &.mep-in { opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .mep-reveal { opacity: 1; transform: none; transition: none; }
+    .mep-molecules { animation: none; }
+}
+
+// ---------- buttons ----------
+
+.mep-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.7rem 1.4rem;
+    border-radius: 0.45rem;
+    font-weight: 600;
+    font-size: 0.95rem;
+    text-decoration: none;
+    transition: transform 0.16s ease, box-shadow 0.16s ease, background 0.16s ease;
+    &:hover { text-decoration: none; transform: translateY(-2px); }
+}
+
+.mep-btn-primary {
+    background: $mep-cyan;
+    color: $mep-slate;
+    box-shadow: 0 8px 24px rgba($mep-cyan, 0.35);
+    &:hover { color: $mep-slate; background: lighten($mep-cyan, 6%); }
+}
+
+.mep-btn-outline {
+    color: $mep-white;
+    border: 1px solid rgba($mep-white, 0.3);
+    &:hover { color: $mep-white; background: rgba($mep-white, 0.08); }
+}
+
+.mep-btn-light {
+    background: $mep-white;
+    color: $mep-slate;
+    box-shadow: 0 8px 24px rgba(#000, 0.2);
+    &:hover { color: $mep-ink; }
+}
+
+.mep-btn-nav {
+    background: $mep-cyan;
+    color: $mep-slate;
+    padding: 0.5rem 1.1rem;
+    font-size: 0.88rem;
+    &:hover { color: $mep-slate; }
+}
+
+// ============================================================
+// LANDING
+// ============================================================
+
+.mep-landing { background: $mep-paper; overflow-x: clip; }
+
+.mep-nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    padding: 0.8rem 0;
+    transition: background 0.25s ease, box-shadow 0.25s ease;
+    &.mep-nav-solid {
+        background: rgba($mep-white, 0.92);
+        backdrop-filter: blur(12px);
+        box-shadow: 0 1px 0 rgba($mep-ink, 0.08), 0 8px 26px rgba($mep-ink, 0.07);
+        .mep-brand-text { color: $mep-muted; }
+    }
+}
+
+.mep-nav-inner {
+    max-width: 68rem;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.mep-brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.7rem;
+    text-decoration: none;
+    &:hover { text-decoration: none; }
+    .mep-brand-logo {
+        height: 2.2rem;
+        background: $mep-white;
+        border-radius: 0.35rem;
+        padding: 0.15rem 0.4rem;
+    }
+    .mep-brand-text {
+        font-size: 0.8rem;
+        font-weight: 600;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: rgba($mep-white, 0.75);
+    }
+}
+
+.mep-hero {
+    position: relative;
+    min-height: 88vh;
+    display: flex;
+    align-items: center;
+    background: linear-gradient(160deg, $mep-slate-2 0%, $mep-slate 55%, darken($mep-slate, 3%) 100%);
+    color: $mep-white;
+    overflow: hidden;
+    padding: 7rem 0 5rem;
+}
+
+.mep-hero-inner {
+    position: relative;
+    max-width: 68rem;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+}
+
+.mep-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.7rem;
+    font-size: 0.76rem;
+    font-weight: 700;
+    letter-spacing: 0.22em;
+    color: $mep-cyan;
+    margin-bottom: 1.5rem;
+    .mep-eyebrow-bar {
+        width: 2.2rem; height: 2px;
+        background: $mep-cyan;
+    }
+}
+
+.mep-hero h1 {
+    font-size: clamp(2.5rem, 5.5vw, 4.3rem);
+    line-height: 1.05;
+    margin-bottom: 1.3rem;
+    max-width: 46rem;
+}
+
+.mep-hero-sub {
+    font-size: 1.1rem;
+    line-height: 1.7;
+    color: rgba($mep-white, 0.72);
+    max-width: 36rem;
+    margin-bottom: 2.2rem;
+}
+
+.mep-hero-actions { display: flex; gap: 1rem; flex-wrap: wrap; }
+
+// ---------- flow strip ----------
+
+.mep-flow {
+    background: $mep-slate;
+    border-top: 1px solid rgba($mep-white, 0.07);
+}
+
+.mep-section-inner {
+    max-width: 68rem;
+    margin: 0 auto;
+    padding: 4rem 1.5rem;
+}
+
+.mep-flow .mep-section-inner { padding-top: 1.4rem; padding-bottom: 1.6rem; }
+
+.mep-flow-track {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+    i { color: rgba($mep-cyan, 0.55); font-size: 0.8rem; }
+}
+
+.mep-flow-step {
+    font-size: 0.82rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgba($mep-white, 0.85);
+    padding: 0.35rem 0.9rem;
+    border: 1px solid rgba($mep-cyan, 0.35);
+    border-radius: 2rem;
+    background: rgba($mep-cyan, 0.07);
+}
+
+// ---------- coverage ----------
+
+.mep-section-head {
+    max-width: 38rem;
+    margin-bottom: 2.8rem;
+    h2 { font-size: clamp(1.7rem, 3vw, 2.4rem); margin-bottom: 0.8rem; }
+    p { color: $mep-muted; font-size: 1.02rem; line-height: 1.65; }
+}
+
+.mep-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.3rem;
+    @media (max-width: 991.98px) { grid-template-columns: repeat(2, 1fr); }
+    @media (max-width: 575.98px) { grid-template-columns: 1fr; }
+}
+
+.mep-tile {
+    background: $mep-white;
+    border: 1px solid rgba($mep-ink, 0.08);
+    border-left: 3px solid rgba($mep-cyan, 0.5);
+    border-radius: 0.55rem;
+    padding: 1.5rem 1.4rem;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-left-color 0.2s ease;
+    &:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 16px 38px rgba($mep-steel, 0.16);
+        border-left-color: $mep-cyan;
+        i { color: $mep-cyan; }
+    }
+    i {
+        font-size: 1.4rem;
+        color: $mep-steel;
+        transition: color 0.2s ease;
+    }
+    h3 { font-size: 1.02rem; margin: 0.9rem 0 0.45rem; }
+    p { font-size: 0.87rem; color: $mep-muted; line-height: 1.55; margin: 0; }
+}
+
+// ---------- CTA + footer ----------
+
+.mep-cta {
+    background: linear-gradient(140deg, $mep-slate-2, $mep-slate 70%);
+    color: $mep-white;
+    text-align: center;
+}
+
+.mep-cta-inner {
+    max-width: 40rem;
+    margin: 0 auto;
+    padding: 4.5rem 1.5rem;
+    h2 { font-size: clamp(1.7rem, 3vw, 2.4rem); margin-bottom: 0.7rem; }
+    p { color: rgba($mep-white, 0.7); margin-bottom: 1.8rem; }
+}
+
+.mep-footer {
+    background: darken($mep-slate, 3%);
+    color: rgba($mep-white, 0.6);
+    font-size: 0.85rem;
+}
+
+.mep-footer-inner {
+    padding-top: 1.5rem;
+    padding-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.7rem;
+}
+
+.mep-footer-credit { color: rgba($mep-white, 0.4); }
+
+// ============================================================
+// LOGIN
+// ============================================================
+
+.mep-login {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(160deg, $mep-slate-2 0%, $mep-slate 60%, darken($mep-slate, 3%) 100%);
+    padding: 2rem 1.25rem;
+    overflow: hidden;
+}
+
+.mep-login-bg { position: absolute; inset: 0; }
+
+.mep-login-card {
+    position: relative;
+    width: 100%;
+    max-width: 24.5rem;
+    background: $mep-white;
+    border-radius: 0.9rem;
+    padding: 2.3rem 2.1rem;
+    box-shadow: 0 30px 80px rgba(#000, 0.4);
+    border-top: 3px solid $mep-cyan;
+    animation: mep-card-in 0.55s cubic-bezier(0.16, 1, 0.3, 1);
+
+    .form-control {
+        border-radius: 0.45rem;
+        padding: 0.68rem 0.9rem;
+        border-color: rgba($mep-ink, 0.16);
+        &:focus {
+            border-color: $mep-cyan-deep;
+            box-shadow: 0 0 0 0.2rem rgba($mep-cyan, 0.15);
+        }
+    }
+    .btn-primary {
+        width: 100%;
+        border: 0;
+        border-radius: 0.45rem;
+        padding: 0.7rem;
+        font-weight: 700;
+        color: $mep-slate;
+        background: $mep-cyan;
+        box-shadow: 0 8px 20px rgba($mep-cyan, 0.3);
+        transition: transform 0.16s ease, background 0.16s ease;
+        &:hover { transform: translateY(-1px); background: lighten($mep-cyan, 6%); color: $mep-slate; }
+    }
+}
+
+@keyframes mep-card-in {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .mep-login-card { animation: none; }
+}
+
+.mep-login-logo {
+    text-align: center;
+    margin-bottom: 1.3rem;
+    img { max-height: 3.6rem; max-width: 75%; }
+}
+
+.mep-login-title {
+    font-size: 1.25rem;
+    text-align: center;
+    margin-bottom: 0.25rem;
+}
+
+.mep-login-sub {
+    text-align: center;
+    color: $mep-muted;
+    font-size: 0.88rem;
+    margin-bottom: 1.5rem;
+}
+
+.mep-login-foot {
+    position: relative;
+    margin-top: 1.3rem;
+    display: flex;
+    gap: 1.2rem;
+    font-size: 0.82rem;
+    color: rgba($mep-white, 0.55);
+    a {
+        color: rgba($mep-white, 0.75);
+        text-decoration: none;
+        &:hover { color: $mep-white; }
+    }
+}

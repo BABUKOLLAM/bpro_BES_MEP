@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="landing_page" name="ME Polymers — Internal Business System">
+        <t t-call="web.frontend_layout">
+            <t t-set="html_data" t-value="{'style': 'scroll-behavior: smooth;'}"/>
+            <t t-set="no_header" t-value="True"/>
+            <t t-set="no_footer" t-value="True"/>
+            <t t-set="pageName" t-value="'mep_landing'"/>
+
+            <div class="mep-landing">
+
+                <!-- ============ NAV ============ -->
+                <nav class="mep-nav" id="mepNav">
+                    <div class="mep-nav-inner">
+                        <a href="/" class="mep-brand">
+                            <img t-attf-src="/web/binary/company_logo" alt="ME Polymers" class="mep-brand-logo"/>
+                            <span class="mep-brand-text d-none d-sm-inline">Internal Business System</span>
+                        </a>
+                        <a href="/web/login" class="mep-btn mep-btn-nav">
+                            Employee Sign in <i class="fa fa-arrow-right ms-2"/>
+                        </a>
+                    </div>
+                </nav>
+
+                <!-- ============ HERO ============ -->
+                <header class="mep-hero">
+                    <div class="mep-hero-bg">
+                        <div class="mep-molecules"/>
+                        <div class="mep-hero-glow"/>
+                    </div>
+                    <div class="mep-hero-inner">
+                        <div class="mep-eyebrow mep-reveal">
+                            <span class="mep-eyebrow-bar"/>
+                            ME POLYMERS PRIVATE LIMITED
+                        </div>
+                        <h1 class="mep-reveal" data-delay="100">
+                            One system runs<br/>the whole plant<span class="mep-accent-dot">.</span>
+                        </h1>
+                        <p class="mep-hero-sub mep-reveal" data-delay="200">
+                            From the first customer enquiry to the final ledger entry —
+                            sales, production, inventory, quality, payroll and accounts
+                            on a single integrated platform, built for ME Polymers by
+                            Team bpro.
+                        </p>
+                        <div class="mep-hero-actions mep-reveal" data-delay="300">
+                            <a href="/web/login" class="mep-btn mep-btn-primary">
+                                Sign in to workspace <i class="fa fa-arrow-right ms-2"/>
+                            </a>
+                            <a href="#coverage" class="mep-btn mep-btn-outline">
+                                What it covers
+                            </a>
+                        </div>
+                    </div>
+                </header>
+
+                <!-- ============ FLOW STRIP ============ -->
+                <section class="mep-flow">
+                    <div class="mep-section-inner">
+                        <div class="mep-flow-track mep-reveal">
+                            <span class="mep-flow-step">Enquiry</span>
+                            <i class="fa fa-long-arrow-right"/>
+                            <span class="mep-flow-step">Order</span>
+                            <i class="fa fa-long-arrow-right"/>
+                            <span class="mep-flow-step">Produce</span>
+                            <i class="fa fa-long-arrow-right"/>
+                            <span class="mep-flow-step">Quality</span>
+                            <i class="fa fa-long-arrow-right"/>
+                            <span class="mep-flow-step">Dispatch</span>
+                            <i class="fa fa-long-arrow-right"/>
+                            <span class="mep-flow-step">Invoice</span>
+                            <i class="fa fa-long-arrow-right"/>
+                            <span class="mep-flow-step">Books</span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ============ COVERAGE ============ -->
+                <section class="mep-coverage" id="coverage">
+                    <div class="mep-section-inner">
+                        <div class="mep-section-head mep-reveal">
+                            <h2>Every department, one database</h2>
+                            <p>No re-typing between systems — an order entered once flows
+                               through production, stores, quality, dispatch and accounts.</p>
+                        </div>
+                        <div class="mep-grid">
+                            <div class="mep-tile mep-reveal"><i class="fa fa-line-chart"/><h3>Sales &amp; CRM</h3><p>Leads, quotations, orders, credit control and salesperson targets.</p></div>
+                            <div class="mep-tile mep-reveal" data-delay="60"><i class="fa fa-industry"/><h3>Production</h3><p>Work orders, capacity, BOMs and batch-wise lot traceability.</p></div>
+                            <div class="mep-tile mep-reveal" data-delay="120"><i class="fa fa-cubes"/><h3>Inventory</h3><p>Bin-wise stock, barcode receipts and auto reorder levels.</p></div>
+                            <div class="mep-tile mep-reveal" data-delay="180"><i class="fa fa-shopping-cart"/><h3>Purchase</h3><p>Requisitions, vendor bills with 3-way match and approvals.</p></div>
+                            <div class="mep-tile mep-reveal"><i class="fa fa-book"/><h3>Accounts</h3><p>GST invoicing, financial reports and Tally import/export.</p></div>
+                            <div class="mep-tile mep-reveal" data-delay="60"><i class="fa fa-users"/><h3>HR &amp; Payroll</h3><p>Attendance, leave, statutory payroll and employee self-service.</p></div>
+                            <div class="mep-tile mep-reveal" data-delay="120"><i class="fa fa-check-square-o"/><h3>Quality</h3><p>Inspection points on receipts and work orders, pass/fail records.</p></div>
+                            <div class="mep-tile mep-reveal" data-delay="180"><i class="fa fa-truck"/><h3>Fleet &amp; Dispatch</h3><p>Vehicle trips, transporter billing and delivery batches.</p></div>
+                            <div class="mep-tile mep-reveal"><i class="fa fa-tachometer"/><h3>Dashboard</h3><p>Executive KPIs across sales, production, finance and HR.</p></div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ============ CTA + FOOTER ============ -->
+                <section class="mep-cta">
+                    <div class="mep-cta-inner mep-reveal">
+                        <h2>Authorized personnel</h2>
+                        <p>Sign in with the credentials issued by the HR/IT department.</p>
+                        <a href="/web/login" class="mep-btn mep-btn-light">
+                            Sign in <i class="fa fa-arrow-right ms-2"/>
+                        </a>
+                    </div>
+                </section>
+
+                <footer class="mep-footer">
+                    <div class="mep-section-inner mep-footer-inner">
+                        <span>
+                            <t t-esc="website.company_id.name"/> — Internal Business System
+                        </span>
+                        <span class="mep-footer-contact">
+                            <span t-if="website.company_id.phone">
+                                <i class="fa fa-phone fa-fw me-1"/><t t-esc="website.company_id.phone"/>
+                            </span>
+                            <span t-if="website.company_id.email">
+                                <t t-if="website.company_id.phone"> · </t>
+                                <i class="fa fa-envelope fa-fw me-1"/><t t-esc="website.company_id.email"/>
+                            </span>
+                        </span>
+                        <span class="mep-footer-credit">Built by Team bpro</span>
+                    </div>
+                </footer>
+            </div>
+        </t>
+    </template>
+</odoo>
