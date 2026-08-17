@@ -1,0 +1,15 @@
+.bpro_ui_systray_btn {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: inherit;
+
+    .bpro_ui_systray_label {
+        font-size: 0.78rem;
+        font-weight: 600;
+        letter-spacing: 0.02em;
+    }
+}

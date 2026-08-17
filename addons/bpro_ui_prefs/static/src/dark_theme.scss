@@ -1,0 +1,187 @@
+// Curated night theme for the Odoo 18 Community backend. Community has
+// no native dark mode, so this covers the main working surfaces (forms,
+// lists, kanban, control panel, dialogs, dropdowns, chatter, settings)
+// rather than attempting a pixel-perfect recolor of every widget. The
+// navbar keeps its brand navy in both modes.
+
+$bpd-bg: #151c21;        // page ground
+$bpd-surface: #1d252b;   // sheets, cards, modals
+$bpd-surface-2: #222c33; // headers, dropdowns
+$bpd-surface-3: #2b3841; // hover / active
+$bpd-border: #2b353c;
+$bpd-input-bg: #141a1f;
+$bpd-input-border: #39444c;
+$bpd-text: #d9e1e6;
+$bpd-text-soft: #9fb0ba;
+$bpd-link: #6cb7e5;
+
+html[data-bpro-theme="dark"] {
+    color-scheme: dark;
+
+    .o_web_client,
+    .o_action_manager,
+    .o_content {
+        background-color: $bpd-bg;
+        color: $bpd-text;
+    }
+
+    // ---------- control panel / breadcrumbs / search ----------
+    .o_control_panel {
+        background-color: #1a2227;
+        border-color: $bpd-border;
+        color: $bpd-text;
+        .o_breadcrumb, .breadcrumb-item, .o_last_breadcrumb_item {
+            color: $bpd-text;
+        }
+    }
+    .o_searchview {
+        background-color: $bpd-input-bg;
+        border-color: $bpd-input-border;
+        color: $bpd-text;
+        input { color: $bpd-text; }
+    }
+    .o_cp_switch_buttons .btn { color: $bpd-text-soft; }
+
+    // ---------- form view ----------
+    .o_form_view {
+        background-color: $bpd-bg;
+        color: $bpd-text;
+        .o_form_sheet_bg { background-color: $bpd-bg; }
+        .o_form_sheet {
+            background-color: $bpd-surface;
+            border-color: $bpd-border;
+        }
+        .o_form_label { color: $bpd-text-soft; }
+        .o_horizontal_separator { color: $bpd-link; }
+    }
+    .o_field_widget { color: $bpd-text; }
+
+    // ---------- list view ----------
+    .o_list_view, .o_list_renderer {
+        background-color: $bpd-surface;
+        color: $bpd-text;
+    }
+    .o_list_table {
+        color: $bpd-text;
+        thead, thead th {
+            background-color: $bpd-surface-2;
+            color: $bpd-text;
+            border-color: $bpd-border;
+        }
+        tbody td { border-color: $bpd-border; }
+        tbody tr:hover:not(.o_group_header) > td { background-color: $bpd-surface-3; }
+        tfoot { background-color: $bpd-surface-2; color: $bpd-text; }
+        .o_group_header { background-color: $bpd-surface-2; color: $bpd-text; }
+    }
+    .o_data_row.o_data_row_selected > td,
+    .o_data_row.o_selected_row > td { background-color: $bpd-surface-3 !important; }
+
+    // ---------- kanban ----------
+    .o_kanban_view, .o_kanban_renderer { background-color: $bpd-bg; }
+    .o_kanban_record, .oe_kanban_card, .o_kanban_record .card, .card {
+        background-color: $bpd-surface !important;
+        border-color: $bpd-border !important;
+        color: $bpd-text !important;
+    }
+    .o_kanban_record {
+        .o_kanban_record_title, .o_kanban_record_subtitle,
+        span, div, p, strong, a:not(.btn) {
+            color: $bpd-text;
+        }
+        .text-muted, .o_text_muted { color: $bpd-text-soft !important; }
+    }
+    .o_kanban_group > .o_kanban_header .o_column_title { color: $bpd-text; }
+
+    // ---------- inputs / buttons ----------
+    .o_input, input.o_input, .form-control, .form-select, textarea.form-control {
+        background-color: $bpd-input-bg;
+        color: $bpd-text;
+        border-color: $bpd-input-border;
+        &::placeholder { color: #6c7d88; }
+        &:focus { background-color: $bpd-input-bg; color: $bpd-text; }
+    }
+    .btn-secondary, .btn-light {
+        background-color: $bpd-surface-3;
+        border-color: $bpd-input-border;
+        color: $bpd-text;
+        &:hover { background-color: lighten($bpd-surface-3, 5%); color: #fff; }
+    }
+    .btn-link { color: $bpd-link; }
+
+    // ---------- dropdowns / popovers / dialogs ----------
+    .dropdown-menu {
+        background-color: $bpd-surface-2;
+        border-color: $bpd-border;
+        color: $bpd-text;
+        .dropdown-item {
+            color: $bpd-text;
+            &:hover, &:focus { background-color: $bpd-surface-3; color: #fff; }
+        }
+        .dropdown-divider { border-color: $bpd-border; }
+    }
+    .o_popover {
+        background-color: $bpd-surface-2;
+        border-color: $bpd-border;
+        color: $bpd-text;
+    }
+    .modal-content {
+        background-color: $bpd-surface;
+        color: $bpd-text;
+        .modal-header, .modal-footer { border-color: $bpd-border; }
+        .btn-close { filter: invert(1) grayscale(1); }
+    }
+
+    // ---------- notebook tabs / status bar ----------
+    .o_notebook .nav-tabs {
+        border-color: $bpd-border;
+        .nav-link {
+            color: $bpd-text-soft;
+            &.active {
+                color: #fff;
+                background-color: transparent;
+                border-color: $bpd-border $bpd-border transparent;
+            }
+        }
+    }
+    .o_statusbar_status .o_arrow_button {
+        background-color: $bpd-surface-2;
+        color: $bpd-text;
+        &.o_arrow_button_current { background-color: $bpd-surface-3; color: #fff; }
+    }
+
+    // ---------- chatter / mail / discuss ----------
+    .o-mail-ChatterContainer, .o-mail-Chatter {
+        background-color: #1a2227;
+        color: $bpd-text;
+    }
+    .o-mail-Message { color: $bpd-text; }
+    .o-mail-Composer { background-color: $bpd-surface; }
+    .o-mail-Discuss, .o-mail-DiscussSidebar, .o-mail-DiscussContent,
+    .o-mail-Thread, .o-mail-DiscussSidebarChannel {
+        background-color: $bpd-bg;
+        color: $bpd-text;
+    }
+    .o-mail-DiscussSidebar {
+        background-color: #1a2227;
+        button, .btn { color: $bpd-text; }
+    }
+    .o-mail-DiscussSidebarCategory span { color: $bpd-text-soft; }
+
+    // ---------- settings ----------
+    .o_base_settings, .settings {
+        background-color: $bpd-bg;
+        color: $bpd-text;
+        .o_setting_box .o_form_label { color: $bpd-text; }
+        .settings_tab, .o_searchable_setting { color: $bpd-text; }
+    }
+
+    // ---------- misc ----------
+    a:not(.btn):not(.dropdown-item):not(.nav-link) { color: $bpd-link; }
+    .table { color: $bpd-text; }
+    .text-muted { color: $bpd-text-soft !important; }
+    .text-900, .text-dark { color: $bpd-text !important; }
+    .bg-view, .bg-white { background-color: $bpd-surface !important; }
+    .o_dialog_container .o_technical_modal .modal-body { color: $bpd-text; }
+    .alert-info { background-color: #1c3140; color: #bcdcf0; border-color: #2b4a5e; }
+    .alert-warning { background-color: #3d3320; color: #f0e0b0; border-color: #5e5230; }
+}

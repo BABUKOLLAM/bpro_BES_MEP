@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="bpro_ui_prefs.ThemeSwitch">
+        <button
+            class="o_menu_systray_item bpro_ui_systray_btn bpro_theme_switch"
+            t-on-click="cycle"
+            t-att-title="'Theme: ' + current.label + ' — click to change'"
+            t-att-aria-label="'Theme: ' + current.label"
+        >
+            <i t-att-class="'fa fa-fw ' + current.icon" role="img"/>
+            <span class="bpro_ui_systray_label d-none d-lg-inline" t-esc="current.label"/>
+        </button>
+    </t>
+
+    <t t-name="bpro_ui_prefs.LangSwitch">
+        <Dropdown>
+            <button
+                class="o_menu_systray_item bpro_ui_systray_btn bpro_lang_switch"
+                title="Language"
+                aria-label="Language"
+            >
+                <i class="fa fa-globe fa-fw" role="img"/>
+                <span class="bpro_ui_systray_label d-none d-lg-inline" t-esc="currentCode"/>
+            </button>
+            <t t-set-slot="content">
+                <DropdownItem
+                    t-foreach="state.langs"
+                    t-as="lang"
+                    t-key="lang[0]"
+                    onSelected="() => this.setLang(lang[0])"
+                >
+                    <i t-att-class="'fa fa-fw me-2 ' + (lang[0] === currentLang ? 'fa-check' : '')" role="img"/>
+                    <t t-esc="lang[1]"/>
+                </DropdownItem>
+            </t>
+        </Dropdown>
+    </t>
+
+</templates>
