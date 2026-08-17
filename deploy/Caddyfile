@@ -2,31 +2,43 @@
 # Add one block per client portal domain (or use a wildcard with DNS challenge).
 
 mepcrm.in, www.mepcrm.in {
-    encode gzip
+	encode gzip
 
-    # Static downloads (e.g. the customer user manual) served directly by
-    # Caddy, no Odoo request involved. Drop files in deploy/static/<path>.
-    handle_path /downloads/* {
-        root * /srv/static
-        file_server
-    }
+	# Static downloads (e.g. the customer user manual) served directly by
+	# Caddy, no Odoo request involved. Drop files in deploy/static/<path>.
+	handle_path /downloads/* {
+		root * /srv/static
+		file_server
+	}
 
-    # Odoo live-chat / realtime uses the gevent port
-    @websocket path /websocket /websocket/*
-    reverse_proxy @websocket deploy-odoo-1:8072
+	# Odoo live-chat / realtime uses the gevent port
+	@websocket path /websocket /websocket/*
+	reverse_proxy @websocket deploy-odoo-1:8072
 
-    reverse_proxy deploy-odoo-1:8069
+	reverse_proxy deploy-odoo-1:8069
+}
+
+# bpro HRMS — standalone HR/HCM product (separate Odoo instance/database,
+# see /root/bpro-hrms-hcm). Never merge this into the mepcrm.in block above -
+# they are two different Odoo backends, on two different databases.
+bprohrms.com, www.bprohrms.com {
+	encode gzip
+
+	@websocket path /websocket /websocket/*
+	reverse_proxy @websocket hrms-odoo:8072
+
+	reverse_proxy hrms-odoo:8069
 }
 
 # Staging — same code, separate database (see deploy/docker-compose.staging.yml).
 # Requires a DNS A record: staging.mepcrm.in -> this server's IP.
 staging.mepcrm.in {
-    encode gzip
+	encode gzip
 
-    @websocket path /websocket /websocket/*
-    reverse_proxy @websocket staging-odoo:8072
+	@websocket path /websocket /websocket/*
+	reverse_proxy @websocket staging-odoo:8072
 
-    reverse_proxy staging-odoo:8069
+	reverse_proxy staging-odoo:8069
 }
 
 # Example client portal (repeat per client; must match the website domain
@@ -37,3 +49,9 @@ staging.mepcrm.in {
 #     reverse_proxy @websocket deploy-odoo-1:8072
 #     reverse_proxy deploy-odoo-1:8069
 # }
+
+# myG PPMS — login-gated static performance console (see /root/bpro-ppms-gate)
+ppms.bprohrms.com {
+	encode gzip
+	reverse_proxy ppms-gate:3000
+}
