@@ -7,9 +7,11 @@
 # on any of the apps being grouped, so a client without e.g. Fleet or
 # Purchase installed just skips those two lines instead of failing.
 _MENU_GROUP_ASSIGNMENTS = {
-    # Sales
+    # Sales (incl. outbound marketing - customer-facing function)
     "crm.crm_menu_root": "menu_group_sales",
     "sale.sale_menu_root": "menu_group_sales",
+    "mass_mailing.mass_mailing_menu_root": "menu_group_sales",
+    "utm.menu_link_tracker_root": "menu_group_sales",
     # Production (manufacturing + the supply chain that feeds it)
     "mrp.menu_mrp_root": "menu_group_production",
     "stock.menu_stock_root": "menu_group_production",
@@ -19,21 +21,31 @@ _MENU_GROUP_ASSIGNMENTS = {
     # Accounts
     "account.menu_finance": "menu_group_accounts",
     "hr_expense.menu_hr_expense_root": "menu_group_accounts",
-    # HR
+    # HR - the full people lifecycle, incl. self-service, hiring,
+    # learning and performance (2026-08-16 reorganisation, per client)
     "hr.menu_hr_root": "menu_group_hr",
     "hr_holidays.menu_hr_holidays_root": "menu_group_hr",
     "hr_attendance.menu_hr_attendance_root": "menu_group_hr",
     "hr_timesheet.timesheet_menu_root": "menu_group_hr",
     "hr_recruitment.menu_hr_recruitment_root": "menu_group_hr",
     "payroll.payroll_menu_root": "menu_group_hr",
-    # General - cross-functional tools that don't belong to one department
+    "bpro_ess.menu_bpro_ess_root": "menu_group_hr",
+    "website_slides.website_slides_menu_root": "menu_group_hr",
+    "bpro_pms.menu_pms_root": "menu_group_hr",
+    # Productivity - cross-department work and collaboration tools
+    "project_todo.menu_todo_todos": "menu_group_productivity",
+    "calendar.mail_menu_calendar": "menu_group_productivity",
+    "contacts.menu_contacts": "menu_group_productivity",
+    "mail.menu_root_discuss": "menu_group_productivity",
+    "im_livechat.menu_livechat_root": "menu_group_productivity",
+    "survey.menu_surveys": "menu_group_productivity",
+    "project.menu_main_pm": "menu_group_productivity",
+    "bpro_helpdesk.menu_bpro_helpdesk_root": "menu_group_productivity",
+    "spreadsheet_dashboard.spreadsheet_dashboard_menu_root": "menu_group_productivity",
+    "website.menu_website_configuration": "menu_group_productivity",
+    # General - the fallback keeps only what every user reaches for
+    # (Executive Dashboard) plus admin entries (Apps, Settings)
     "bpro_dashboard.menu_bpro_executive_dashboard_root": "menu_group_general",
-    "spreadsheet_dashboard.spreadsheet_dashboard_menu_root": "menu_group_general",
-    "bpro_helpdesk.menu_bpro_helpdesk_root": "menu_group_general",
-    "project.menu_main_pm": "menu_group_general",
-    "bpro_pms.menu_pms_root": "menu_group_general",
-    "website_slides.website_slides_menu_root": "menu_group_general",
-    "im_livechat.menu_livechat_root": "menu_group_general",
 }
 
 

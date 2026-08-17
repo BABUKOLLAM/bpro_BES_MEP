@@ -16,6 +16,10 @@
         <field name="name">HR</field>
         <field name="sequence">40</field>
     </record>
+    <record id="menu_group_productivity" model="bpro.menu.group">
+        <field name="name">Productivity</field>
+        <field name="sequence">45</field>
+    </record>
     <record id="menu_group_general" model="bpro.menu.group">
         <field name="name">General</field>
         <field name="sequence">50</field>
