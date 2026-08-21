@@ -47,6 +47,15 @@ services:
       - ../config/odoo.prod.conf:/etc/odoo/odoo.conf:ro
       - ../addons:/mnt/extra-addons:ro
     command: odoo -c /etc/odoo/odoo.conf
+    healthcheck:
+      # /web/health is Odoo's built-in liveness endpoint (no db hit).
+      # A hung worker pool stops answering it -> the container turns
+      # "unhealthy" and the host's autoheal cron restarts it.
+      test: ["CMD", "python3", "-c", "import urllib.request; exit(0 if urllib.request.urlopen('http://localhost:8069/web/health', timeout=8).status == 200 else 1)"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 120s
     expose:
       - "8069"
       - "8072"
