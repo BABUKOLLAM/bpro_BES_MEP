@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="seq_bpro_dept_order" model="ir.sequence">
+            <field name="name">Department Order</field>
+            <field name="code">bpro.dept.order</field>
+            <field name="prefix">DO/%(year)s/</field>
+            <field name="padding">4</field>
+        </record>
+    </data>
+
+    <!-- Requesters see their own orders and their department's; HODs the
+         same (their department's flow through them anyway); inventory and
+         purchase users see everything so they can process. -->
+    <record id="rule_dept_order_own_or_department" model="ir.rule">
+        <field name="name">Dept Order: own or own department</field>
+        <field name="model_id" ref="model_bpro_dept_order"/>
+        <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+        <field name="domain_force">['|', '|', ('requested_by', '=', user.id), ('approver_user_id', '=', user.id), ('department_id.member_ids.user_id', 'in', [user.id])]</field>
+    </record>
+    <record id="rule_dept_order_operators_all" model="ir.rule">
+        <field name="name">Dept Order: stores and purchase see all</field>
+        <field name="model_id" ref="model_bpro_dept_order"/>
+        <field name="groups" eval="[(4, ref('stock.group_stock_user')), (4, ref('purchase.group_purchase_user'))]"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+    </record>
+    <record id="rule_dept_order_line_follow" model="ir.rule">
+        <field name="name">Dept Order Line: follows the order</field>
+        <field name="model_id" ref="model_bpro_dept_order_line"/>
+        <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+        <field name="domain_force">['|', '|', ('order_id.requested_by', '=', user.id), ('order_id.approver_user_id', '=', user.id), ('order_id.department_id.member_ids.user_id', 'in', [user.id])]</field>
+    </record>
+    <record id="rule_dept_order_line_operators_all" model="ir.rule">
+        <field name="name">Dept Order Line: stores and purchase see all</field>
+        <field name="model_id" ref="model_bpro_dept_order_line"/>
+        <field name="groups" eval="[(4, ref('stock.group_stock_user')), (4, ref('purchase.group_purchase_user'))]"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+    </record>
+</odoo>

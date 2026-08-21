@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_bpro_dept_order_list" model="ir.ui.view">
+        <field name="name">bpro.dept.order.list</field>
+        <field name="model">bpro.dept.order</field>
+        <field name="arch" type="xml">
+            <list decoration-info="state == 'submitted'"
+                  decoration-warning="state == 'approved'"
+                  decoration-success="state == 'processed'"
+                  decoration-danger="state == 'rejected'">
+                <field name="name"/>
+                <field name="create_date" string="Date"/>
+                <field name="department_id"/>
+                <field name="order_type"/>
+                <field name="requested_by"/>
+                <field name="approver_user_id"/>
+                <field name="state" widget="badge"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_bpro_dept_order_form" model="ir.ui.view">
+        <field name="name">bpro.dept.order.form</field>
+        <field name="model">bpro.dept.order</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_submit" string="Submit to HOD"
+                            type="object" class="btn-primary"
+                            invisible="state != 'draft'"/>
+                    <button name="action_approve" string="Approve"
+                            type="object" class="btn-primary"
+                            invisible="state != 'submitted'"/>
+                    <button name="action_reject" string="Reject"
+                            type="object" invisible="state != 'submitted'"/>
+                    <button name="action_create_rfq" string="Create RFQ"
+                            type="object" class="btn-primary"
+                            invisible="state != 'approved' or order_type != 'purchase'"
+                            groups="purchase.group_purchase_user"/>
+                    <button name="action_reset_draft" string="Reset to Draft"
+                            type="object" invisible="state != 'rejected'"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,submitted,approved,processed"/>
+                </header>
+                <sheet>
+                    <div class="oe_title"><h1><field name="name"/></h1></div>
+                    <group>
+                        <group>
+                            <field name="department_id" readonly="state != 'draft'"/>
+                            <field name="order_type" readonly="state != 'draft'"/>
+                            <field name="vendor_id"
+                                   invisible="order_type != 'purchase'"
+                                   readonly="state in ('processed', 'rejected')"/>
+                            <field name="reason" readonly="state != 'draft'"/>
+                        </group>
+                        <group>
+                            <field name="requested_by"/>
+                            <field name="approver_user_id"/>
+                            <field name="picking_ref" invisible="not picking_ref"/>
+                            <field name="purchase_order_ref" invisible="not purchase_order_ref"/>
+                            <field name="picking_id" invisible="not picking_id" groups="stock.group_stock_user"/>
+                            <field name="purchase_order_id" invisible="not purchase_order_id" groups="purchase.group_purchase_user"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Items">
+                            <field name="line_ids" readonly="state not in ('draft', 'rejected')">
+                                <list editable="bottom">
+                                    <field name="product_id"/>
+                                    <field name="description"/>
+                                    <field name="quantity"/>
+                                    <field name="uom_id"/>
+                                    <field name="price_estimate" optional="hide"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                    <group invisible="state not in ('submitted', 'rejected')">
+                        <field name="rejection_reason"
+                               placeholder="Required before rejecting."/>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_bpro_dept_order_search" model="ir.ui.view">
+        <field name="name">bpro.dept.order.search</field>
+        <field name="model">bpro.dept.order</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="department_id"/>
+                <field name="requested_by"/>
+                <filter name="my_orders" string="My Orders"
+                        domain="[('requested_by', '=', uid)]"/>
+                <filter name="to_approve" string="To Approve (me)"
+                        domain="[('state', '=', 'submitted'), ('approver_user_id', '=', uid)]"/>
+                <filter name="material" string="Material Issues"
+                        domain="[('order_type', '=', 'material')]"/>
+                <filter name="purchase" string="Purchase Requests"
+                        domain="[('order_type', '=', 'purchase')]"/>
+                <filter name="awaiting_rfq" string="Awaiting RFQ"
+                        domain="[('state', '=', 'approved'), ('order_type', '=', 'purchase')]"/>
+                <group expand="0" string="Group By">
+                    <filter name="gb_department" string="Department"
+                            context="{'group_by': 'department_id'}"/>
+                    <filter name="gb_state" string="Status"
+                            context="{'group_by': 'state'}"/>
+                    <filter name="gb_type" string="Type"
+                            context="{'group_by': 'order_type'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="view_bpro_dept_order_pivot" model="ir.ui.view">
+        <field name="name">bpro.dept.order.pivot</field>
+        <field name="model">bpro.dept.order</field>
+        <field name="arch" type="xml">
+            <pivot>
+                <field name="department_id" type="row"/>
+                <field name="order_type" type="col"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="action_bpro_dept_order" model="ir.actions.act_window">
+        <field name="name">Department Orders</field>
+        <field name="res_model">bpro.dept.order</field>
+        <field name="view_mode">list,form,pivot</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Raise a department order</p>
+            <p>Material issues go to Stores after HOD approval;
+               purchase requests go to the Purchase team as RFQs.</p>
+        </field>
+    </record>
+
+    <menuitem id="menu_bpro_dept_order_root" name="Department Orders"
+              action="action_bpro_dept_order" sequence="85"/>
+</odoo>

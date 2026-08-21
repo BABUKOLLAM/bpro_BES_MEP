@@ -43,6 +43,7 @@ _MENU_GROUP_ASSIGNMENTS = {
     "bpro_helpdesk.menu_bpro_helpdesk_root": "menu_group_productivity",
     "spreadsheet_dashboard.spreadsheet_dashboard_menu_root": "menu_group_productivity",
     "bpro_data_tools.menu_bpro_data_upload_root": "menu_group_productivity",
+    "bpro_dept_orders.menu_bpro_dept_order_root": "menu_group_productivity",
     "website.menu_website_configuration": "menu_group_productivity",
     # General - the fallback keeps only what every user reaches for
     # (Executive Dashboard) plus admin entries (Apps, Settings)
