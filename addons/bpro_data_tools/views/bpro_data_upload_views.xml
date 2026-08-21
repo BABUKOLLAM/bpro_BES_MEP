@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_bpro_data_upload_list" model="ir.ui.view">
+        <field name="name">bpro.data.upload.list</field>
+        <field name="model">bpro.data.upload</field>
+        <field name="arch" type="xml">
+            <list decoration-info="state == 'submitted'"
+                  decoration-success="state == 'approved'"
+                  decoration-danger="state == 'rejected'">
+                <field name="create_date" string="Uploaded On"/>
+                <field name="name"/>
+                <field name="target_type"/>
+                <field name="file_name"/>
+                <field name="uploaded_by"/>
+                <field name="manager_user_id"/>
+                <field name="imported_count"/>
+                <field name="state" widget="badge"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_bpro_data_upload_form" model="ir.ui.view">
+        <field name="name">bpro.data.upload.form</field>
+        <field name="model">bpro.data.upload</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_submit" string="Submit for Approval"
+                            type="object" class="btn-primary"
+                            invisible="state != 'draft'"/>
+                    <button name="action_approve" string="Approve &amp; Import"
+                            type="object" class="btn-primary"
+                            invisible="state != 'submitted'"/>
+                    <button name="action_reject" string="Reject"
+                            type="object" invisible="state != 'submitted'"/>
+                    <button name="action_reset_draft" string="Reset to Draft"
+                            type="object" invisible="state != 'rejected'"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,submitted,approved"/>
+                </header>
+                <sheet>
+                    <div class="alert alert-info" role="status" invisible="state != 'draft'">
+                        Download the matching template from
+                        <a href="/downloads/templates/" target="_blank">/downloads/templates/</a>,
+                        fill it, upload here, and submit. Your manager reviews the file;
+                        on approval the data is imported automatically.
+                    </div>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="target_type" readonly="state != 'draft'"/>
+                            <field name="file" filename="file_name" readonly="state not in ('draft', 'rejected')"/>
+                            <field name="file_name" invisible="1"/>
+                        </group>
+                        <group>
+                            <field name="uploaded_by"/>
+                            <field name="manager_user_id" readonly="state != 'draft'"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="imported_count" invisible="state != 'approved'"/>
+                        </group>
+                    </group>
+                    <group invisible="state not in ('submitted', 'rejected')">
+                        <field name="rejection_reason"
+                               placeholder="Required before rejecting - tell the uploader what to fix."/>
+                    </group>
+                    <group invisible="not result_log">
+                        <field name="result_log"/>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_bpro_data_upload" model="ir.actions.act_window">
+        <field name="name">Data Uploads</field>
+        <field name="res_model">bpro.data.upload</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Upload a filled template for approval</p>
+            <p>Templates: <a href="/downloads/templates/" target="_blank">mepcrm.in/downloads/templates/</a></p>
+        </field>
+    </record>
+
+    <menuitem id="menu_bpro_data_upload_root" name="Data Uploads"
+              action="action_bpro_data_upload" sequence="90"
+              web_icon="bpro_data_tools,static/description/icon.png"/>
+</odoo>

@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_bpro_data_upload_user,bpro.data.upload user,model_bpro_data_upload,base.group_user,1,1,1,0
+access_bpro_data_upload_admin,bpro.data.upload admin,model_bpro_data_upload,group_direct_import,1,1,1,1

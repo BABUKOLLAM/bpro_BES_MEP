@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="group_direct_import" model="res.groups">
+        <field name="name">Direct Import (bypass approval)</field>
+        <field name="category_id" ref="base.module_category_hidden"/>
+        <field name="comment">May run list-view imports directly, without the
+Data Upload approval workflow, and may approve any upload. Grant to
+managers/administrators only.</field>
+    </record>
+
+    <!-- Admins and bpro super admins import directly by default. -->
+    <record id="base.group_system" model="res.groups">
+        <field name="implied_ids" eval="[(4, ref('group_direct_import'))]"/>
+    </record>
+
+    <!-- Uploaders see their own uploads; approvers see what awaits them;
+         Direct Import users see everything. -->
+    <record id="rule_data_upload_own" model="ir.rule">
+        <field name="name">Data Upload: own records</field>
+        <field name="model_id" ref="model_bpro_data_upload"/>
+        <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+        <field name="domain_force">['|', ('uploaded_by', '=', user.id), ('manager_user_id', '=', user.id)]</field>
+    </record>
+    <record id="rule_data_upload_direct_import_all" model="ir.rule">
+        <field name="name">Data Upload: direct importers see all</field>
+        <field name="model_id" ref="model_bpro_data_upload"/>
+        <field name="groups" eval="[(4, ref('group_direct_import'))]"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+    </record>
+</odoo>

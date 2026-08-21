@@ -18,8 +18,13 @@ directions) are served statically at /downloads/templates/.
     "author": "Team bpro",
     "website": "https://bpropms.com",
     "license": "LGPL-3",
-    "depends": ["base"],
-    "data": ["security/export_groups.xml"],
+    "depends": ["base", "mail", "base_import"],
+    "data": [
+        "security/data_upload_security.xml",
+        "security/export_groups.xml",
+        "security/ir.model.access.csv",
+        "views/bpro_data_upload_views.xml",
+    ],
     "installable": True,
     "auto_install": False,
 }
