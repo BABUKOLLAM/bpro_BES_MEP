@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Every internal user gets the Export action on list views.
+         Role-based read/create rights still decide WHAT each user can
+         actually export or import - this only unhides the buttons. -->
+    <record id="base.group_user" model="res.groups">
+        <field name="implied_ids" eval="[(4, ref('base.group_allow_export'))]"/>
+    </record>
+</odoo>
