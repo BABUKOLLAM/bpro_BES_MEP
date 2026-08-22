@@ -55,3 +55,7 @@ ppms.bprohrms.com {
 	encode gzip
 	reverse_proxy ppms-gate:3000
 }
+
+fieldopspro.in {
+    reverse_proxy nginx:80
+}

@@ -62,7 +62,7 @@ R4.4 - hiring finalization:
 
 * Adds employee_code to hr.employee (unique, auto-assigned, never
   reused) via a new ir.sequence 'bpro.employee.code' (EMP00001 style).
-  Not company-scoped - each bpro-lms-pms client gets its own database
+  Not company-scoped - each bpro-bes-mini-erp-odoo client gets its own database
   (per that repo's own README), so there's no cross-client collision to
   guard against with company scoping.
 * bpro.job.offer's "Finalize Hiring" action (accepted state only, once

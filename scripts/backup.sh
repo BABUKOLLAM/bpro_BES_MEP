@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Nightly backup: database dump + Odoo filestore (attachments, SCORM content).
 # Cron example (2:30 AM daily):
-#   30 2 * * * /path/to/bpro-lms-pms/scripts/backup.sh >> /var/log/bpro-backup.log 2>&1
+#   30 2 * * * /path/to/bpro-bes-mini-erp-odoo/scripts/backup.sh >> /var/log/bpro-backup.log 2>&1
 set -euo pipefail
 
 cd "$(dirname "$0")/../deploy"

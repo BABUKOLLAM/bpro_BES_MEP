@@ -22,7 +22,7 @@ Point these A-records at the server's IP:
 ```bash
 ssh root@SERVER-IP
 curl -fsSL https://get.docker.com | sh
-git clone <your-repo-url> bpro-lms-pms && cd bpro-lms-pms/deploy
+git clone <your-repo-url> bpro-bes-mini-erp-odoo && cd bpro-bes-mini-erp-odoo/deploy
 cp .env.example .env            # then edit: strong POSTGRES_PASSWORD
 nano ../config/odoo.prod.conf   # change admin_passwd
 nano Caddyfile                  # set real domains
@@ -110,7 +110,7 @@ Settings → Technical → Outgoing Mail Servers:
 
 ```bash
 crontab -e
-# 30 2 * * * /root/bpro-lms-pms/scripts/backup.sh >> /var/log/bpro-backup.log 2>&1
+# 30 2 * * * /root/bpro-bes-mini-erp-odoo/scripts/backup.sh >> /var/log/bpro-backup.log 2>&1
 ```
 
 ### Off-server copy
@@ -145,7 +145,7 @@ every check plus a clearly marked line on any up/down state change:
 
 ```bash
 crontab -e
-# */5 * * * * /root/bpro-lms-pms/scripts/healthcheck.sh
+# */5 * * * * /root/bpro-bes-mini-erp-odoo/scripts/healthcheck.sh
 tail -f /var/log/bpro-healthcheck.log
 ```
 
@@ -169,7 +169,7 @@ A backup you've never restored is a hope, not a plan. Test periodically —
 this restores into a **throwaway database**, never `bpro` itself:
 
 ```bash
-cd /root/bpro-lms-pms/deploy
+cd /root/bpro-bes-mini-erp-odoo/deploy
 LATEST=$(ls -t ~/bpro-backups/bpro-db-*.dump | head -1)
 docker compose -f docker-compose.prod.yml exec -T db psql -U odoo -d postgres \
     -c 'CREATE DATABASE bpro_restore_test OWNER odoo;'
@@ -221,7 +221,7 @@ same `handle_path` — see `deploy/Caddyfile`).
 ## 8. Updating the app (new addon code)
 
 ```bash
-cd bpro-lms-pms && git pull
+cd bpro-bes-mini-erp-odoo && git pull
 docker compose -f deploy/docker-compose.prod.yml exec odoo \
   /entrypoint.sh odoo -c /etc/odoo/odoo.conf -d bpro -u bpro_base,bpro_pms,bpro_lms,bpro_branding,bpro_onboarding,bpro_billing,bpro_scorm,bpro_approval,bpro_xlsx_export,bpro_inventory,bpro_sales,bpro_manufacturing,bpro_finance,bpro_hr,bpro_logistics,bpro_quality,bpro_plant,bpro_project,bpro_fleet,bpro_dashboard,bpro_helpdesk,bpro_field_sales,bpro_collections --stop-after-init --no-http
 docker compose -f deploy/docker-compose.prod.yml restart odoo
@@ -274,7 +274,7 @@ further action needed here once DNS is added).
 
 **Bring up / tear down**:
 ```bash
-cd /root/bpro-lms-pms/deploy
+cd /root/bpro-bes-mini-erp-odoo/deploy
 docker compose -f docker-compose.staging.yml up -d      # start
 docker compose -f docker-compose.staging.yml down       # stop (keeps the DB/filestore)
 ```
@@ -282,7 +282,7 @@ docker compose -f docker-compose.staging.yml down       # stop (keeps the DB/fil
 **Refreshing staging from a production backup** (do this whenever
 staging data goes stale):
 ```bash
-cd /root/bpro-lms-pms/deploy
+cd /root/bpro-bes-mini-erp-odoo/deploy
 docker compose -f docker-compose.staging.yml down
 docker compose -f docker-compose.prod.yml exec -T db psql -U odoo -d postgres \
     -c 'DROP DATABASE bpro_staging;'

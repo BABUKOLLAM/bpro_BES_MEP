@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <odoo>
     <!-- Not company-scoped: this platform gives each client its own
-         separate Odoo database (see bpro-lms-pms's own README, "Each
+         separate Odoo database (see bpro-bes-mini-erp-odoo's own README, "Each
          client organisation gets its own Odoo database"), so a single
          global sequence per database is correct - no cross-client
          collision risk to guard against here. -->

@@ -5,7 +5,7 @@ Built on **Odoo 18 Community** with custom addons.
 
 ## Architecture
 
-Follows the **bpro LMS & PMS Architecture Roadmap** (see `#7.B Pro PMS/bpro_LMS_PMS_Architecture_Roadmap_1.docx`):
+Follows the **bpro LMS & PMS Architecture Roadmap** (see `#7.B Pro PMS/bpro_BES_MINI_ERP_ODOO_Architecture_Roadmap_1.docx`):
 one Odoo instance, **single database, multi-company** — clients are child companies of the
 **bpro Corporate** master company. Global content (Induction, Compliance, Policy) is owned by
 bpro Corporate and visible to all clients; client content stays isolated per company.
