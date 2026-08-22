@@ -4,3 +4,10 @@ __pycache__/
 *.log
 .env
 .local-backups/
+
+# server-side backups and proxy snapshots - never commit
+backups/
+deploy/caddy-backups/
+deploy/Caddyfile.bak*
+deploy/Caddyfile.backup*
+deploy/Caddyfile.save

@@ -56,6 +56,6 @@ ppms.bprohrms.com {
 	reverse_proxy ppms-gate:3000
 }
 
-fieldopspro.in {
+app.fieldopspro.in, fieldopspro.in, www.fieldopspro.in, api.fieldopspro.in {
     reverse_proxy nginx:80
 }
