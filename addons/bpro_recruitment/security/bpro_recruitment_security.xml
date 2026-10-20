@@ -40,13 +40,15 @@
          own department by these rules too - ir.rule ORs together only
          the rule rows that exist for groups a user belongs to, so a
          group with zero rows on a model contributes no counterbalancing
-         "unrestricted" clause on its own. Every group that already has
-         full/company-wide access to these four models (per
-         ir.model.access.csv, none of which had any ir.rule before R4.6)
-         gets an explicit unrestricted rule below so the OR cancels the
-         HOD restriction out for them, exactly as
-         rule_vacancy_request_hr_own_company already does above for
-         bpro.vacancy.request. -->
+         clause on its own. Every group that already has full/company-
+         wide access to these four models (per ir.model.access.csv, none
+         of which had any ir.rule before R4.6) gets an explicit own-
+         company rule below so the OR cancels the HOD restriction out
+         for them, exactly as rule_vacancy_request_hr_own_company already
+         does above for bpro.vacancy.request - scoped to company_ids, NOT
+         a bare (1,'=',1): this is a multi-tenant deployment, and a rule
+         meant to cancel out a too-narrow HOD domain must not instead
+         hand that group every other client company's records too. -->
 
     <record id="rule_interview_evaluation_hod_own_department" model="ir.rule">
         <field name="name">bpro Interview Evaluation: HOD Own Department</field>
@@ -63,10 +65,10 @@
     </record>
 
     <record id="rule_interview_evaluation_hr_recruitment_all" model="ir.rule">
-        <field name="name">bpro Interview Evaluation: Recruitment User/Manager Unrestricted</field>
+        <field name="name">bpro Interview Evaluation: Recruitment User/Manager Own Company</field>
         <field name="model_id" ref="model_bpro_interview_evaluation"/>
         <field name="groups" eval="[(4, ref('hr_recruitment.group_hr_recruitment_user')), (4, ref('hr_recruitment.group_hr_recruitment_manager'))]"/>
-        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="domain_force">[('applicant_id.company_id', 'in', company_ids)]</field>
     </record>
 
     <record id="rule_job_offer_hod_own_department" model="ir.rule">
@@ -77,10 +79,10 @@
     </record>
 
     <record id="rule_job_offer_hr_recruitment_all" model="ir.rule">
-        <field name="name">bpro Job Offer: Recruitment User/Manager Unrestricted</field>
+        <field name="name">bpro Job Offer: Recruitment User/Manager Own Company</field>
         <field name="model_id" ref="model_bpro_job_offer"/>
         <field name="groups" eval="[(4, ref('hr_recruitment.group_hr_recruitment_user')), (4, ref('hr_recruitment.group_hr_recruitment_manager'))]"/>
-        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
     </record>
 
     <record id="rule_joining_report_hod_own_department" model="ir.rule">
@@ -91,9 +93,16 @@
     </record>
 
     <record id="rule_joining_report_hr_all" model="ir.rule">
-        <field name="name">bpro Joining Report: HR Unrestricted</field>
+        <field name="name">bpro Joining Report: HR Own Company</field>
         <field name="model_id" ref="model_bpro_joining_report"/>
         <field name="groups" eval="[(4, ref('bpro_base.group_client_hr'))]"/>
+        <field name="domain_force">[('employee_id.company_id', 'in', company_ids)]</field>
+    </record>
+
+    <record id="rule_joining_report_super_admin_all" model="ir.rule">
+        <field name="name">bpro Joining Report: Super Admin All</field>
+        <field name="model_id" ref="model_bpro_joining_report"/>
+        <field name="groups" eval="[(4, ref('bpro_base.group_super_admin'))]"/>
         <field name="domain_force">[(1, '=', 1)]</field>
     </record>
 
@@ -105,9 +114,16 @@
     </record>
 
     <record id="rule_employee_asset_hr_all" model="ir.rule">
-        <field name="name">bpro Employee Asset: HR Unrestricted</field>
+        <field name="name">bpro Employee Asset: HR Own Company</field>
         <field name="model_id" ref="model_bpro_employee_asset"/>
         <field name="groups" eval="[(4, ref('bpro_base.group_client_hr'))]"/>
+        <field name="domain_force">[('employee_id.company_id', 'in', company_ids)]</field>
+    </record>
+
+    <record id="rule_employee_asset_super_admin_all" model="ir.rule">
+        <field name="name">bpro Employee Asset: Super Admin All</field>
+        <field name="model_id" ref="model_bpro_employee_asset"/>
+        <field name="groups" eval="[(4, ref('bpro_base.group_super_admin'))]"/>
         <field name="domain_force">[(1, '=', 1)]</field>
     </record>
 </odoo>
