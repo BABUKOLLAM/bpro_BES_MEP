@@ -93,7 +93,10 @@ class BproAttendanceImport(models.TransientModel):
             if not badge or not date_raw:
                 skipped.append(f"Row {i}: missing badge_id or date")
                 continue
-            employee = Employee.search([("barcode", "=", badge)], limit=1)
+            employee = Employee.search([
+                ("barcode", "=", badge),
+                ("company_id", "in", self.env.companies.ids),
+            ], limit=1)
             if not employee:
                 skipped.append(f"Row {i}: no employee with Badge ID '{badge}'")
                 continue

@@ -207,6 +207,7 @@ R3.6c - Form 16 Part B:
     ],
     "data": [
         "security/ir.model.access.csv",
+        "security/bpro_tds_security.xml",
         "data/hr_salary_rule_category_data.xml",
         "data/hr_contract_advantage_template_data.xml",
         "data/hr_payroll_structure_data.xml",
